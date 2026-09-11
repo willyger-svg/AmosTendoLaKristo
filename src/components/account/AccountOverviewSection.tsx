@@ -25,59 +25,75 @@ import {
 } from 'lucide-react';
 
 interface AccountOverviewSectionProps {
-  orders: Order[];
-  tickets: ServiceTicket[];
-  quotes: QuoteRequest[];
-  payments: PaymentTransaction[];
-  savedCount: number;
-  onNavigateTab: (tab: AccountTabId) => void;
-  onOpenPhotoModal: () => void;
-  onNavigatePath: (path: string) => void;
+  orders?: Order[];
+  tickets?: ServiceTicket[];
+  serviceTickets?: ServiceTicket[];
+  quotes?: QuoteRequest[];
+  quoteRequests?: QuoteRequest[];
+  payments?: PaymentTransaction[];
+  savedCount?: number;
+  savedProducts?: any[];
+  documents?: any[];
+  notifications?: any[];
+  whatsappNumber?: string;
+  onNavigateTab?: (tab: AccountTabId) => void;
+  onTabChange?: (tab: AccountTabId) => void;
+  onOpenPhotoModal?: () => void;
+  onNavigatePath?: (path: string) => void;
 }
 
 export const AccountOverviewSection: React.FC<AccountOverviewSectionProps> = ({
-  orders,
+  orders = [],
   tickets,
+  serviceTickets,
   quotes,
-  payments,
+  quoteRequests,
+  payments = [],
   savedCount,
-  onNavigateTab,
+  savedProducts = [],
+  onNavigateTab: onNavigateTabProp,
+  onTabChange,
   onOpenPhotoModal,
   onNavigatePath
 }) => {
   const { currentUser, userProfile } = useAuth();
   const { language } = useTranslation();
 
-  // Compute real metrics from loaded user data
-  const totalOrders = orders.length;
+  const effectiveTickets = tickets || serviceTickets || [];
+  const effectiveQuotes = quotes || quoteRequests || [];
+  const effectiveSavedCount = savedCount !== undefined ? savedCount : savedProducts.length;
+  const onNavigateTab = onNavigateTabProp || onTabChange || (() => {});
 
-  const activeOrders = orders.filter(o => {
+  // Compute real metrics from loaded user data
+  const totalOrders = (orders || []).length;
+
+  const activeOrders = (orders || []).filter(o => {
     const s = (o.orderStatus || o.status || '').toLowerCase();
     return s === 'submitted' || s === 'processing' || s === 'packed' || s === 'ready' || s === 'ready_for_pickup' || s === 'out for delivery' || s === 'out_for_delivery';
   }).length;
 
-  const completedOrders = orders.filter(o => {
+  const completedOrders = (orders || []).filter(o => {
     const s = (o.orderStatus || o.status || '').toLowerCase();
     return s === 'completed' || s === 'delivered';
   }).length;
 
-  const pendingTickets = tickets.filter(t => {
+  const pendingTickets = effectiveTickets.filter(t => {
     const s = (t.status || '').toLowerCase();
     return s !== 'completed' && s !== 'cancelled';
   }).length;
 
-  const activeQuotes = quotes.filter(q => {
+  const activeQuotes = effectiveQuotes.filter(q => {
     const s = (q.status || '').toLowerCase();
     return s !== 'completed' && s !== 'rejected' && s !== 'cancelled';
   }).length;
 
-  const pendingPayments = orders.filter(o => {
+  const pendingPayments = (orders || []).filter(o => {
     const ps = (o.paymentStatus || '').toLowerCase();
     return ps.includes('pending') || ps === 'unpaid';
   }).length;
 
-  const recentOrders = orders.slice(0, 3);
-  const recentTickets = tickets.slice(0, 3);
+  const recentOrders = (orders || []).slice(0, 3);
+  const recentTickets = effectiveTickets.slice(0, 3);
 
   const formattedJoinDate = userProfile?.createdAt
     ? formatDate(userProfile.createdAt)

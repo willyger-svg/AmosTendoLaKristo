@@ -16,8 +16,8 @@ export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   tigopesaAccountName: 'TK STATIONERY (Mixx by Yas / Tigo Pesa: 0787754202)',
   airtelMoneyAccountName: 'TK STATIONERY (Airtel Money: 0787754202)',
   bankAccountDetails: 'CRDB Bank: 0152489201900 | NMB Bank: 20810034561 (Account Name: TK STATIONERY TRADING CO.)',
-  heroAnnouncementText: '🚀 Malipo kwa Simu (M-Pesa, Tigo Pesa, Airtel) au Taslimu. WhatsApp: 0787754202. Huduma za Chapisho na Serikali Mtandaoni.',
-  announcementActive: true,
+  heroAnnouncementText: '',
+  announcementActive: false,
   updatedAt: new Date().toISOString()
 };
 

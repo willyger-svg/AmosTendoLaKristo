@@ -8,6 +8,7 @@ import {
   query,
   where,
   orderBy,
+  onSnapshot,
   serverTimestamp
 } from 'firebase/firestore';
 import { db } from '../../firebase/config';
@@ -98,6 +99,41 @@ export const orderService = {
     } catch (err) {
       console.warn('Error fetching user orders:', err);
       return [];
+    }
+  },
+
+  /**
+   * Listen to orders for a specific authenticated customer in real time
+   */
+  listenToUserOrders(customerId: string, callback: (orders: Order[]) => void): () => void {
+    if (!customerId) {
+      callback([]);
+      return () => {};
+    }
+    try {
+      const colRef = collection(db, ORDERS_COLLECTION);
+      const q = query(colRef, where('customerId', '==', customerId));
+      return onSnapshot(
+        q,
+        snapshot => {
+          const orders: Order[] = [];
+          snapshot.forEach(d => {
+            const data = d.data();
+            orders.push({
+              id: d.id,
+              ...data
+            } as Order);
+          });
+          orders.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+          callback(orders);
+        },
+        err => {
+          console.warn('Real-time customer orders listener warning:', err);
+        }
+      );
+    } catch (err) {
+      console.warn('Error establishing customer orders listener:', err);
+      return () => {};
     }
   },
 

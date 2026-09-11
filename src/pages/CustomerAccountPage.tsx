@@ -9,6 +9,7 @@ import { AccountSidebar, AccountTabId } from '../components/account/AccountSideb
 import { AccountMobileNav } from '../components/account/AccountMobileNav';
 import { AccountOverviewSection } from '../components/account/AccountOverviewSection';
 import { AccountOrdersSection } from '../components/account/AccountOrdersSection';
+import { OrderHistory } from '../components/account/OrderHistory';
 import { AccountServicesSection } from '../components/account/AccountServicesSection';
 import { AccountQuotesSection } from '../components/account/AccountQuotesSection';
 import { AccountDocumentsSection } from '../components/account/AccountDocumentsSection';
@@ -420,8 +421,8 @@ export const CustomerAccountPage: React.FC = () => {
             )}
 
             {activeTab === 'orders' && (
-              <AccountOrdersSection
-                orders={userOrders}
+              <OrderHistory
+                initialOrders={userOrders}
                 whatsappNumber={whatsappPaymentNumber}
                 showToast={showToast}
                 onNavigatePath={navigateTo}
@@ -721,3 +722,5 @@ export const CustomerAccountPage: React.FC = () => {
     </div>
   );
 };
+
+export { OrderHistory } from '../components/account/OrderHistory';
