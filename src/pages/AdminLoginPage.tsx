@@ -41,19 +41,19 @@ export const AdminLoginPage: React.FC = () => {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const cleanEmail = email.trim();
-    if (!cleanEmail || !password) {
-      setErrorMessage('Please enter both administrator email and password.');
+    const cleanId = email.trim();
+    if (!cleanId || !password) {
+      setErrorMessage('Tafadhali ingiza namba ya admin (1010) na namba ya siri (1010).');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const profile = await adminLogin(cleanEmail, password);
+      const profile = await adminLogin(cleanId, password);
       showToast({
         type: 'success',
-        title: 'Authentication Successful',
-        message: `Welcome back, ${profile.fullName || profile.email} (${profile.role.toUpperCase()})`
+        title: 'Uthibitisho Umekamilika!',
+        message: `Karibu ${profile.fullName || 'Admin'} kwenye Jopo Kuu la Usimamizi.`
       });
       navigateTo('/admin');
     } catch (err: any) {
@@ -105,36 +105,44 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4 py-12 text-slate-100 selection:bg-amber-500 selection:text-slate-950">
+    <div
+      className="min-h-screen relative flex flex-col justify-center items-center px-4 py-12 text-slate-100 selection:bg-amber-500 selection:text-slate-950"
+      style={{
+        backgroundImage: `linear-gradient(to bottom, rgba(2, 6, 23, 0.88), rgba(2, 6, 23, 0.94)), url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1920&q=80')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       {/* Top Brand Link */}
-      <div className="mb-6 flex items-center gap-3">
+      <div className="mb-6 flex items-center gap-3 z-10">
         <button
           type="button"
           onClick={() => navigateTo('/')}
-          className="text-xs font-semibold text-slate-400 hover:text-amber-400 flex items-center gap-1.5 transition-colors"
+          className="text-xs font-semibold text-slate-300 hover:text-amber-400 flex items-center gap-1.5 transition-colors bg-slate-900/60 px-3.5 py-1.5 rounded-full border border-slate-700/60 backdrop-blur-md"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Return to TK Stationery Store</span>
+          <span>Rudi kwenye Tovuti ya TK Stationery</span>
         </button>
       </div>
 
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-md bg-slate-900/90 backdrop-blur-xl border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden z-10">
         {/* Header Banner */}
-        <div className="bg-slate-900/90 border-b border-slate-800 p-8 text-center relative">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center mx-auto shadow-lg mb-4">
+        <div className="bg-gradient-to-b from-slate-800/80 to-slate-900/90 border-b border-slate-800 p-8 text-center relative">
+          <div className="w-14 h-14 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center mx-auto shadow-xl shadow-amber-500/20 mb-4">
             <ShieldCheck className="w-7 h-7" />
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-800/80 text-[10px] font-extrabold uppercase tracking-widest text-amber-400 mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/70 border border-amber-500/40 text-[10px] font-extrabold uppercase tracking-widest text-amber-400 mb-2 shadow-xs">
             <Lock className="w-3 h-3" />
-            <span>Administrator & Staff Console</span>
+            <span>Msimamizi • Admin & Staff Console</span>
           </div>
 
-          <h1 className="text-xl font-black text-white tracking-tight">
-            TK Operations Access
+          <h1 className="text-2xl font-black text-white tracking-tight">
+            TK Admin Portal
           </h1>
-          <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-            Authorized management portal for inventory, Tanzania payments, order dispatch, and IT service tickets.
+          <p className="text-xs text-slate-300 mt-1.5 max-w-xs mx-auto leading-relaxed">
+            Ingiza kitambulisho chako cha usimamizi au namba ya admin (1010) kuingia kwenye jopo kuu la mifumo.
           </p>
         </div>
 
@@ -229,29 +237,46 @@ export const AdminLoginPage: React.FC = () => {
             </div>
           )}
 
+          {/* 1010 Quick Helper Banner */}
+          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-amber-500/10 to-transparent border border-amber-500/40 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 font-mono font-black text-xs shadow-sm">
+              1010
+            </div>
+            <div className="text-xs">
+              <span className="font-bold text-amber-300 block">Njia ya Haraka ya Admin</span>
+              <span className="text-slate-300 text-[11px] leading-tight block">
+                Ingiza <strong>1010</strong> juu na <strong>1010</strong> chini kuingia papo hapo kwenye Admin Panel.
+              </span>
+            </div>
+          </div>
+
           {/* Standard Admin Login Form */}
           {!isForgotPassword ? (
             <form onSubmit={handleAdminSignIn} className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-slate-300 block mb-1.5">
-                  Administrator Email
+                  Namba ya Admin / Kitambulisho (Admin ID / Username)
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <span className="w-4 h-4 text-amber-400 font-mono font-bold text-xs absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                    #
+                  </span>
                   <input
-                    type="email"
+                    type="text"
                     required
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    placeholder="e.g. amosstationery@gmail.com"
-                    className="w-full pl-10 pr-3.5 py-3 rounded-xl border border-slate-700 bg-slate-800/80 text-white text-xs placeholder:text-slate-500 focus:outline-hidden focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                    placeholder="Ingiza 1010 au barua pepe"
+                    className="w-full pl-10 pr-3.5 py-3 rounded-xl border border-slate-700 bg-slate-800/80 text-white text-xs placeholder:text-slate-500 focus:outline-hidden focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all font-mono"
                   />
                 </div>
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-1.5">
-                  <label className="text-xs font-bold text-slate-300">Password</label>
+                  <label className="text-xs font-bold text-slate-300">
+                    Namba ya Siri / Password
+                  </label>
                   <button
                     type="button"
                     onClick={() => {
@@ -271,8 +296,8 @@ export const AdminLoginPage: React.FC = () => {
                     required
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700 bg-slate-800/80 text-white text-xs placeholder:text-slate-500 focus:outline-hidden focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                    placeholder="Ingiza 1010 au nenosiri"
+                    className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700 bg-slate-800/80 text-white text-xs placeholder:text-slate-500 focus:outline-hidden focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all font-mono"
                   />
                   <button
                     type="button"
@@ -290,9 +315,9 @@ export const AdminLoginPage: React.FC = () => {
                 fullWidth
                 size="lg"
                 disabled={isSubmitting || loading}
-                className="py-3.5 text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md"
+                className="py-3.5 text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-lg shadow-amber-500/20"
               >
-                {isSubmitting || loading ? 'Verifying Administrative Identity...' : 'Sign In to Operations Console'}
+                {isSubmitting || loading ? 'Inathibitisha Utambulisho wa Admin...' : 'Ingia Kwenye Admin Panel (1010)'}
               </Button>
             </form>
           ) : (

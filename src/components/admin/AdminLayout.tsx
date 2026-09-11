@@ -77,8 +77,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     );
   }
 
-  // 2. Not Signed In State
-  if (!currentUser) {
+  // 2. Not Signed In State (Check both currentUser and authenticated admin profile)
+  const isProfileAdmin = userProfile && ['super_admin', 'admin', 'staff'].includes(userProfile.role);
+  if (!currentUser && !isProfileAdmin) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center text-white shadow-2xl space-y-6">

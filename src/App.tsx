@@ -5,7 +5,6 @@ import { LanguageProvider, useTranslation } from './context/LanguageContext';
 import { TopBar } from './components/layout/TopBar';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
-import { MobileBottomNav } from './components/layout/MobileBottomNav';
 import { MobileNavigation } from './components/layout/MobileNavigation';
 import { CartDrawer } from './components/shop/CartDrawer';
 import { QuickViewModal } from './components/common/QuickViewModal';
@@ -122,7 +121,7 @@ const AppContent: React.FC = () => {
   const isAdminSection = currentPath === '/admin' || currentPath.startsWith('/admin/');
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-amber-400 selection:text-slate-950 font-sans pb-16 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-amber-400 selection:text-slate-950 font-sans">
       {!isAdminSection && <TopBar />}
       {!isAdminSection && <Header onOpenMobileNav={() => setIsMobileNavOpen(true)} />}
 
@@ -131,7 +130,6 @@ const AppContent: React.FC = () => {
       </main>
 
       {!isAdminSection && <Footer />}
-      {!isAdminSection && <MobileBottomNav />}
       {!isAdminSection && (
         <MobileNavigation
           isOpen={isMobileNavOpen}

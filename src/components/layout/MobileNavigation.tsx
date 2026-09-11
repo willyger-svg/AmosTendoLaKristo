@@ -46,17 +46,14 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
   };
 
   const navLinks = [
-    { label: 'Home', path: '/', icon: <Home className="w-5 h-5" /> },
-    { label: 'Shop Stationery', path: '/shop', icon: <ShoppingBag className="w-5 h-5" />, badge: 'Store' },
-    { label: 'Online Public Services', path: '/online-services', icon: <ShieldCheck className="w-5 h-5" />, badge: 'NIDA/TRA' },
-    { label: 'Printing & Document Hub', path: '/printing', icon: <Printer className="w-5 h-5" /> },
-    { label: 'Graphic Design Studio', path: '/graphic-design', icon: <Sparkles className="w-5 h-5" /> },
-    { label: 'IT Support & Hardware', path: '/it-support', icon: <Cpu className="w-5 h-5" /> },
-    { label: 'Digital Solutions & Software', path: '/digital-solutions', icon: <Globe className="w-5 h-5" />, badge: 'Systems' },
-    { label: 'Track Order / Ticket', path: '/track-order', icon: <Search className="w-5 h-5" /> },
-    { label: 'Customer Account', path: '/account', icon: <User className="w-5 h-5" /> },
-    { label: 'About TK Stationery', path: '/about', icon: <Info className="w-5 h-5" /> },
-    { label: 'Contact Us', path: '/contact', icon: <PhoneCall className="w-5 h-5" /> }
+    { label: 'Nyumbani', path: '/', icon: <Home className="w-5 h-5" /> },
+    { label: 'Duka la Vifaa (Shop)', path: '/shop', icon: <ShoppingBag className="w-5 h-5" /> },
+    { label: 'Huduma za Chapisho (Printing)', path: '/printing', icon: <Printer className="w-5 h-5" /> },
+    { label: 'Huduma za Serikali (NIDA/TRA)', path: '/online-services', icon: <ShieldCheck className="w-5 h-5" /> },
+    { label: 'Fuatilia Oda Yako', path: '/track-order', icon: <Search className="w-5 h-5" /> },
+    { label: 'Akaunti Yangu', path: '/account', icon: <User className="w-5 h-5" /> },
+    { label: 'Kuhusu Sisi', path: '/about', icon: <Info className="w-5 h-5" /> },
+    { label: 'Wasiliana Nasi', path: '/contact', icon: <PhoneCall className="w-5 h-5" /> }
   ];
 
   return (

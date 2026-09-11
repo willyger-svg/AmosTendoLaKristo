@@ -11,9 +11,16 @@ interface AuthContextType {
   isStaff: boolean;
   isSuperAdmin: boolean;
   loading: boolean;
-  login: (email: string, password: string) => Promise<UserProfile>;
-  adminLogin: (email: string, password: string) => Promise<UserProfile>;
-  signUp: (fullName: string, email: string, password: string, phone: string, role?: UserRole) => Promise<UserProfile>;
+  login: (emailOrPhone: string, password: string) => Promise<UserProfile>;
+  adminLogin: (identifier: string, password: string) => Promise<UserProfile>;
+  signUp: (
+    fullName: string,
+    email: string,
+    password: string,
+    phone: string,
+    role?: UserRole,
+    extraDetails?: { city?: string; region?: string; address?: string }
+  ) => Promise<UserProfile>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updateProfile: (data: Partial<UserProfile>) => Promise<void>;
@@ -31,19 +38,50 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    // Check if there is an active admin session cached in localStorage
+    try {
+      const cached = localStorage.getItem('tk_active_admin_session');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && (parsed.role === 'super_admin' || parsed.role === 'admin')) {
+          setUserProfile(parsed);
+        }
+      }
+    } catch {
+      // ignore
+    }
+
     const unsubscribe = authService.onAuthState((user, profile) => {
       setCurrentUser(user);
-      setUserProfile(profile);
+      if (profile) {
+        setUserProfile(profile);
+      } else {
+        const cached = localStorage.getItem('tk_active_admin_session');
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            if (parsed && (parsed.role === 'super_admin' || parsed.role === 'admin')) {
+              setUserProfile(parsed);
+            } else {
+              setUserProfile(null);
+            }
+          } catch {
+            setUserProfile(null);
+          }
+        } else {
+          setUserProfile(null);
+        }
+      }
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string): Promise<UserProfile> => {
+  const login = async (emailOrPhone: string, password: string): Promise<UserProfile> => {
     setLoading(true);
     try {
-      const profile = await authService.login(email, password);
+      const profile = await authService.login(emailOrPhone, password);
       setUserProfile(profile);
       return profile;
     } finally {
@@ -51,10 +89,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const adminLogin = async (email: string, password: string): Promise<UserProfile> => {
+  const adminLogin = async (identifier: string, password: string): Promise<UserProfile> => {
     setLoading(true);
     try {
-      const profile = await authService.adminLogin(email, password);
+      const profile = await authService.adminLogin(identifier, password);
       setUserProfile(profile);
       return profile;
     } finally {
@@ -67,11 +105,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     email: string,
     password: string,
     phone: string,
-    role: UserRole = 'customer'
+    role: UserRole = 'customer',
+    extraDetails?: { city?: string; region?: string; address?: string }
   ): Promise<UserProfile> => {
     setLoading(true);
     try {
-      const profile = await authService.signUp(fullName, email, password, phone, role);
+      const profile = await authService.signUp(fullName, email, password, phone, role, extraDetails);
       setUserProfile(profile);
       return profile;
     } finally {
@@ -82,6 +121,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = async (): Promise<void> => {
     setLoading(true);
     try {
+      try {
+        localStorage.removeItem('tk_active_admin_session');
+      } catch {
+        // ignore
+      }
       await authService.logout();
       setCurrentUser(null);
       setUserProfile(null);

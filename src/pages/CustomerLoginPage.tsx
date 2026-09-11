@@ -25,6 +25,7 @@ export const CustomerLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('Dar es Salaam');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -42,19 +43,19 @@ export const CustomerLoginPage: React.FC = () => {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const cleanEmail = email.trim();
-    if (!cleanEmail || !password) {
-      setErrorMessage('Please provide both email and password.');
+    const cleanIdentifier = email.trim();
+    if (!cleanIdentifier || !password) {
+      setErrorMessage('Tafadhali jaza barua pepe au namba ya simu pamoja na nenosiri.');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await login(cleanEmail, password);
+      await login(cleanIdentifier, password);
       showToast({
         type: 'success',
-        title: 'Welcome Back',
-        message: 'You have signed in successfully.'
+        title: 'Karibu Tena!',
+        message: 'Umeingia kikamilifu kwenye akaunti yako ya TK Stationery.'
       });
       navigateTo('/account');
     } catch (err: any) {
@@ -64,11 +65,11 @@ export const CustomerLoginPage: React.FC = () => {
         err.code === 'auth/user-not-found' ||
         err.code === 'auth/wrong-password'
       ) {
-        setErrorMessage('Invalid email or password. Please verify your details.');
+        setErrorMessage('Barua pepe au nenosiri sio sahihi. Tafadhali hakiki taarifa zako.');
       } else if (err.code === 'auth/too-many-requests') {
-        setErrorMessage('Too many attempts. Please try again in a few minutes.');
+        setErrorMessage('Majaribio yamezidi. Tafadhali subiri kidogo kisha ujaribu tena.');
       } else {
-        setErrorMessage('Unable to sign in. Please verify your internet connection and try again.');
+        setErrorMessage('Hitilafu ya kuingia. Tafadhali hakiki muunganisho wa intaneti.');
       }
     } finally {
       setIsSubmitting(false);
@@ -85,34 +86,37 @@ export const CustomerLoginPage: React.FC = () => {
     const cleanPhone = phone.trim();
 
     if (!cleanName || !cleanEmail || !password || !cleanPhone) {
-      setErrorMessage('Please fill in all required fields.');
+      setErrorMessage('Tafadhali jaza sehemu zote zinazohitajika.');
       return;
     }
 
     if (password.length < 6) {
-      setErrorMessage('Password must be at least 6 characters.');
+      setErrorMessage('Nenosiri lazima liwe na herufi au tarakimu 6 au zaidi.');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await signUp(cleanName, cleanEmail, password, cleanPhone, 'customer');
+      await signUp(cleanName, cleanEmail, password, cleanPhone, 'customer', {
+        city: city.trim(),
+        region: city.trim()
+      });
       showToast({
         type: 'success',
-        title: 'Account Created',
-        message: `Welcome to TK Stationery, ${cleanName}!`
+        title: 'Akaunti Imefunguliwa!',
+        message: `Karibu TK Stationery, ${cleanName}! Taarifa zako zimehifadhiwa.`
       });
       navigateTo('/account');
     } catch (err: any) {
       console.warn('Customer Registration Error:', err);
       if (err.code === 'auth/email-already-in-use') {
-        setErrorMessage('An account with this email already exists. Please log in.');
+        setErrorMessage('Barua pepe hii tayari inatumika. Tafadhali ingia.');
       } else if (err.code === 'auth/invalid-email') {
-        setErrorMessage('Please enter a valid email address.');
+        setErrorMessage('Tafadhali weka barua pepe sahihi.');
       } else if (err.code === 'auth/weak-password') {
-        setErrorMessage('Password is too weak. Please use at least 6 characters.');
+        setErrorMessage('Nenosiri ni dhaifu. Tafadhali tumia herufi 6 au zaidi.');
       } else {
-        setErrorMessage('Could not create account. Please try again.');
+        setErrorMessage('Imeshindikana kusajili. Tafadhali jaribu tena.');
       }
     } finally {
       setIsSubmitting(false);
@@ -126,49 +130,69 @@ export const CustomerLoginPage: React.FC = () => {
 
     const cleanEmail = email.trim();
     if (!cleanEmail) {
-      setErrorMessage('Please enter your account email address.');
+      setErrorMessage('Tafadhali weka barua pepe ya akaunti yako.');
       return;
     }
 
     setIsSubmitting(true);
     try {
       await resetPassword(cleanEmail);
-      setSuccessMessage('Password reset instructions have been sent to your email inbox.');
+      setSuccessMessage('Maelekezo ya kubadili nenosiri yametumwa kwenye barua pepe yako.');
       showToast({
         type: 'info',
-        title: 'Reset Link Sent',
-        message: 'Check your email inbox for password recovery instructions.'
+        title: 'Kiungo Kimetumwa',
+        message: 'Fungua barua pepe yako kubadili nenosiri.'
       });
     } catch (err: any) {
       console.warn('Reset password error:', err);
-      setErrorMessage('Unable to send reset email. Please ensure the address is correct.');
+      setErrorMessage('Imeshindikana kutuma barua pepe. Hakikisha anwani ni sahihi.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-[80vh] flex flex-col justify-center items-center px-4 py-12 bg-slate-50">
-      <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+    <div
+      className="min-h-[88vh] flex flex-col justify-center items-center px-4 py-12 relative"
+      style={{
+        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.92)), url('https://images.unsplash.com/photo-1507842229451-79b1be886a20?auto=format&fit=crop&w=1920&q=80')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Back to Home Button */}
+      <button
+        type="button"
+        onClick={() => navigateTo('/')}
+        className="mb-6 px-4 py-1.5 rounded-full bg-slate-900/80 border border-slate-700/80 text-xs text-slate-300 hover:text-amber-400 backdrop-blur-md transition-colors"
+      >
+        ← Rudi kwenye Duka Kuu la TK Stationery
+      </button>
+
+      <div className="w-full max-w-md bg-white/95 backdrop-blur-md rounded-3xl border border-slate-200 shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-slate-900 text-white p-8 text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center mx-auto shadow-md">
-            <ShoppingBag className="w-7 h-7" />
+        <div className="bg-slate-900 text-white p-7 text-center space-y-2 relative border-b border-slate-800">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center mx-auto shadow-md shadow-amber-500/20">
+            <ShoppingBag className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-black text-white">
-            {mode === 'login' && 'Sign In to Your Account'}
-            {mode === 'register' && 'Create Customer Account'}
-            {mode === 'forgot' && 'Reset Account Password'}
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-950/80 border border-amber-500/40 text-[10px] font-bold text-amber-300">
+            TK STATIONERY & DIGITAL
+          </div>
+          <h1 className="text-xl font-black text-white">
+            {mode === 'login' && 'Ingia Kwenye Akaunti Yako'}
+            {mode === 'register' && 'Fungua Akaunti ya Mteja (Sign Up)'}
+            {mode === 'forgot' && 'Rudisha Nenosiri Lako'}
           </h1>
-          <p className="text-xs text-slate-400 max-w-xs mx-auto">
-            {mode === 'login' && 'Track your stationery orders, printing jobs, and public portal tickets.'}
-            {mode === 'register' && 'Join TK Stationery for faster checkout, order history, and live SMS updates.'}
-            {mode === 'forgot' && 'Enter your email address to receive password recovery instructions.'}
+          <p className="text-xs text-slate-300 max-w-xs mx-auto leading-relaxed">
+            {mode === 'login' && 'Fuatilia oda za vifaa vya ofisi, maombi ya uchapishaji na huduma za serikali.'}
+            {mode === 'register' && 'Jiunge na TK Stationery kutunza kumbukumbu za manunuzi na kupata huduma haraka.'}
+            {mode === 'forgot' && 'Ingiza barua pepe yako kutumiwa kiungo cha kurejesha nenosiri.'}
           </p>
         </div>
 
         {/* Content */}
-        <div className="p-8 space-y-4">
+        <div className="p-7 space-y-4">
           {/* Error Message */}
           {errorMessage && (
             <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2 animate-in fade-in">
@@ -189,23 +213,25 @@ export const CustomerLoginPage: React.FC = () => {
           {mode === 'login' && (
             <form onSubmit={handleLogin} className="space-y-3.5">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Email Address</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Barua Pepe au Namba ya Simu (Email / Phone)
+                </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
-                    type="email"
+                    type="text"
                     required
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    placeholder="e.g. juma@gmail.com"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500"
+                    placeholder="e.g. juma@gmail.com au 0754 123 456"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="text-xs font-bold text-slate-700">Password</label>
+                  <label className="text-xs font-bold text-slate-700">Nenosiri (Password)</label>
                   <button
                     type="button"
                     onClick={() => {
@@ -214,7 +240,7 @@ export const CustomerLoginPage: React.FC = () => {
                     }}
                     className="text-[11px] font-semibold text-amber-600 hover:underline"
                   >
-                    Forgot Password?
+                    Umesahau Nenosiri?
                   </button>
                 </div>
                 <div className="relative">
@@ -225,7 +251,7 @@ export const CustomerLoginPage: React.FC = () => {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
                   />
                   <button
                     type="button"
@@ -243,13 +269,13 @@ export const CustomerLoginPage: React.FC = () => {
                 fullWidth
                 size="lg"
                 disabled={isSubmitting || loading}
-                className="mt-2 py-3"
+                className="mt-2 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold"
               >
-                {isSubmitting || loading ? 'Authenticating...' : 'Sign In'}
+                {isSubmitting || loading ? 'Inathibitisha...' : 'Ingia Kwenye Akaunti'}
               </Button>
 
-              <div className="text-center pt-2 text-xs text-slate-500">
-                Don’t have an account?{' '}
+              <div className="text-center pt-2 text-xs text-slate-600">
+                Huna akaunti bado?{' '}
                 <button
                   type="button"
                   onClick={() => {
@@ -258,7 +284,7 @@ export const CustomerLoginPage: React.FC = () => {
                   }}
                   className="font-bold text-slate-900 hover:text-amber-600 underline"
                 >
-                  Create one now
+                  Fungua akaunti sasa
                 </button>
               </div>
             </form>
@@ -268,7 +294,7 @@ export const CustomerLoginPage: React.FC = () => {
           {mode === 'register' && (
             <form onSubmit={handleRegister} className="space-y-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Full Name</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Jina Kamili (Full Name)</label>
                 <div className="relative">
                   <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
@@ -277,13 +303,28 @@ export const CustomerLoginPage: React.FC = () => {
                     value={fullName}
                     onChange={e => setFullName(e.target.value)}
                     placeholder="e.g. Juma Ramadhani"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Email Address</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Namba ya Simu (Phone Number)</label>
+                <div className="relative">
+                  <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="tel"
+                    required
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    placeholder="e.g. 0754 123 456 au 0787 754 202"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Barua Pepe (Email Address)</label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
@@ -292,28 +333,24 @@ export const CustomerLoginPage: React.FC = () => {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="e.g. juma@gmail.com"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Phone Number (SMS / WhatsApp)</label>
-                <div className="relative">
-                  <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="tel"
-                    required
-                    value={phone}
-                    onChange={e => setPhone(e.target.value)}
-                    placeholder="e.g. 0754 123 456 or +255..."
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500"
-                  />
-                </div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Mkoa / Eneo (City/Region)</label>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={e => setCity(e.target.value)}
+                  placeholder="e.g. Dar es Salaam, Mwenge"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
+                />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Password (min 6 chars)</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Nenosiri / Password (Tarakimu 6+)</label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
@@ -323,7 +360,7 @@ export const CustomerLoginPage: React.FC = () => {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
                   />
                 </div>
               </div>
@@ -334,13 +371,13 @@ export const CustomerLoginPage: React.FC = () => {
                 fullWidth
                 size="lg"
                 disabled={isSubmitting || loading}
-                className="mt-2 py-3"
+                className="mt-2 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold"
               >
-                {isSubmitting || loading ? 'Creating Account...' : 'Register Account'}
+                {isSubmitting || loading ? 'Inasajili Akaunti...' : 'Kamilisha Usajili (Jisajili)'}
               </Button>
 
-              <div className="text-center pt-2 text-xs text-slate-500">
-                Already have an account?{' '}
+              <div className="text-center pt-2 text-xs text-slate-600">
+                Tayari una akaunti?{' '}
                 <button
                   type="button"
                   onClick={() => {
@@ -349,7 +386,7 @@ export const CustomerLoginPage: React.FC = () => {
                   }}
                   className="font-bold text-slate-900 hover:text-amber-600 underline"
                 >
-                  Sign In
+                  Ingia hapa
                 </button>
               </div>
             </form>
@@ -359,7 +396,7 @@ export const CustomerLoginPage: React.FC = () => {
           {mode === 'forgot' && (
             <form onSubmit={handleForgot} className="space-y-3.5">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Account Email</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Barua Pepe Yako</label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
@@ -368,7 +405,7 @@ export const CustomerLoginPage: React.FC = () => {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="e.g. juma@gmail.com"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
                   />
                 </div>
               </div>
@@ -379,13 +416,13 @@ export const CustomerLoginPage: React.FC = () => {
                 fullWidth
                 size="lg"
                 disabled={isSubmitting || loading}
-                className="mt-2 py-3"
+                className="mt-2 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold"
               >
-                {isSubmitting || loading ? 'Sending...' : 'Send Password Reset Link'}
+                {isSubmitting || loading ? 'Inatuma...' : 'Tuma Kiungo cha Nenosiri'}
               </Button>
 
-              <div className="text-center pt-2 text-xs text-slate-500">
-                Remember your password?{' '}
+              <div className="text-center pt-2 text-xs text-slate-600">
+                Unakumbuka nenosiri lako?{' '}
                 <button
                   type="button"
                   onClick={() => {
@@ -394,11 +431,23 @@ export const CustomerLoginPage: React.FC = () => {
                   }}
                   className="font-bold text-slate-900 hover:text-amber-600 underline"
                 >
-                  Back to Sign In
+                  Rudi kwenye kuingia
                 </button>
               </div>
             </form>
           )}
+
+          {/* Admin link at the bottom */}
+          <div className="pt-4 border-t border-slate-200 text-center">
+            <button
+              type="button"
+              onClick={() => navigateTo('/admin/login')}
+              className="text-xs font-medium text-slate-500 hover:text-amber-600 flex items-center justify-center gap-1.5 mx-auto transition-colors"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+              <span>Msimamizi wa Duka? Ingia hapa &rarr;</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

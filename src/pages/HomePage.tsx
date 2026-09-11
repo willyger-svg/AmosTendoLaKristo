@@ -211,7 +211,15 @@ export const HomePage: React.FC = () => {
   return (
     <div className="space-y-16 sm:space-y-24 pb-16">
       {/* 1. HERO SECTION */}
-      <section className="relative bg-slate-950 text-white pt-10 pb-16 sm:pt-16 sm:pb-24 overflow-hidden">
+      <section
+        className="relative text-white pt-10 pb-16 sm:pt-16 sm:pb-24 overflow-hidden"
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(2, 6, 23, 0.94) 0%, rgba(15, 23, 42, 0.88) 50%, rgba(2, 6, 23, 0.95) 100%), url('https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=2000&q=80')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      >
         <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] opacity-30 pointer-events-none" />
 
         <Container>
@@ -552,7 +560,14 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 5. PUBLIC SERVICES ASSISTANCE SECTION */}
-      <section className="bg-slate-900 text-white py-16 rounded-3xl mx-4 sm:mx-8">
+      <section
+        className="relative text-white py-16 rounded-3xl mx-4 sm:mx-8 overflow-hidden shadow-2xl"
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(6, 78, 59, 0.92), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
         <Container>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
             <div>
@@ -646,6 +661,65 @@ export const HomePage: React.FC = () => {
             ))}
           </div>
         </Container>
+      </section>
+
+      {/* 7. WHOLESALE, SCHOOL & CORPORATE SUPPLIES BANNER */}
+      <section className="mx-4 sm:mx-8">
+        <div
+          className="relative rounded-3xl overflow-hidden text-white p-8 sm:p-12 shadow-2xl"
+          style={{
+            backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.88) 50%, rgba(15, 23, 42, 0.95) 100%), url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1920&q=80')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          <div className="max-w-3xl space-y-5 relative z-10">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-xs font-bold text-amber-300">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Oda za Jumla • Mashule, Vyuo na Mashirika</span>
+            </span>
+
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+              {language === 'sw'
+                ? 'Unahitaji Vifaa vya Ofisi na Uchapaji kwa Wingi?'
+                : 'Looking for Bulk Stationery & Printing Supplies?'}
+            </h2>
+
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
+              {language === 'sw'
+                ? 'TK Stationery inatoa punguzo maalum la bei kwa taasisi, makampuni, mashule na vituo vya mafunzo kote Tanzania. Tunatoa ankara rasmi (Proforma & EFD Tax Invoice) na usafirishaji wa haraka.'
+                : 'TK Stationery offers tailored wholesale discounts for institutions, corporate offices, schools, and organizations across Tanzania with official tax invoicing.'}
+            </p>
+
+            <div className="pt-3 flex flex-wrap items-center gap-3">
+              <a
+                href={createWhatsAppUrl(whatsappPaymentNumber, 'Habari TK Stationery! Ninahitaji vifaa vya jumla / quotation ya ofisi.')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-lg shadow-emerald-900/30"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Ongea Nasi WhatsApp</span>
+              </a>
+
+              <a
+                href={`tel:${whatsappPaymentNumber}`}
+                className="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-2 transition-all shadow-lg shadow-amber-900/20"
+              >
+                <PhoneCall className="w-4 h-4" />
+                <span>Piga: {displayPhone}</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => navigateTo('/contact')}
+                className="px-5 py-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 backdrop-blur-sm transition-all"
+              >
+                Fika Dukani / Wasiliana Nasi
+              </button>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );

@@ -23,6 +23,8 @@ import { UserProfile, UserRole } from '../../types';
 import { storageService, UploadProgressCallback } from '../storage/storageService';
 
 const INITIAL_SUPER_ADMIN_EMAIL = 'amosstationery@gmail.com';
+const ADMIN_1010_EMAIL = 'admin1010@tkstationery.co.tz';
+const ADMIN_1010_PASSWORD = 'TkAdminPass1010!#Secure';
 
 export const authService = {
   /**
@@ -33,50 +35,82 @@ export const authService = {
     email: string,
     password: string,
     phone: string,
-    role: UserRole = 'customer'
+    role: UserRole = 'customer',
+    extraDetails?: { city?: string; region?: string; address?: string }
   ): Promise<UserProfile> {
-    const isSuperAdminEmail = email.trim().toLowerCase() === INITIAL_SUPER_ADMIN_EMAIL.toLowerCase();
+    const cleanEmail = email.trim().toLowerCase();
+    const isSuperAdminEmail = cleanEmail === INITIAL_SUPER_ADMIN_EMAIL.toLowerCase();
     const assignedRole: UserRole = isSuperAdminEmail ? 'super_admin' : role;
 
-    const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+    const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
     const user = userCredential.user;
 
     const userProfile: UserProfile = {
       id: user.uid,
       fullName: fullName.trim(),
-      email: user.email || email.trim(),
+      email: user.email || cleanEmail,
       phone: phone.trim() || '',
       role: assignedRole,
+      city: extraDetails?.city?.trim() || 'Dar es Salaam',
+      region: extraDetails?.region?.trim() || 'Dar es Salaam',
+      address: extraDetails?.address?.trim() || '',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     // Save profile to Firestore
-    await setDoc(doc(db, 'users', user.uid), {
-      ...userProfile,
-      createdAtServer: serverTimestamp(),
-      updatedAtServer: serverTimestamp()
-    });
+    try {
+      await setDoc(doc(db, 'users', user.uid), {
+        ...userProfile,
+        createdAtServer: serverTimestamp(),
+        updatedAtServer: serverTimestamp()
+      });
+    } catch (saveErr) {
+      console.warn('Could not save user profile with server timestamps:', saveErr);
+      await setDoc(doc(db, 'users', user.uid), userProfile, { merge: true });
+    }
 
     return userProfile;
   },
 
   /**
-   * Client / Customer Log in with Email and Password
+   * Client / Customer Log in with Email or Phone Number and Password
    */
-  async login(email: string, password: string): Promise<UserProfile> {
-    const cleanEmail = email.trim();
-    const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, password);
+  async login(emailOrPhone: string, password: string): Promise<UserProfile> {
+    let cleanIdentifier = emailOrPhone.trim();
+
+    // If identifier doesn't contain '@', it might be a phone number
+    if (!cleanIdentifier.includes('@')) {
+      const digitsOnly = cleanIdentifier.replace(/\D/g, '');
+      try {
+        const usersRef = collection(db, 'users');
+        const snap = await getDocs(usersRef);
+        const match = snap.docs.find(d => {
+          const uPhone = (d.data().phone || '').replace(/\D/g, '');
+          return uPhone && (uPhone === digitsOnly || uPhone.endsWith(digitsOnly) || digitsOnly.endsWith(uPhone));
+        });
+        if (match && match.data().email) {
+          cleanIdentifier = match.data().email;
+        } else {
+          // Fallback synthetic email for phone-registered accounts
+          cleanIdentifier = `${digitsOnly}@customer.tkstationery.co.tz`;
+        }
+      } catch {
+        cleanIdentifier = `${digitsOnly}@customer.tkstationery.co.tz`;
+      }
+    }
+
+    const userCredential = await signInWithEmailAndPassword(auth, cleanIdentifier, password);
     const user = userCredential.user;
 
     // Fetch user profile from Firestore
     let profile = await this.getUserProfile(user.uid);
     if (!profile) {
-      const isSuperAdminEmail = cleanEmail.toLowerCase() === INITIAL_SUPER_ADMIN_EMAIL.toLowerCase();
+      const isSuperAdminEmail = cleanIdentifier.toLowerCase() === INITIAL_SUPER_ADMIN_EMAIL.toLowerCase();
       profile = {
         id: user.uid,
-        fullName: user.displayName || cleanEmail.split('@')[0],
-        email: user.email || cleanEmail,
+        fullName: user.displayName || cleanIdentifier.split('@')[0],
+        email: user.email || cleanIdentifier,
         phone: '',
         role: isSuperAdminEmail ? 'super_admin' : 'customer',
         createdAt: new Date().toISOString(),
@@ -90,23 +124,79 @@ export const authService = {
 
   /**
    * Dedicated Admin Portal Authentication
-   * Validates both credentials and administrator role
+   * Validates credentials and administrator role.
+   * Supports entering "1010" in username and "1010" in password for instant super admin access!
    */
-  async adminLogin(email: string, password: string): Promise<UserProfile> {
-    const cleanEmail = email.trim();
+  async adminLogin(emailOrCode: string, passwordOrCode: string): Promise<UserProfile> {
+    const cleanId = emailOrCode.trim();
+    const cleanPass = passwordOrCode.trim();
+
+    // Direct numerical master code check (1010 / 1010)
+    const isMasterCode1010 = cleanId === '1010' && cleanPass === '1010';
+
+    if (isMasterCode1010) {
+      // Provision or sign in to the dedicated 1010 super administrator Firebase account
+      let user;
+      try {
+        const cred = await signInWithEmailAndPassword(auth, ADMIN_1010_EMAIL, ADMIN_1010_PASSWORD);
+        user = cred.user;
+      } catch (err: any) {
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+          try {
+            const cred = await createUserWithEmailAndPassword(auth, ADMIN_1010_EMAIL, ADMIN_1010_PASSWORD);
+            user = cred.user;
+          } catch (createErr) {
+            console.warn('Could not auto-create 1010 Firebase Auth user:', createErr);
+          }
+        }
+      }
+
+      const uid = user ? user.uid : 'admin_1010_master';
+      const adminProfile: UserProfile = {
+        id: uid,
+        fullName: 'TK Super Administrator (1010)',
+        email: ADMIN_1010_EMAIL,
+        phone: '+255 787 754 202',
+        role: 'super_admin',
+        city: 'Dar es Salaam',
+        region: 'Dar es Salaam',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        await setDoc(doc(db, 'users', uid), {
+          ...adminProfile,
+          role: 'super_admin',
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      } catch (docErr) {
+        console.warn('Could not update 1010 admin doc in Firestore:', docErr);
+      }
+
+      try {
+        localStorage.setItem('tk_active_admin_session', JSON.stringify(adminProfile));
+      } catch {
+        // ignore
+      }
+
+      return adminProfile;
+    }
+
+    // Standard administrator email login
+    const cleanEmail = cleanId;
     const isInitialSuperAdmin = cleanEmail.toLowerCase() === INITIAL_SUPER_ADMIN_EMAIL.toLowerCase();
 
     let userCredential;
     try {
-      userCredential = await signInWithEmailAndPassword(auth, cleanEmail, password);
+      userCredential = await signInWithEmailAndPassword(auth, cleanEmail, cleanPass);
     } catch (authErr: any) {
-      // If initial super_admin account hasn't been created yet in Firebase Auth, provision it seamlessly with given credentials
       if (
         isInitialSuperAdmin &&
         (authErr.code === 'auth/user-not-found' || authErr.code === 'auth/invalid-credential')
       ) {
         try {
-          userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
+          userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, cleanPass);
         } catch (createErr) {
           throw authErr;
         }
@@ -118,13 +208,12 @@ export const authService = {
     const user = userCredential.user;
     let profile = await this.getUserProfile(user.uid);
 
-    // Bootstrap or verify role for super admin
     if (!profile) {
       profile = {
         id: user.uid,
         fullName: 'TK Super Administrator',
         email: user.email || cleanEmail,
-        phone: '+255 754 123 456',
+        phone: '+255 787 754 202',
         role: isInitialSuperAdmin ? 'super_admin' : 'staff',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -135,11 +224,16 @@ export const authService = {
       await updateDoc(doc(db, 'users', user.uid), { role: 'super_admin' });
     }
 
-    // Role Enforcement Gate: Must be staff, admin, or super_admin
     const hasAdminAccess = ['super_admin', 'admin', 'staff'].includes(profile.role);
     if (!hasAdminAccess) {
       await signOut(auth);
-      throw new Error('Access Denied: This account does not possess administrator or staff privileges. Please use the customer portal.');
+      throw new Error('Access Denied: This account does not possess administrator or staff privileges.');
+    }
+
+    try {
+      localStorage.setItem('tk_active_admin_session', JSON.stringify(profile));
+    } catch {
+      // ignore
     }
 
     return profile;
@@ -149,6 +243,11 @@ export const authService = {
    * Sign out current user
    */
   async logout(): Promise<void> {
+    try {
+      localStorage.removeItem('tk_active_admin_session');
+    } catch {
+      // ignore
+    }
     await signOut(auth);
   },
 
