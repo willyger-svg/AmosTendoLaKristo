@@ -1,0 +1,225 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && (
+        request.auth.token.role == 'super_admin' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         getUserData().role == 'super_admin')
+      );
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.role in ['admin', 'super_admin'] ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         getUserData().role in ['admin', 'super_admin'])
+      );
+    }
+
+    function isStaffOrAdmin() {
+      return isSignedIn() && (
+        request.auth.token.role in ['admin', 'super_admin', 'staff'] ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         getUserData().role in ['admin', 'super_admin', 'staff'])
+      );
+    }
+
+    // Users Collection - Strict Customer Isolation & Anti-Escalation
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isStaffOrAdmin();
+      allow create: if (isOwner(userId) &&
+                        (!('role' in request.resource.data) || request.resource.data.role == 'customer') &&
+                        !('isAdmin' in request.resource.data) &&
+                        !('isStaff' in request.resource.data) &&
+                        !('superAdmin' in request.resource.data) &&
+                        !('permissions' in request.resource.data) &&
+                        !('status' in request.resource.data)) || isSuperAdmin();
+      allow update: if (isOwner(userId) &&
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                          'fullName', 'phone', 'companyName', 'tin', 'region', 'street',
+                          'address', 'city', 'avatarUrl', 'languagePreference',
+                          'themePreference', 'updatedAt', 'updatedAtServer'
+                        ])) ||
+                        (isSuperAdmin() && (userId != request.auth.uid || request.resource.data.role == resource.data.role)) ||
+                        (isAdmin() && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+                          'role', 'isAdmin', 'isStaff', 'superAdmin', 'permissions'
+                        ]));
+      allow delete: if isSuperAdmin();
+
+      // Subcollection for Customer Saved Products
+      match /savedProducts/{productId} {
+        allow read, write: if isOwner(userId) || isStaffOrAdmin();
+      }
+
+      // Subcollection for Customer Documents
+      match /documents/{docId} {
+        allow read: if isOwner(userId) || isStaffOrAdmin();
+        allow create: if isOwner(userId) || isStaffOrAdmin();
+        allow update: if isOwner(userId) || isStaffOrAdmin();
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Products Collection - Public Read, Admin Write Only, Staff Stock Adjustment
+    match /products/{productId} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() ||
+                       (isStaffOrAdmin() &&
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                          'stockCount', 'updatedAt', 'updatedAtServer'
+                        ]) &&
+                        request.resource.data.stockCount is number &&
+                        request.resource.data.stockCount >= 0);
+    }
+
+    // Categories Collection - Public Read, Admin Write Only
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Orders Collection - Scoped Customer List, Protected Mutations
+    match /orders/{orderId} {
+      // Individual lookup permitted for customer owner, staff/admin, or unassigned guest orders
+      allow get: if (resource.data.customerId == '' || !('customerId' in resource.data)) ||
+                    (isSignedIn() && resource.data.customerId == request.auth.uid) ||
+                    isStaffOrAdmin();
+      // List query strictly constrained to own customerId or staff/admin
+      allow list: if (isSignedIn() && resource.data.customerId == request.auth.uid) || isStaffOrAdmin();
+      allow create: if request.resource.data.customerName is string &&
+                       request.resource.data.customerPhone is string &&
+                       request.resource.data.items is list &&
+                       request.resource.data.total is number &&
+                       request.resource.data.total >= 0 &&
+                       (!('paymentStatus' in request.resource.data) ||
+                        request.resource.data.paymentStatus in [
+                          'Pending (Pay on Delivery/Pickup)',
+                          'Pending Payment',
+                          'Payment Submitted (Verification Pending)',
+                          'Pending Verification'
+                        ]) &&
+                       (!('status' in request.resource.data) ||
+                        request.resource.data.status in ['Submitted', 'Pending']);
+      allow update: if isStaffOrAdmin() ||
+                       (isSignedIn() && resource.data.customerId == request.auth.uid &&
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                          'paymentReference', 'paymentProofUrl', 'notes', 'updatedAt', 'updatedAtServer'
+                        ]) &&
+                        request.resource.data.paymentStatus == resource.data.paymentStatus &&
+                        request.resource.data.status == resource.data.status);
+      allow delete: if isAdmin();
+    }
+
+    // Service Requests & Tickets Collection - Scoped Customer List
+    match /serviceRequests/{requestId} {
+      allow get: if (resource.data.customerId == '' || !('customerId' in resource.data)) ||
+                    (isSignedIn() && resource.data.customerId == request.auth.uid) ||
+                    isStaffOrAdmin();
+      allow list: if (isSignedIn() && resource.data.customerId == request.auth.uid) || isStaffOrAdmin();
+      allow create: if request.resource.data.customerName is string &&
+                       request.resource.data.customerPhone is string &&
+                       request.resource.data.serviceType is string &&
+                       (!('status' in request.resource.data) ||
+                        request.resource.data.status in ['Submitted', 'Pending', 'In Review']);
+      allow update: if isStaffOrAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Quotes Collection - Scoped Customer List
+    match /quotes/{quoteId} {
+      allow get: if (resource.data.customerId == '' || !('customerId' in resource.data)) ||
+                    (isSignedIn() && resource.data.customerId == request.auth.uid) ||
+                    isStaffOrAdmin();
+      allow list: if (isSignedIn() && resource.data.customerId == request.auth.uid) || isStaffOrAdmin();
+      allow create: if request.resource.data.customerName is string &&
+                       request.resource.data.customerPhone is string &&
+                       (!('status' in request.resource.data) ||
+                        request.resource.data.status in ['New Inquiry', 'Pending', 'In Review']);
+      allow update: if isStaffOrAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // General Store Settings
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Payments Collection - Scoped Customer Read & Protected Mutation
+    match /payments/{paymentId} {
+      // Individual lookup permitted for customer or staff/admin
+      allow get: if isOwner(resource.data.customerId) || isStaffOrAdmin() || (resource.data.customerId == '');
+      // List query constrained to own customer payments or staff/admin
+      allow list: if (isSignedIn() && resource.data.customerId == request.auth.uid) || isStaffOrAdmin();
+      // Creation allowed with valid payload, but status must be pending on customer creation
+      allow create: if request.resource.data.orderId != null &&
+                       request.resource.data.amount is number &&
+                       request.resource.data.amount >= 0 &&
+                       request.resource.data.method != null &&
+                       (!('status' in request.resource.data) ||
+                        request.resource.data.status in ['pending', 'verification_pending', 'Submitted']);
+      // Mutation of payment status restricted to staff/admin
+      allow update: if isStaffOrAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Documents Collection - Sensitive attachments
+    match /documents/{docId} {
+      allow get: if isOwner(resource.data.customerId) || isStaffOrAdmin();
+      allow list: if (isSignedIn() && resource.data.customerId == request.auth.uid) || isStaffOrAdmin();
+      allow create: if isSignedIn() && (request.resource.data.customerId == request.auth.uid || isStaffOrAdmin());
+      allow update: if (isOwner(resource.data.customerId) &&
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                          'fileName', 'notes', 'tags', 'updatedAt'
+                        ])) || isStaffOrAdmin();
+      allow delete: if isOwner(resource.data.customerId) || isAdmin();
+    }
+
+    // Notifications Collection - User Scoped Read & Safe Read Status Update
+    match /notifications/{notificationId} {
+      allow get, list: if isOwner(resource.data.userId) || isStaffOrAdmin() || resource.data.userId in ['all', 'customer'];
+      allow create: if isStaffOrAdmin() ||
+                       (isSignedIn() && request.resource.data.userId in ['admin', 'staff', request.auth.uid]);
+      allow update: if (isOwner(resource.data.userId) &&
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'readAt'])) ||
+                       isStaffOrAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Advertisements & Banners CMS - Public Read, Admin Write Only
+    match /advertisements/{adId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Payment & Security Audit Logs - Append-Only, Super Admin Read Only
+    match /auditLogs/{logId} {
+      allow read: if isSuperAdmin();
+      allow create: if isStaffOrAdmin() &&
+                       request.resource.data.actorId == request.auth.uid &&
+                       request.resource.data.action is string &&
+                       request.resource.data.targetType is string;
+      allow update, delete: if false;
+    }
+
+    // Default Fallback
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

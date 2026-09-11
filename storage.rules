@@ -1,0 +1,102 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role in ['admin', 'super_admin'] ||
+        request.auth.token.email in ['wshavu@gmail.com'] ||
+        (firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+         firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin'])
+      );
+    }
+
+    function isStaffOrAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role in ['admin', 'super_admin', 'staff'] ||
+        request.auth.token.email in ['wshavu@gmail.com'] ||
+        (firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+         firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin', 'staff'])
+      );
+    }
+    
+    function isValidImageType() {
+      return request.resource.contentType in [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/webp'
+      ];
+    }
+    
+    function isValidImageSize() {
+      return request.resource.size <= 5 * 1024 * 1024; // 5MB maximum limit
+    }
+
+    function isValidDocType() {
+      return request.resource.contentType in [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'text/plain',
+        'text/csv',
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/webp'
+      ];
+    }
+    
+    // User Profile Photos:
+    // Path: users/{userId}/profile_photos/{fileName}
+    match /users/{userId}/profile_photos/{fileName} {
+      // Avatars are readable for display across customer portal & headers
+      allow read: if true;
+      
+      // Strict Customer Isolation:
+      // Customers can ONLY create/update within their own profile_photos path
+      // Strictly enforces JPG/PNG/WEBP and <= 5MB (Rejects EXE, JS, HTML, SVG, ZIP, etc.)
+      allow create, update: if isOwner(userId)
+        && isValidImageType()
+        && isValidImageSize();
+        
+      // Customers can only delete their own profile photos
+      allow delete: if isOwner(userId);
+    }
+
+    // User Documents:
+    // Path: users/{userId}/documents/{fileName}
+    match /users/{userId}/documents/{fileName} {
+      allow read: if isOwner(userId) || isStaffOrAdmin();
+      allow create, update: if isOwner(userId)
+        && isValidDocType()
+        && request.resource.size <= 15 * 1024 * 1024; // 15MB max limit
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // Admin Catalog Assets (Products, Banners, Ads):
+    match /catalog/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin()
+        && isValidImageType()
+        && isValidImageSize();
+    }
+    
+    // Fallback: Deny all other arbitrary access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

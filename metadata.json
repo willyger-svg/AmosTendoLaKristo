@@ -1,0 +1,6 @@
+{
+  "name": "TK Stationery",
+  "description": "Stationery, Office Supplies, Public & Online Services, Printing, IT Support & Digital Solutions platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

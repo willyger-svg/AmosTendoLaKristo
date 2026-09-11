@@ -1,0 +1,182 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "User accounts with role-based access control",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "role": { "type": "string", "enum": ["customer", "staff", "admin", "super_admin"] },
+        "avatarUrl": { "type": "string" },
+        "address": { "type": "string" },
+        "city": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "fullName", "email", "role", "createdAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Stationery and tech products available for sale",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" },
+        "shortDescription": { "type": "string" },
+        "category": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "brand": { "type": "string" },
+        "sku": { "type": "string" },
+        "price": { "type": "number" },
+        "compareAtPrice": { "type": "number" },
+        "stockQuantity": { "type": "number" },
+        "lowStockThreshold": { "type": "number" },
+        "image": { "type": "string" },
+        "images": { "type": "array", "items": { "type": "string" } },
+        "isActive": { "type": "boolean" },
+        "isFeatured": { "type": "boolean" },
+        "isBestSeller": { "type": "boolean" },
+        "unit": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "price", "category", "isActive"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Stationery product purchase orders",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "customerEmail": { "type": "string" },
+        "items": { "type": "array" },
+        "subtotal": { "type": "number" },
+        "deliveryFee": { "type": "number" },
+        "total": { "type": "number" },
+        "deliveryMethod": { "type": "string" },
+        "deliveryAddress": { "type": "string" },
+        "deliveryDistrict": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "paymentStatus": { "type": "string", "enum": ["unpaid", "pending", "paid", "failed", "refunded", "Pending (Pay on Delivery/Pickup)", "Simulated Verification", "Paid"] },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "processing", "packed", "ready_for_pickup", "out_for_delivery", "delivered", "completed", "cancelled", "Submitted", "Processing", "Ready", "Out for Delivery", "Completed", "Cancelled"] },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "customerName", "customerPhone", "items", "total", "status", "createdAt"]
+    },
+    "ServiceRequest": {
+      "title": "Service Request",
+      "description": "Printing, Public Portal assistance, Design, and IT tickets",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "ticketId": { "type": "string" },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "customerEmail": { "type": "string" },
+        "serviceType": { "type": "string" },
+        "serviceTitle": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string" },
+        "priority": { "type": "string" },
+        "estimatedCost": { "type": "string" },
+        "assignedStaffId": { "type": "string" },
+        "assignedStaffName": { "type": "string" },
+        "internalNotes": { "type": "string" },
+        "details": { "type": "object" },
+        "fileName": { "type": "string" },
+        "fileUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "customerName", "customerPhone", "serviceType", "status", "createdAt"]
+    },
+    "Quote": {
+      "title": "Technology Quote Request",
+      "description": "Web, Mobile, POS, and custom software quote inquiries",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "quoteId": { "type": "string" },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerCompany": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "customerEmail": { "type": "string" },
+        "projectType": { "type": "string" },
+        "businessScale": { "type": "string" },
+        "features": { "type": "array", "items": { "type": "string" } },
+        "timeline": { "type": "string" },
+        "estimatedRange": { "type": "string" },
+        "projectNotes": { "type": "string" },
+        "status": { "type": "string" },
+        "internalNotes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "customerName", "customerPhone", "projectType", "status", "createdAt"]
+    },
+    "Payment": {
+      "title": "Payment Transaction",
+      "description": "Tanzanian mobile money, bank, and cash payment transactions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "paymentId": { "type": "string" },
+        "orderId": { "type": "string" },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "provider": { "type": "string" },
+        "method": { "type": "string" },
+        "amount": { "type": "number" },
+        "currency": { "type": "string" },
+        "status": { "type": "string" },
+        "providerTransactionId": { "type": "string" },
+        "reference": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "orderId", "amount", "currency", "status", "method", "createdAt"]
+    },
+    "Notification": {
+      "title": "User Notification",
+      "description": "In-app and omnichannel notification records",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "type": { "type": "string" },
+        "channel": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "message", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "UserProfile", "description": "User profile with role" },
+    "/products/{productId}": { "schema": "Product", "description": "Store products" },
+    "/categories/{categoryId}": { "description": "Product categories" },
+    "/orders/{orderId}": { "schema": "Order", "description": "Stationery orders" },
+    "/serviceRequests/{requestId}": { "schema": "ServiceRequest", "description": "Printing & portal service tickets" },
+    "/quotes/{quoteId}": { "schema": "Quote", "description": "Tech consultation quote requests" },
+    "/payments/{paymentId}": { "schema": "Payment", "description": "Payment transactions" },
+    "/notifications/{notificationId}": { "schema": "Notification", "description": "Omnichannel notifications" },
+    "/auditLogs/{logId}": { "description": "Payment audit logs" },
+    "/settings/general": { "description": "General store & assistance settings" }
+  }
+}
