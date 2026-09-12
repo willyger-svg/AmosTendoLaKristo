@@ -34,6 +34,7 @@ export interface Product {
   id: string;
   slug: string;
   name: string;
+  title?: string;
   category: ProductCategory;
   categoryId?: string;
   price: number; // in TZS (TSh)
@@ -219,7 +220,7 @@ export interface Testimonial {
   rating: number;
   comment: string;
   serviceUsed: string;
-  isDemo: true;
+  isDemo?: boolean;
 }
 
 export type ActiveModal =

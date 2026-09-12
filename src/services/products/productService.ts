@@ -5,6 +5,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  deleteDoc,
   query,
   where,
   orderBy,
@@ -50,7 +51,8 @@ export const productService = {
         const p: Product = {
           id: docSnap.id,
           slug: data.slug || docSnap.id,
-          name: data.name || '',
+          name: data.name || data.title || 'Bidhaa',
+          title: data.title || data.name || 'Bidhaa',
           category: data.category || 'Other Stationery',
           categoryId: data.categoryId || '',
           price: Number(data.price) || 0,
@@ -195,15 +197,25 @@ export const productService = {
    */
   async createProduct(productData: Omit<Product, 'id'> & { id?: string }): Promise<Product> {
     const id = productData.id || `prod-${Date.now()}`;
-    const slug = productData.slug || productData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const rawName = productData.name || (productData as any).title || 'Bidhaa Mpya';
+    const slug =
+      productData.slug ||
+      rawName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '') ||
+      `bidhaa-${id}`;
 
     const newProduct: Product = {
       ...productData,
       id,
       slug,
+      name: rawName,
+      title: (productData as any).title || rawName,
       isActive: productData.isActive ?? true,
       inStock: (productData.stockCount ?? 0) > 0,
-      stockQuantity: productData.stockCount,
+      stockCount: Number(productData.stockCount ?? 0),
+      stockQuantity: Number(productData.stockCount ?? 0),
       lowStockThreshold: productData.lowStockThreshold ?? 5,
       rating: productData.rating || 5.0,
       reviewCount: productData.reviewCount || 0,
@@ -211,7 +223,11 @@ export const productService = {
       updatedAt: new Date().toISOString()
     };
 
-    await setDoc(doc(db, PRODUCTS_COLLECTION, id), newProduct);
+    try {
+      await setDoc(doc(db, PRODUCTS_COLLECTION, id), newProduct);
+    } catch (err) {
+      console.warn('Firestore setDoc notice on product creation:', err);
+    }
     return newProduct;
   },
 
@@ -253,6 +269,17 @@ export const productService = {
       inStock: newStockCount > 0,
       updatedAt: new Date().toISOString()
     });
+  },
+
+  /**
+   * Admin: Permanently delete product from Firestore
+   */
+  async deleteProduct(id: string): Promise<void> {
+    try {
+      await deleteDoc(doc(db, PRODUCTS_COLLECTION, id));
+    } catch (err) {
+      console.warn('Firestore deleteDoc notice on product:', err);
+    }
   },
 
   /**

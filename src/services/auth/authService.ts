@@ -22,9 +22,15 @@ import { auth, db } from '../../firebase/config';
 import { UserProfile, UserRole } from '../../types';
 import { storageService, UploadProgressCallback } from '../storage/storageService';
 
-const INITIAL_SUPER_ADMIN_EMAIL = 'amosstationery@gmail.com';
+const INITIAL_SUPER_ADMIN_EMAILS = [
+  'amosstationery@gmail.com',
+  'wshavu@gmail.com'
+];
 const ADMIN_1010_EMAIL = 'admin1010@tkstationery.co.tz';
 const ADMIN_1010_PASSWORD = 'TkAdminPass1010!#Secure';
+
+const isSuperAdminEmailAddress = (email: string) =>
+  INITIAL_SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === email.trim().toLowerCase());
 
 export const authService = {
   /**
@@ -39,7 +45,7 @@ export const authService = {
     extraDetails?: { city?: string; region?: string; address?: string }
   ): Promise<UserProfile> {
     const cleanEmail = email.trim().toLowerCase();
-    const isSuperAdminEmail = cleanEmail === INITIAL_SUPER_ADMIN_EMAIL.toLowerCase();
+    const isSuperAdminEmail = isSuperAdminEmailAddress(cleanEmail);
     const assignedRole: UserRole = isSuperAdminEmail ? 'super_admin' : role;
 
     const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
@@ -122,7 +128,7 @@ export const authService = {
     // Fetch user profile from Firestore
     let profile = await this.getUserProfile(user.uid);
     if (!profile) {
-      const isSuperAdminEmail = cleanIdentifier.toLowerCase() === INITIAL_SUPER_ADMIN_EMAIL.toLowerCase();
+      const isSuperAdminEmail = isSuperAdminEmailAddress(cleanIdentifier);
       profile = {
         id: user.uid,
         fullName: user.displayName || cleanIdentifier.split('@')[0],
@@ -210,7 +216,7 @@ export const authService = {
 
     // Standard administrator email login
     const cleanEmail = cleanId;
-    const isInitialSuperAdmin = cleanEmail.toLowerCase() === INITIAL_SUPER_ADMIN_EMAIL.toLowerCase();
+    const isInitialSuperAdmin = isSuperAdminEmailAddress(cleanEmail);
 
     let userCredential;
     try {

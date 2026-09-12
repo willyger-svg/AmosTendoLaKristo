@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 
 export const AdminProductsView: React.FC = () => {
-  const { products, refreshData, showToast } = useApp();
+  const { products, refreshData, showToast, addProduct, updateProductInState, removeProductFromState } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,7 +66,7 @@ export const AdminProductsView: React.FC = () => {
 
   const handleOpenEdit = (p: Product) => {
     setEditingProduct(p);
-    setTitle(p.name);
+    setTitle(p.name || p.title || '');
     setCategory(p.category);
     setPrice(p.price);
     setOriginalPrice(p.originalPrice || p.price);
@@ -85,8 +85,8 @@ export const AdminProductsView: React.FC = () => {
     setIsSubmitting(true);
     try {
       const productPayload: any = {
-        name: title,
-        title,
+        name: title.trim(),
+        title: title.trim(),
         category,
         price: Number(price),
         originalPrice: Number(originalPrice),
@@ -102,6 +102,7 @@ export const AdminProductsView: React.FC = () => {
       };
 
       if (editingProduct) {
+        updateProductInState(editingProduct.id, productPayload);
         await productService.updateProduct(editingProduct.id, productPayload);
         if (currentUser) {
           await auditLogService.logAdminAction({
@@ -123,6 +124,7 @@ export const AdminProductsView: React.FC = () => {
         });
       } else {
         const created = await productService.createProduct(productPayload);
+        addProduct(created);
         if (currentUser) {
           await auditLogService.logAdminAction({
             action: 'product_created',
@@ -139,7 +141,7 @@ export const AdminProductsView: React.FC = () => {
         showToast({
           type: 'success',
           title: 'Bidhaa Mpya Imeongezwa',
-          message: `${title} imeongezwa kwenye katalogi.`
+          message: `${title} imeongezwa kwenye katalogi kwa ufanisi.`
         });
       }
 
@@ -159,6 +161,7 @@ export const AdminProductsView: React.FC = () => {
   const handleToggleActive = async (product: Product) => {
     try {
       const nextActive = !product.isActive;
+      updateProductInState(product.id, { isActive: nextActive });
       await productService.updateProduct(product.id, { isActive: nextActive });
       if (currentUser) {
         await auditLogService.logAdminAction({
@@ -169,7 +172,7 @@ export const AdminProductsView: React.FC = () => {
           actorRole: userRole,
           targetType: 'product',
           targetId: product.id,
-          targetTitle: product.name,
+          targetTitle: product.name || product.title || '',
           details: { isActive: nextActive }
         });
       }
@@ -179,12 +182,45 @@ export const AdminProductsView: React.FC = () => {
     }
   };
 
+  const handleDeleteProduct = async (product: Product) => {
+    const prodName = product.name || product.title || 'Bidhaa hii';
+    if (!window.confirm(`Je, una uhakika unataka kuiondoa bidhaa "${prodName}" kwenye duka?`)) {
+      return;
+    }
+    try {
+      removeProductFromState(product.id);
+      await productService.deleteProduct(product.id);
+      if (currentUser) {
+        await auditLogService.logAdminAction({
+          action: 'product_deleted',
+          actorId: currentUser.uid,
+          actorEmail: currentUser.email || '',
+          actorName: userProfile?.fullName || '',
+          actorRole: userRole,
+          targetType: 'product',
+          targetId: product.id,
+          targetTitle: prodName,
+          details: { id: product.id }
+        });
+      }
+      showToast({
+        type: 'success',
+        title: 'Bidhaa Imeondolewa',
+        message: `"${prodName}" imeondolewa kwenye katalogi.`
+      });
+      await refreshData();
+    } catch {
+      showToast({ type: 'error', title: 'Hitilafu', message: 'Imeshindwa kuondoa bidhaa.' });
+    }
+  };
+
   const filteredProducts = products.filter(p => {
     const matchCat = categoryFilter === 'all' || p.category === categoryFilter;
     const q = searchTerm.trim().toLowerCase();
+    const pName = (p.name || p.title || '').toLowerCase();
     const matchSearch =
       !q ||
-      p.title.toLowerCase().includes(q) ||
+      pName.includes(q) ||
       (p.sku && p.sku.toLowerCase().includes(q)) ||
       p.category.toLowerCase().includes(q);
     return matchCat && matchSearch;
@@ -265,7 +301,7 @@ export const AdminProductsView: React.FC = () => {
                         </div>
                         <div className="min-w-0">
                           <p className="font-bold text-slate-900 dark:text-white truncate max-w-[220px]">
-                            {p.title}
+                            {p.name || p.title}
                           </p>
                           <p className="text-[11px] text-slate-400 font-mono">SKU: {p.sku || 'N/A'}</p>
                         </div>
@@ -303,13 +339,22 @@ export const AdminProductsView: React.FC = () => {
                       </button>
                     </td>
                     <td className="p-4 text-right">
-                      <button
-                        onClick={() => handleOpenEdit(p)}
-                        className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                        title="Hariri Bidhaa"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => handleOpenEdit(p)}
+                          className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                          title="Hariri Bidhaa"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(p)}
+                          className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
+                          title="Futa Bidhaa"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

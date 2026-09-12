@@ -28,6 +28,7 @@ interface AuthContextType {
   removeProfilePhoto: () => Promise<void>;
   getAllUsers: () => Promise<UserProfile[]>;
   setUserRole: (userId: string, newRole: UserRole) => Promise<void>;
+  refreshUserProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -171,6 +172,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const refreshUserProfile = async (): Promise<void> => {
+    if (currentUser) {
+      const p = await authService.getUserProfile(currentUser.uid);
+      if (p) {
+        setUserProfile(p);
+      }
+    } else {
+      try {
+        const cached = localStorage.getItem('tk_active_admin_session');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed?.id) {
+            const p = await authService.getUserProfile(parsed.id);
+            if (p) setUserProfile(p);
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+  };
+
   const userRole: UserRole = userProfile?.role || 'customer';
   const isSuperAdmin = userRole === 'super_admin';
   const isAdmin = userRole === 'admin' || isSuperAdmin;
@@ -195,7 +218,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         uploadProfilePhoto,
         removeProfilePhoto,
         getAllUsers,
-        setUserRole
+        setUserRole,
+        refreshUserProfile
       }}
     >
       {children}

@@ -52,8 +52,8 @@ export const AdminOverviewPage: React.FC = () => {
   // Compute Real Metrics
   const totalOrdersCount = orders.length;
   const pendingOrders = orders.filter(o => o.status === 'Submitted' || o.status === 'Processing');
-  const completedOrders = orders.filter(o => o.status === 'Completed');
-  const grossRevenue = completedOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+  const completedOrders = orders.filter(o => o.status === 'Completed' || o.status === 'completed' || o.status === 'delivered');
+  const grossRevenue = completedOrders.reduce((sum, o) => sum + (o.totalAmount || o.total || 0), 0);
 
   const pendingPayments = orders.filter(o => o.paymentStatus === 'pending' || o.paymentStatus === 'failed');
   const activeTickets = serviceTickets.filter(t => t.status === 'Received' || t.status === 'In Progress');

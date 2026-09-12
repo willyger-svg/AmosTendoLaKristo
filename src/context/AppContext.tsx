@@ -47,6 +47,9 @@ interface AppContextType {
   refreshAds: () => Promise<void>;
   isLoadingData: boolean;
   refreshData: () => Promise<void>;
+  addProduct: (product: Product) => void;
+  updateProductInState: (id: string, updates: Partial<Product>) => void;
+  removeProductFromState: (id: string) => void;
   createOrder: (order: Partial<Order> & { customerName: string; customerPhone: string; items: any[] }) => Promise<Order>;
   createServiceTicket: (ticket: Partial<ServiceTicket> & { customerName: string; customerPhone: string; serviceType: string }) => Promise<ServiceTicket>;
   createQuoteRequest: (quote: Partial<QuoteRequest> & { customerName: string; customerPhone: string; projectType: string }) => Promise<QuoteRequest>;
@@ -65,6 +68,29 @@ const CART_STORAGE_KEY = 'tk_stationery_cart_v1';
 const ORDERS_STORAGE_KEY = 'tk_stationery_orders_v1';
 const TICKETS_STORAGE_KEY = 'tk_stationery_tickets_v1';
 const QUOTES_STORAGE_KEY = 'tk_stationery_quotes_v1';
+const PRODUCTS_STORAGE_KEY = 'tk_stationery_products_cache_v1';
+
+// Scrub legacy mock/demo records so only real user transactions persist
+const sanitizeOrders = (rawOrders: any[]): Order[] => {
+  if (!Array.isArray(rawOrders)) return [];
+  const fakeIds = ['TK-ORD-1042', 'TK-ORD-1043', 'TK-ORD-1044', 'TK-ORD-1045'];
+  const fakeNames = ['Juma Ramadhani', 'Neema Mwamburi', 'Baraka Shadrack', 'Amina Kassim'];
+  return rawOrders.filter(o => o && o.id && !fakeIds.includes(o.id) && !fakeNames.includes(o.customerName));
+};
+
+const sanitizeTickets = (rawTickets: any[]): ServiceTicket[] => {
+  if (!Array.isArray(rawTickets)) return [];
+  const fakeIds = ['TK-PRT-4091', 'TK-GOV-2088', 'TK-IT-3012'];
+  const fakeNames = ['Emmanuel Lyimo', 'Fatma Said', 'Rashid Bakari'];
+  return rawTickets.filter(t => t && t.id && !fakeIds.includes(t.id) && !fakeNames.includes(t.customerName));
+};
+
+const sanitizeQuotes = (rawQuotes: any[]): QuoteRequest[] => {
+  if (!Array.isArray(rawQuotes)) return [];
+  const fakeIds = ['TK-QTE-7714', 'TK-QTE-7715'];
+  const fakeNames = ['Goodluck Mtei', 'Advocate Sarah Mwakipesile'];
+  return rawQuotes.filter(q => q && q.id && !fakeIds.includes(q.id) && !fakeNames.includes(q.customerName));
+};
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Routing based on window.location.hash or memory path
@@ -125,38 +151,101 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, [cart]);
 
-  // Persistent Collections State
+  // Persistent Collections State (Initialized strictly empty or sanitized real records)
   const [orders, setOrders] = useState<Order[]>(() => {
     try {
       const saved = localStorage.getItem(ORDERS_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : mockOrders;
+      return saved ? sanitizeOrders(JSON.parse(saved)) : [];
     } catch {
-      return mockOrders;
+      return [];
     }
   });
 
   const [serviceTickets, setServiceTickets] = useState<ServiceTicket[]>(() => {
     try {
       const saved = localStorage.getItem(TICKETS_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : mockServiceTickets;
+      return saved ? sanitizeTickets(JSON.parse(saved)) : [];
     } catch {
-      return mockServiceTickets;
+      return [];
     }
   });
 
   const [quoteRequests, setQuoteRequests] = useState<QuoteRequest[]>(() => {
     try {
       const saved = localStorage.getItem(QUOTES_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : mockQuoteRequests;
+      return saved ? sanitizeQuotes(JSON.parse(saved)) : [];
     } catch {
-      return mockQuoteRequests;
+      return [];
     }
   });
 
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const [products, setProducts] = useState<Product[]>(() => {
+    try {
+      const cached = localStorage.getItem(PRODUCTS_STORAGE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    return mockProducts;
+  });
+
   const [storeSettings, setStoreSettings] = useState<StoreSettings>(DEFAULT_STORE_SETTINGS);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>(mockAdvertisements);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
+
+  // Sync products cache to localStorage whenever products state updates
+  useEffect(() => {
+    try {
+      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(products));
+    } catch (e) {
+      console.warn('Products cache storage error:', e);
+    }
+  }, [products]);
+
+  // Sync orders to localStorage whenever real orders change
+  useEffect(() => {
+    try {
+      localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(orders));
+    } catch (e) {
+      console.warn('Orders storage error:', e);
+    }
+  }, [orders]);
+
+  // Sync service tickets to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(TICKETS_STORAGE_KEY, JSON.stringify(serviceTickets));
+    } catch (e) {
+      console.warn('Tickets storage error:', e);
+    }
+  }, [serviceTickets]);
+
+  // Sync quote requests to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(QUOTES_STORAGE_KEY, JSON.stringify(quoteRequests));
+    } catch (e) {
+      console.warn('Quotes storage error:', e);
+    }
+  }, [quoteRequests]);
+
+  // Admin In-State Product Modifiers
+  const addProduct = (newProd: Product) => {
+    setProducts(prev => [newProd, ...prev.filter(p => p.id !== newProd.id)]);
+  };
+
+  const updateProductInState = (id: string, updates: Partial<Product>) => {
+    setProducts(prev =>
+      prev.map(p => (p.id === id ? { ...p, ...updates, updatedAt: new Date().toISOString() } : p))
+    );
+  };
+
+  const removeProductFromState = (id: string) => {
+    setProducts(prev => prev.filter(p => p.id !== id));
+  };
 
   // Synchronize settings & ads
   const refreshAds = useCallback(async () => {
@@ -198,21 +287,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       // Orders
       const firestoreOrders = await orderService.getAllOrders();
-      if (firestoreOrders.length > 0) {
-        setOrders(firestoreOrders);
-      }
+      setOrders(sanitizeOrders(firestoreOrders));
 
       // Tickets
       const firestoreTickets = await serviceRequestService.getAllServiceRequests();
-      if (firestoreTickets.length > 0) {
-        setServiceTickets(firestoreTickets);
-      }
+      setServiceTickets(sanitizeTickets(firestoreTickets));
 
       // Quotes
       const firestoreQuotes = await quoteService.getAllQuotes();
-      if (firestoreQuotes.length > 0) {
-        setQuoteRequests(firestoreQuotes);
-      }
+      setQuoteRequests(sanitizeQuotes(firestoreQuotes));
     } catch (err) {
       console.warn('Firestore synchronization notice:', err);
     } finally {
@@ -464,6 +547,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         serviceTickets,
         quoteRequests,
         products,
+        addProduct,
+        updateProductInState,
+        removeProductFromState,
         storeSettings,
         advertisements,
         updateStoreSettings,

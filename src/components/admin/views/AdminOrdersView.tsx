@@ -155,23 +155,37 @@ export const AdminOrdersView: React.FC = () => {
                       <p className="text-[11px] text-slate-400 font-mono mt-0.5">{order.customerPhone}</p>
                     </td>
                     <td className="p-4">
-                      <span className="font-semibold text-slate-700 dark:text-slate-300">{order.items.length} bidhaa</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">
+                        {order.items?.length || 0} bidhaa
+                      </span>
                       <p className="text-[11px] text-slate-400 truncate max-w-[180px]">
-                        {order.items.map(i => `${i.quantity}x ${i.product.title}`).join(', ')}
+                        {order.items
+                          ?.map(
+                            i =>
+                              `${i.quantity}x ${
+                                (i as any).productName ||
+                                (i as any).product?.name ||
+                                (i as any).product?.title ||
+                                'Bidhaa'
+                              }`
+                          )
+                          .join(', ') || 'Bila bidhaa'}
                       </p>
                     </td>
                     <td className="p-4 font-black text-slate-900 dark:text-white">
-                      {formatPrice(order.totalAmount)}
+                      {formatPrice(order.totalAmount || order.total || 0)}
                     </td>
                     <td className="p-4">
                       <span
                         className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          order.paymentStatus === 'successful'
+                          order.paymentStatus === 'successful' || order.paymentStatus === 'Paid'
                             ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
                             : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
                         }`}
                       >
-                        {order.paymentStatus === 'successful' ? 'Imelipwa' : order.paymentStatus || 'Inasubiri'}
+                        {order.paymentStatus === 'successful' || order.paymentStatus === 'Paid'
+                          ? 'Imelipwa'
+                          : order.paymentStatus || 'Inasubiri'}
                       </span>
                     </td>
                     <td className="p-4">
@@ -243,19 +257,34 @@ export const AdminOrdersView: React.FC = () => {
               <div className="space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Bidhaa za Oda Hii</h4>
                 <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
-                  {selectedOrder.items.map((item, idx) => (
-                    <div key={idx} className="p-3.5 flex items-center justify-between text-xs">
-                      <div>
-                        <p className="font-bold text-slate-800 dark:text-slate-200">{item.product.title}</p>
-                        <p className="text-[11px] text-slate-400">
-                          {item.quantity} x {formatPrice(item.product.price)}
+                  {selectedOrder.items?.map((item, idx) => {
+                    const itemName =
+                      (item as any).productName ||
+                      (item as any).product?.name ||
+                      (item as any).product?.title ||
+                      'Bidhaa';
+                    const unitPrice =
+                      Number((item as any).unitPrice) ||
+                      Number((item as any).product?.price) ||
+                      0;
+                    const itemTotal =
+                      Number((item as any).totalPrice) ||
+                      (item.quantity || 1) * unitPrice;
+
+                    return (
+                      <div key={idx} className="p-3.5 flex items-center justify-between text-xs">
+                        <div>
+                          <p className="font-bold text-slate-800 dark:text-slate-200">{itemName}</p>
+                          <p className="text-[11px] text-slate-400">
+                            {item.quantity} x {formatPrice(unitPrice)}
+                          </p>
+                        </div>
+                        <p className="font-black text-slate-900 dark:text-white">
+                          {formatPrice(itemTotal)}
                         </p>
                       </div>
-                      <p className="font-black text-slate-900 dark:text-white">
-                        {formatPrice(item.quantity * item.product.price)}
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -263,10 +292,16 @@ export const AdminOrdersView: React.FC = () => {
               <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-bold text-slate-900 dark:text-white">Jumla ya Thamani ya Oda</p>
-                  <p className="text-[11px] text-slate-500">Malipo: {selectedOrder.paymentMethod.toUpperCase()} ({selectedOrder.paymentStatus === 'successful' ? 'Yamekamilika' : 'Yanasubiri'})</p>
+                  <p className="text-[11px] text-slate-500">
+                    Malipo: {selectedOrder.paymentMethod ? selectedOrder.paymentMethod.toUpperCase() : 'CASH'} (
+                    {selectedOrder.paymentStatus === 'successful' || selectedOrder.paymentStatus === 'Paid'
+                      ? 'Yamekamilika'
+                      : 'Yanasubiri'}
+                    )
+                  </p>
                 </div>
                 <p className="text-xl font-black text-amber-600 dark:text-amber-400">
-                  {formatPrice(selectedOrder.totalAmount)}
+                  {formatPrice(selectedOrder.totalAmount || selectedOrder.total || 0)}
                 </p>
               </div>
             </div>
