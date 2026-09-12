@@ -2,7 +2,6 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider, useTranslation } from './context/LanguageContext';
-import { TopBar } from './components/layout/TopBar';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { MobileNavigation } from './components/layout/MobileNavigation';
@@ -122,7 +121,6 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-amber-400 selection:text-slate-950 font-sans">
-      {!isAdminSection && <TopBar />}
       {!isAdminSection && <Header onOpenMobileNav={() => setIsMobileNavOpen(true)} />}
 
       <main className="flex-1">

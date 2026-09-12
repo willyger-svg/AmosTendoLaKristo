@@ -40,9 +40,7 @@ export const Footer: React.FC = () => {
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-              Your comprehensive business, educational, and digital bureau in Tanzania.
-              We supply quality stationery, expedite document printing, assist with
-              public internet portals, and develop custom software for modern enterprises.
+              Kituo chako namba moja cha vifaa vya shule na ofisi, uchapaji wa nyaraka (laser printing, binding, passport photos), na msaada wa huduma za serikali mtandaoni (NIDA, TRA, Polisi, RITA) jijini Dar es Salaam.
             </p>
 
             {/* Direct WhatsApp CTA */}
@@ -90,17 +88,17 @@ export const Footer: React.FC = () => {
           {/* Col 3: Services & Assistance */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4 border-b border-slate-800 pb-2">
-              Services & Assistance
+              Huduma Kuu
             </h4>
             <ul className="space-y-2 text-xs">
               {[
-                { label: 'Online Public Services (NIDA/TRA)', path: '/online-services' },
-                { label: 'Document Printing & Copying', path: '/printing' },
-                { label: 'Binding & Lamination', path: '/printing' },
-                { label: 'Passport-Size Photos', path: '/printing' },
-                { label: 'Graphic & Logo Design', path: '/graphic-design' },
-                { label: 'IT Support & PC Repair', path: '/it-support' },
-                { label: 'Custom Software & Websites', path: '/digital-solutions' }
+                { label: 'Huduma za Serikali (NIDA/TRA)', path: '/online-services' },
+                { label: 'Uchapaji wa Nyaraka (Printing)', path: '/printing' },
+                { label: 'Binding na Hardcover Thesis', path: '/printing' },
+                { label: 'Picha za Pasipoti (Passport)', path: '/printing' },
+                { label: 'Uchapaji wa Risiti & Ankara', path: '/printing' },
+                { label: 'Kikokotoo cha Bei ya Printing', path: '/printing' },
+                { label: 'Ripoti ya Polisi ya Upotevu', path: '/online-services?focus=POLICE' }
               ].map(link => (
                 <li key={link.label}>
                   <button
@@ -123,7 +121,7 @@ export const Footer: React.FC = () => {
 
             <div className="flex items-start gap-2 text-xs text-slate-400">
               <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-              <span>Dar es Salaam, Tanzania (Central Business & Suburb Hubs)</span>
+              <span>Manzese, Dar es Salaam (Karibia na Kituo cha Mwendokasi cha Bakhresa)</span>
             </div>
 
             <div className="flex items-start gap-2 text-xs text-slate-400">
@@ -137,16 +135,6 @@ export const Footer: React.FC = () => {
             <div className="flex items-start gap-2 text-xs text-slate-400">
               <Phone className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span>{TK_PHONE_DISPLAY}</span>
-            </div>
-
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={() => navigateTo('/admin/login')}
-                className="text-[11px] text-slate-500 hover:text-amber-400 underline transition-colors"
-              >
-                Staff & Operations Portal &rarr;
-              </button>
             </div>
           </div>
         </div>

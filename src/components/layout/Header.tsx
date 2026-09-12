@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from '../../context/LanguageContext';
 import { Button } from '../common/Button';
 import { mockProducts } from '../../data/products';
 import { printingServices } from '../../data/services';
@@ -46,6 +47,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
     openModal
   } = useApp();
 
+  const { language, setLanguage } = useTranslation();
   const { currentUser, userProfile, isStaff } = useAuth();
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -171,7 +173,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
                   TK STATIONERY
                 </span>
                 <span className="text-[10px] font-bold text-amber-600 tracking-wider uppercase mt-0.5">
-                  Stationery • Printing • Digital
+                  Manzese, Dar es Salaam (Bakhresa)
                 </span>
               </div>
             </button>
@@ -418,19 +420,51 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
               </div>
             )}
 
+            {/* Language Switcher */}
+            <div className="hidden sm:flex items-center bg-slate-100 rounded-lg p-0.5 text-[11px] font-bold">
+              <button
+                type="button"
+                onClick={() => setLanguage('sw')}
+                className={`px-2 py-1 rounded-md transition-all ${
+                  language === 'sw'
+                    ? 'bg-amber-400 text-slate-950 shadow-2xs font-extrabold'
+                    : 'text-slate-600 hover:text-slate-950'
+                }`}
+                title="Badili lugha kuwa Kiswahili"
+              >
+                SW
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`px-2 py-1 rounded-md transition-all ${
+                  language === 'en'
+                    ? 'bg-amber-400 text-slate-950 shadow-2xs font-extrabold'
+                    : 'text-slate-600 hover:text-slate-950'
+                }`}
+                title="Switch to English"
+              >
+                EN
+              </button>
+            </div>
+
             {/* Account Link / Sign In Trigger */}
-            <Tooltip content={currentUser ? `Account: ${userProfile?.fullName || currentUser.email}` : 'Sign in to your customer account'}>
+            <Tooltip content={currentUser || userProfile ? (isStaff || userProfile?.role === 'super_admin' || userProfile?.role === 'admin' ? `Jopo la Admin: ${userProfile?.fullName || 'Msimamizi'}` : `Akaunti: ${userProfile?.fullName || currentUser?.email}`) : 'Ingia kwenye akaunti yako'}>
               <button
                 type="button"
                 onClick={() => {
-                  if (currentUser) {
-                    navigateTo('/account');
+                  if (currentUser || userProfile) {
+                    if (isStaff || userProfile?.role === 'super_admin' || userProfile?.role === 'admin') {
+                      navigateTo('/admin');
+                    } else {
+                      navigateTo('/account');
+                    }
                   } else {
-                    openModal({ type: 'auth-modal', mode: 'login' });
+                    navigateTo('/login');
                   }
                 }}
                 className="p-2 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl transition-colors flex items-center gap-2 active:scale-[0.98]"
-                aria-label={currentUser ? 'Customer Account' : 'Sign In'}
+                aria-label={currentUser ? (isStaff ? 'Admin Portal' : 'Customer Account') : 'Ingia'}
               >
                 {userProfile?.avatarUrl ? (
                   <img
@@ -442,7 +476,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
                   <User className="w-5 h-5" />
                 )}
                 <span className="hidden lg:inline text-xs font-medium text-slate-700 max-w-[120px] truncate">
-                  {currentUser ? (userProfile?.fullName ? userProfile.fullName.split(' ')[0] : 'My Account') : 'Sign In'}
+                  {currentUser || userProfile ? (userProfile?.fullName ? userProfile.fullName.split(' ')[0] : (isStaff ? 'Admin' : 'Akaunti')) : 'Ingia'}
                 </span>
               </button>
             </Tooltip>

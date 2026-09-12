@@ -98,11 +98,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
           <div className="pt-2 flex flex-col gap-3">
             <button
-              onClick={() => navigateTo('/admin/login')}
+              onClick={() => navigateTo('/login')}
               className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2"
             >
               <LogIn className="w-4 h-4" />
-              <span>{language === 'sw' ? 'Ingia Jopo la Admin' : 'Sign In to Admin Portal'}</span>
+              <span>{language === 'sw' ? 'Ingia Kwenye Mfumo' : 'Sign In'}</span>
             </button>
             <button
               onClick={() => navigateTo('/')}

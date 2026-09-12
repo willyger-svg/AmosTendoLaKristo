@@ -48,7 +48,7 @@ export class MockPaymentProvider implements PaymentProvider {
 
       case 'bank':
         paybillNumber = 'CRDB BANK / NMB BANK';
-        accountNumber = '0150-8829-1002 (CRDB Mwenge Tower Branch)';
+        accountNumber = '0150-8829-1002 (CRDB Bank)';
         instructions = `Please transfer ${formatTSh(req.amount)} to CRDB Bank Account No: 0150-8829-1002 (Account Name: TK Stationery Ltd) with reference "${req.orderId}".`;
         break;
 
@@ -58,7 +58,7 @@ export class MockPaymentProvider implements PaymentProvider {
 
       case 'cash_at_store':
       default:
-        instructions = `Pay at TK Stationery counter (Mwenge Tower / Posta branch) when collecting your items.`;
+        instructions = `Pay at TK Stationery counter (Manzese — Karibu na kituo cha mwendokasi cha Bakhresa) when collecting your items.`;
         break;
     }
 

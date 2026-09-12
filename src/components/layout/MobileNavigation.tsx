@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from '../../context/LanguageContext';
 import { createWhatsAppUrl, TK_PHONE_DISPLAY } from '../../utils/whatsapp';
 import { HelpCircle } from 'lucide-react';
 
@@ -32,11 +33,22 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
 }) => {
   const { navigateTo, currentPath, openModal } = useApp();
   const { currentUser, userProfile } = useAuth();
+  const { language, setLanguage } = useTranslation();
 
   if (!isOpen) return null;
 
   const handleNav = (path: string) => {
     onClose();
+    if (path === '/account') {
+      if (userProfile?.role === 'super_admin' || userProfile?.role === 'admin' || userProfile?.role === 'staff') {
+        navigateTo('/admin');
+        return;
+      }
+      if (!currentUser) {
+        navigateTo('/login');
+        return;
+      }
+    }
     navigateTo(path);
   };
 
@@ -45,11 +57,18 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
     openModal({ type: 'quick-help' });
   };
 
-  const navLinks = [
+  interface MobileNavItem {
+    label: string;
+    path: string;
+    icon: React.ReactNode;
+    badge?: string;
+  }
+
+  const navLinks: MobileNavItem[] = [
     { label: 'Nyumbani', path: '/', icon: <Home className="w-5 h-5" /> },
-    { label: 'Duka la Vifaa (Shop)', path: '/shop', icon: <ShoppingBag className="w-5 h-5" /> },
+    { label: 'Duka la Vifaa (Shop)', path: '/shop', icon: <ShoppingBag className="w-5 h-5" />, badge: 'Duka' },
     { label: 'Huduma za Chapisho (Printing)', path: '/printing', icon: <Printer className="w-5 h-5" /> },
-    { label: 'Huduma za Serikali (NIDA/TRA)', path: '/online-services', icon: <ShieldCheck className="w-5 h-5" /> },
+    { label: 'Huduma za Serikali (NIDA/TRA)', path: '/online-services', icon: <ShieldCheck className="w-5 h-5" />, badge: 'NIDA' },
     { label: 'Fuatilia Oda Yako', path: '/track-order', icon: <Search className="w-5 h-5" /> },
     { label: 'Akaunti Yangu', path: '/account', icon: <User className="w-5 h-5" /> },
     { label: 'Kuhusu Sisi', path: '/about', icon: <Info className="w-5 h-5" /> },
@@ -158,7 +177,36 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
         </div>
 
         {/* Bottom Drawer Contact & Helpline */}
-        <div className="p-4 border-t border-slate-100 bg-slate-50 space-y-2">
+        <div className="p-4 border-t border-slate-100 bg-slate-50 space-y-2.5">
+          {/* Language Toggle */}
+          <div className="flex items-center justify-between px-1">
+            <span className="text-xs font-bold text-slate-600">Lugha / Language:</span>
+            <div className="flex items-center bg-slate-200/80 rounded-lg p-0.5 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setLanguage('sw')}
+                className={`px-3 py-1 rounded-md transition-all ${
+                  language === 'sw'
+                    ? 'bg-amber-400 text-slate-950 shadow-xs font-black'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Kiswahili
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`px-3 py-1 rounded-md transition-all ${
+                  language === 'en'
+                    ? 'bg-amber-400 text-slate-950 shadow-xs font-black'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                English
+              </button>
+            </div>
+          </div>
+
           <a
             href={createWhatsAppUrl('Hello TK Stationery! I need assistance.')}
             target="_blank"

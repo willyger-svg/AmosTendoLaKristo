@@ -8,7 +8,7 @@ export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   paymentWhatsAppNumber: '0787754202',
   displayPhoneNumber: '+255 787 754 202',
   businessEmail: 'info@tkstationery.co.tz',
-  storeAddress: 'Shekilango Road / Mwenge, Dar es Salaam, Tanzania',
+  storeAddress: 'Manzese, Dar es Salaam (Karibu na Kituo cha Mwendokasi cha Bakhresa)',
   businessHours: 'Mon - Sat: 8:00 AM - 8:00 PM | Sun: 10:00 AM - 4:00 PM',
   darDeliveryFee: 3000,
   upcountryDeliveryFee: 7000,

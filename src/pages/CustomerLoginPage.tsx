@@ -31,12 +31,16 @@ export const CustomerLoginPage: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // If already logged in, redirect to customer account
+  // If already logged in, redirect to appropriate portal
   useEffect(() => {
-    if (currentUser) {
-      navigateTo('/account');
+    if (currentUser || userProfile) {
+      if (userProfile?.role === 'super_admin' || userProfile?.role === 'admin' || userProfile?.role === 'staff') {
+        navigateTo('/admin');
+      } else if (currentUser) {
+        navigateTo('/account');
+      }
     }
-  }, [currentUser, navigateTo]);
+  }, [currentUser, userProfile, navigateTo]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,13 +55,28 @@ export const CustomerLoginPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await login(cleanIdentifier, password);
-      showToast({
-        type: 'success',
-        title: 'Karibu Tena!',
-        message: 'Umeingia kikamilifu kwenye akaunti yako ya TK Stationery.'
-      });
-      navigateTo('/account');
+      const profile = await login(cleanIdentifier, password);
+
+      const isStaffOrAdmin =
+        profile.role === 'super_admin' ||
+        profile.role === 'admin' ||
+        profile.role === 'staff';
+
+      if (isStaffOrAdmin) {
+        showToast({
+          type: 'success',
+          title: 'Uthibitisho Umekamilika!',
+          message: `Karibu ${profile.fullName || 'Msimamizi'} kwenye Jopo Kuu la Usimamizi.`
+        });
+        navigateTo('/admin');
+      } else {
+        showToast({
+          type: 'success',
+          title: 'Karibu Tena!',
+          message: 'Umeingia kikamilifu kwenye akaunti yako ya TK Stationery.'
+        });
+        navigateTo('/account');
+      }
     } catch (err: any) {
       console.warn('Customer Login Error:', err);
       if (
@@ -69,7 +88,7 @@ export const CustomerLoginPage: React.FC = () => {
       } else if (err.code === 'auth/too-many-requests') {
         setErrorMessage('Majaribio yamezidi. Tafadhali subiri kidogo kisha ujaribu tena.');
       } else {
-        setErrorMessage('Hitilafu ya kuingia. Tafadhali hakiki muunganisho wa intaneti.');
+        setErrorMessage('Hitilafu ya kuingia. Tafadhali hakiki taarifa au muunganisho wa intaneti.');
       }
     } finally {
       setIsSubmitting(false);
@@ -344,7 +363,7 @@ export const CustomerLoginPage: React.FC = () => {
                   type="text"
                   value={city}
                   onChange={e => setCity(e.target.value)}
-                  placeholder="e.g. Dar es Salaam, Mwenge"
+                  placeholder="e.g. Manzese, Dar es Salaam"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
                 />
               </div>
@@ -437,16 +456,10 @@ export const CustomerLoginPage: React.FC = () => {
             </form>
           )}
 
-          {/* Admin link at the bottom */}
-          <div className="pt-4 border-t border-slate-200 text-center">
-            <button
-              type="button"
-              onClick={() => navigateTo('/admin/login')}
-              className="text-xs font-medium text-slate-500 hover:text-amber-600 flex items-center justify-center gap-1.5 mx-auto transition-colors"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-              <span>Msimamizi wa Duka? Ingia hapa &rarr;</span>
-            </button>
+          {/* Trust and Security indicator */}
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-[11px] text-slate-400">
+            <ShieldCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <span>Mfumo Salama wa Kuingia (256-Bit SSL Secured)</span>
           </div>
         </div>
       </div>

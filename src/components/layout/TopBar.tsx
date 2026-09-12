@@ -18,7 +18,7 @@ export const TopBar: React.FC = () => {
         <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
           <div className="flex items-center gap-1.5 text-slate-300">
             <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span>{storeSettings?.storeAddress || 'Mwenge / Shekilango, Dar es Salaam'}</span>
+            <span>{storeSettings?.storeAddress || 'Manzese, Dar es Salaam (Karibia na Kituo cha Mwendokasi cha Bakhresa)'}</span>
           </div>
 
           <div className="hidden md:flex items-center gap-1.5 text-slate-400">

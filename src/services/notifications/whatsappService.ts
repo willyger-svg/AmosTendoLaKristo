@@ -72,7 +72,7 @@ export class WhatsAppService {
           `• Agizo: *${data.orderId}*\n` +
           `• Kiasi Kinachotakiwa: *${formatTSh(data.amount || 0)}*\n` +
           `• Njia: *${data.paymentMethod || 'Mobile Money / Cash'}*\n\n` +
-          `Tafadhali kamilisha malipo au lipa wakati wa kuchukua bidhaa zako dukani Mwenge Tower.`
+          `Tafadhali kamilisha malipo au lipa wakati wa kuchukua bidhaa zako dukani Manzese (karibu na kituo cha mwendokasi cha Bakhresa).`
         );
 
       case 'payment_failed':
@@ -92,7 +92,7 @@ export class WhatsAppService {
       case 'order_ready':
         return (
           `*TK STATIONERY — AGIZO LIKO TAYARI*\n\n` +
-          `Habari! Agizo lako *${data.orderId}* liko tayari kwa ajili ya kuchukuliwa katika kituo cha TK Stationery (Mwenge Tower, Dar es Salaam).\n\n` +
+          `Habari! Agizo lako *${data.orderId}* liko tayari kwa ajili ya kuchukuliwa katika kituo cha TK Stationery (Manzese, Dar es Salaam — Karibu na Kituo cha Mwendokasi cha Bakhresa).\n\n` +
           `Karibu sana!`
         );
 

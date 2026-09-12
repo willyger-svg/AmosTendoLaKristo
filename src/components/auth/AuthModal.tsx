@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export const AuthModal: React.FC = () => {
-  const { activeModal, closeModal, showToast } = useApp();
+  const { activeModal, closeModal, showToast, navigateTo } = useApp();
   const { login, signUp, resetPassword, loading } = useAuth();
 
   const [mode, setMode] = useState<'login' | 'register' | 'forgot'>(
@@ -44,11 +44,27 @@ export const AuthModal: React.FC = () => {
     }
 
     try {
-      await login(email.trim(), password);
+      const profile = await login(email.trim(), password);
+      const isStaffOrAdmin =
+        profile.role === 'super_admin' ||
+        profile.role === 'admin' ||
+        profile.role === 'staff';
+
+      if (isStaffOrAdmin) {
+        showToast({
+          type: 'success',
+          title: 'Uthibitisho Umekamilika!',
+          message: `Karibu ${profile.fullName || 'Msimamizi'} kwenye Jopo Kuu la Usimamizi.`
+        });
+        closeModal();
+        navigateTo('/admin');
+        return;
+      }
+
       showToast({
         type: 'success',
-        title: 'Welcome Back',
-        message: 'You have signed in successfully.'
+        title: 'Karibu Tena!',
+        message: 'Umeingia kikamilifu kwenye akaunti yako.'
       });
       closeModal();
     } catch (err: any) {

@@ -40,7 +40,8 @@ import {
   X,
   Lock,
   LogOut,
-  AlertTriangle
+  AlertTriangle,
+  ShieldCheck
 } from 'lucide-react';
 
 export const CustomerAccountPage: React.FC = () => {
@@ -315,15 +316,9 @@ export const CustomerAccountPage: React.FC = () => {
                 </Button>
               </div>
 
-              <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
-                <span>{language === 'sw' ? 'Wafanyakazi au Wasimamizi?' : 'Staff or Administrator?'}</span>
-                <button
-                  type="button"
-                  onClick={() => navigateTo('/admin/login')}
-                  className="text-amber-600 dark:text-amber-400 font-bold hover:underline min-h-[44px] flex items-center"
-                >
-                  {language === 'sw' ? 'Mlango wa Admin →' : 'Admin Login Portal →'}
-                </button>
+              <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-center text-xs text-slate-500 gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span>{language === 'sw' ? 'Mfumo salama unaolinda taarifa zako (256-Bit SSL Secured)' : 'Protected by 256-Bit SSL Encryption'}</span>
               </div>
             </div>
           </div>
@@ -388,6 +383,33 @@ export const CustomerAccountPage: React.FC = () => {
             badges={badges}
           />
         </div>
+
+        {/* Admin Shortcut if authenticated as Admin or Staff */}
+        {(userProfile?.role === 'super_admin' || userProfile?.role === 'admin' || userProfile?.role === 'staff') && (
+          <div className="mb-6 p-4 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg border border-slate-800">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white">
+                  {language === 'sw' ? 'Umeingia kama Msimamizi' : 'Signed in as Administrator'} ({userProfile.fullName || 'Admin'})
+                </p>
+                <p className="text-xs text-slate-400">
+                  {language === 'sw' ? 'Una ruhusa kamili za kiutawala za kuona maagizo na kusimamia duka.' : 'You have administrator privileges to manage the store and requests.'}
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => navigateTo('/admin')}
+              className="shrink-0 w-full sm:w-auto"
+            >
+              {language === 'sw' ? 'Fungua Jopo Kuu la Admin →' : 'Open Admin Dashboard →'}
+            </Button>
+          </div>
+        )}
 
         {/* Main Two-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">

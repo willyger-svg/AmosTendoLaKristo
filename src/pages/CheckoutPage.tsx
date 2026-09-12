@@ -307,7 +307,7 @@ export const CheckoutPage: React.FC = () => {
                   <span className="font-bold text-slate-900">
                     {completedOrder.deliveryMethod === 'Dar es Salaam Delivery'
                       ? `Courier Dispatch (${completedOrder.deliveryAddress})`
-                      : 'Store Pickup (TK Center Mwenge)'}
+                      : 'Store Pickup (TK Center Manzese)'}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -482,8 +482,8 @@ export const CheckoutPage: React.FC = () => {
                     </span>
                     <span className="text-[11px] text-slate-500 block">
                       {language === 'sw'
-                        ? 'Chukua vifaa vyako TK Stationery Center (Mwenge/Shekilango).'
-                        : 'Pick up ready at TK Stationery Center (Mwenge/Shekilango).'}
+                        ? 'Chukua vifaa vyako TK Stationery Center (Manzese — Karibu na kituo cha mwendokasi cha Bakhresa).'
+                        : 'Pick up ready at TK Stationery Center (Manzese — Near Bakhresa BRT Station).'}
                     </span>
                   </div>
                   {deliveryMethod === 'pickup' && <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />}
@@ -494,7 +494,7 @@ export const CheckoutPage: React.FC = () => {
                 <div className="pt-2">
                   <Input
                     label={language === 'sw' ? 'Mtaa / Jengo / Alama ya Eneo (Dar es Salaam)' : 'Street / Building / Landmark in Dar'}
-                    placeholder="e.g. Mwenge, Karibu na Posta, Floor 2"
+                    placeholder="e.g. Manzese, Bakhresa, au popote Dar es Salaam"
                     value={deliveryAddress}
                     onChange={e => setDeliveryAddress(e.target.value)}
                     required
@@ -546,7 +546,7 @@ export const CheckoutPage: React.FC = () => {
                     id: 'cash_at_store',
                     label: 'Taslimu Dukani',
                     icon: <Store className="w-4 h-4 text-amber-600" />,
-                    desc: 'Lipa dukani Mwenge'
+                    desc: 'Lipa dukani Manzese (Bakhresa)'
                   },
                   {
                     id: 'cash_on_delivery',

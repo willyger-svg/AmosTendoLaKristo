@@ -84,7 +84,7 @@ export const ContactPage: React.FC = () => {
                   <div>
                     <span className="font-bold text-slate-900 block">Physical Center Location</span>
                     <span className="text-slate-600 leading-relaxed block mt-0.5">
-                      Plot 18, Commercial Plaza, Dar es Salaam, Tanzania (Central & Suburb Access)
+                      Manzese, Dar es Salaam, Tanzania (Karibia na Kituo cha Mwendokasi cha Bakhresa)
                     </span>
                   </div>
                 </div>

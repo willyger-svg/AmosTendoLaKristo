@@ -549,7 +549,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({
                     <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                     <span className="truncate max-w-xs">
                       {order.deliveryMethod === 'Store Pickup'
-                        ? (language === 'sw' ? 'Kuchukua Dukan (Mwenge / Shekilango)' : 'Store Pickup (Mwenge / Shekilango)')
+                        ? (language === 'sw' ? 'Kuchukua Dukani (Manzese — Karibu na Mwendokasi Bakhresa)' : 'Store Pickup (Manzese — Near Bakhresa BRT)')
                         : (order.deliveryAddress || order.deliveryDistrict || 'Dar es Salaam Delivery')}
                     </span>
                   </div>
@@ -720,7 +720,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({
                 </span>
                 <p className="text-slate-700 dark:text-slate-300">
                   <strong>{selectedOrder.deliveryMethod || 'Store Pickup'}:</strong>{' '}
-                  {selectedOrder.deliveryAddress || selectedOrder.deliveryDistrict || 'Duka Kuu — Shekilango / Mwenge, Dar es Salaam'}
+                  {selectedOrder.deliveryAddress || selectedOrder.deliveryDistrict || 'Duka Kuu — Manzese, Dar es Salaam (Karibu na Kituo cha Mwendokasi cha Bakhresa)'}
                 </p>
                 {selectedOrder.notes && (
                   <p className="text-slate-500 dark:text-slate-400 text-[11px] pt-1">
