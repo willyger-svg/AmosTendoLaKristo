@@ -38,9 +38,9 @@ export const CartPage: React.FC = () => {
       )
       .join('\n');
 
-    const msg = `Hello TK Stationery! 👋\n\nI want to place an order for the following items:\n\n${summary}\n\n*Total Amount: ${formatTSh(
+    const msg = `Habari TK Stationery! 👋\n\nNingependa kuagiza vifaa hivi kutoka kwenye kikapu changu:\n\n${summary}\n\n*Jumla ya Malipo: ${formatTSh(
       cartSubtotal
-    )}*\n\nPlease confirm availability and delivery timeframe.`;
+    )}*\n\nTafadhali thibitisha upatikanaji na maandalizi ya mzigo wangu.`;
 
     window.open(createWhatsAppUrl(msg), '_blank');
   };
@@ -53,9 +53,9 @@ export const CartPage: React.FC = () => {
             <div className="w-20 h-20 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
               <ShoppingBag className="w-10 h-10" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900">Your Cart is Empty</h2>
+            <h2 className="text-2xl font-bold text-slate-900">Kikapu Chako Kiko Tupu</h2>
             <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-              You don't have any stationery items in your cart right now. Browse our catalog for school supplies, paper, and accessories.
+              Huna vifaa vyovyote kwenye kikapu chako kwa sasa. Tembelea duka letu kupata vifaa vya shule, ream za karatasi, na vifaa vya ofisi.
             </p>
             <div className="pt-2">
               <Button
@@ -64,7 +64,7 @@ export const CartPage: React.FC = () => {
                 onClick={() => navigateTo('/shop')}
                 icon={<ArrowLeft className="w-4 h-4" />}
               >
-                Explore Stationery Store
+                Angalia Vifaa vya Duka
               </Button>
             </div>
           </div>
@@ -78,18 +78,18 @@ export const CartPage: React.FC = () => {
       <Container>
         <Breadcrumbs
           items={[
-            { label: 'Shop', path: '/shop' },
-            { label: 'Your Shopping Cart' }
+            { label: 'Duka la Vifaa', path: '/shop' },
+            { label: 'Kikapu Chako cha Manunuzi' }
           ]}
         />
 
         <div className="flex items-center justify-between pb-4 border-b border-slate-200">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Shopping Cart
+              Kikapu cha Manunuzi
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Review your selected stationery supplies before proceeding to checkout.
+              Kagua vifaa ulivyochagua kabla ya kukamilisha malipo na usafirishaji.
             </p>
           </div>
 
@@ -98,7 +98,7 @@ export const CartPage: React.FC = () => {
             onClick={clearCart}
             className="text-xs text-rose-600 hover:text-rose-700 font-semibold hover:underline"
           >
-            Clear Entire Cart
+            Futa Kikapu Chote
           </button>
         </div>
 
@@ -124,7 +124,7 @@ export const CartPage: React.FC = () => {
                       {item.product.name}
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      {formatTSh(item.product.price)} each
+                      {formatTSh(item.product.price)} kila kimoja
                     </p>
                   </div>
                 </div>
@@ -161,7 +161,7 @@ export const CartPage: React.FC = () => {
                     type="button"
                     onClick={() => removeFromCart(item.product.id)}
                     className="text-slate-400 hover:text-rose-600 p-1 transition-colors"
-                    title="Remove item"
+                    title="Ondoa kifaa hiki"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -174,20 +174,20 @@ export const CartPage: React.FC = () => {
           <div className="lg:col-span-4 space-y-4">
             <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
               <h3 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">
-                Order Summary
+                Muhtasari wa Malipo
               </h3>
 
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between text-slate-600">
-                  <span>Items Subtotal ({cartCount})</span>
+                  <span>Jumla ya Vifaa ({cartCount})</span>
                   <span className="font-semibold text-slate-900">{formatTSh(cartSubtotal)}</span>
                 </div>
                 <div className="flex justify-between text-slate-600">
-                  <span>Estimated Delivery</span>
-                  <span className="text-slate-500">Pickup Free / Dispatch TSh 3,000+</span>
+                  <span>Makadirio ya Usafiri</span>
+                  <span className="text-slate-500">Bure Kuchukua Dukani / Bodaboda TSh 3,000+</span>
                 </div>
                 <div className="flex justify-between text-base font-black text-slate-950 pt-3 border-t border-slate-200">
-                  <span>Estimated Total</span>
+                  <span>Jumla Kuu</span>
                   <span className="text-amber-600">{formatTSh(cartSubtotal)}</span>
                 </div>
               </div>
@@ -201,7 +201,7 @@ export const CartPage: React.FC = () => {
                   icon={<ArrowRight className="w-4 h-4" />}
                   iconPosition="right"
                 >
-                  Proceed to Checkout
+                  Endelea na Malipo & Oda
                 </Button>
 
                 <Button
@@ -211,7 +211,7 @@ export const CartPage: React.FC = () => {
                   onClick={handleWhatsAppOrder}
                   icon={<MessageSquare className="w-4 h-4" />}
                 >
-                  Instant WhatsApp Order
+                  Agiza Moja kwa Moja WhatsApp
                 </Button>
               </div>
 
@@ -221,7 +221,7 @@ export const CartPage: React.FC = () => {
                   onClick={() => navigateTo('/shop')}
                   className="text-xs text-slate-500 hover:text-slate-900 underline"
                 >
-                  &larr; Continue Shopping
+                  &larr; Endelea Kununua Vifaa
                 </button>
               </div>
             </div>
@@ -230,10 +230,10 @@ export const CartPage: React.FC = () => {
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600 space-y-2">
               <div className="flex items-center gap-2 font-bold text-slate-900">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Verified Quality Products</span>
+                <span>Vifaa Halisi na Vyenye Ubora</span>
               </div>
               <p className="text-[11px] text-slate-500 leading-relaxed">
-                Genuine brands including Faber-Castell, Double A, Casio, and Deli. In-store replacement guarantee for any defective stationery.
+                Chapa asilia ikiwemo Faber-Castell, Double A, Casio, na Deli. Tuna dhamana ya kubadilisha kifaa chochote chenye hitilafu dukani kwetu Manzese.
               </p>
             </div>
           </div>

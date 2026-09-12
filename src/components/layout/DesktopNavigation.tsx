@@ -31,11 +31,11 @@ export const DesktopNavigation: React.FC = () => {
       hasDropdown: true,
       dropdownItems: [
         { label: 'Bidhaa Zote za Vifaa', path: '/shop' },
-        { label: 'Vifaa vya Shule (School Supplies)', path: '/shop?category=School Supplies' },
-        { label: 'Vifaa vya Ofisi (Office Supplies)', path: '/shop?category=Office Supplies' },
-        { label: 'Kalamu & Vifaa vya Kuandikia', path: '/shop?category=Writing Materials' },
-        { label: 'Karatasi na Ream (A4/A3)', path: '/shop?category=Paper & Printing' },
-        { label: 'Mafaili & Folders', path: '/shop?category=Files & Folders' },
+        { label: 'Vifaa vya Shule', path: '/shop?category=School Supplies' },
+        { label: 'Vifaa vya Ofisi', path: '/shop?category=Office Supplies' },
+        { label: 'Kalamu na Vifaa vya Kuandikia', path: '/shop?category=Writing Materials' },
+        { label: 'Karatasi na Ream (A4 na A3)', path: '/shop?category=Paper & Printing' },
+        { label: 'Mafaili na Majalada', path: '/shop?category=Files & Folders' },
         { label: 'Vifaa vya Kompyuta', path: '/shop?category=Computer Accessories' }
       ]
     },
@@ -44,10 +44,10 @@ export const DesktopNavigation: React.FC = () => {
       path: '/printing',
       hasDropdown: true,
       dropdownItems: [
-        { label: 'Kituo cha Chapisho (Printing Hub)', path: '/printing' },
+        { label: 'Kituo cha Chapisho & Printing', path: '/printing' },
         { label: 'Tuma Nyaraka ya Kuchapishwa', path: '/printing/order-service' },
-        { label: 'Binding & Jalada Gumu (Hardcover)', path: '/printing' },
-        { label: 'Picha za Pasipoti (Passport Photos)', path: '/printing' }
+        { label: 'Kufunga Vitabu na Jalada Gumu', path: '/printing' },
+        { label: 'Picha za Pasipoti na Leseni', path: '/printing' }
       ]
     },
     {
@@ -56,11 +56,11 @@ export const DesktopNavigation: React.FC = () => {
       hasDropdown: true,
       dropdownItems: [
         { label: 'Huduma Zote za Mtandaoni', path: '/online-services' },
-        { label: 'Msaada wa NIDA (NIN Lookup)', path: '/online-services?focus=NIDA' },
-        { label: 'Msaada wa TRA (TIN & Tax)', path: '/online-services?focus=TRA' },
-        { label: 'Ripoti ya Polisi ya Upotevu', path: '/online-services?focus=POLICE' },
-        { label: 'RITA & Vyeti vya Kuzaliwa', path: '/online-services?focus=RITA' },
-        { label: 'Maombi ya Ajira (Ajira Portal)', path: '/online-services?focus=NAPA' }
+        { label: 'Msaada wa Vitambulisho vya NIDA', path: '/online-services?focus=NIDA' },
+        { label: 'Msaada wa Kodi na TIN ya TRA', path: '/online-services?focus=TRA' },
+        { label: 'Ripoti ya Polisi ya Upotevu wa Nyaraka', path: '/online-services?focus=POLICE' },
+        { label: 'Vyeti vya Kuzaliwa na Vifo (RITA)', path: '/online-services?focus=RITA' },
+        { label: 'Maombi ya Kazi Serikalini (Ajira Portal)', path: '/online-services?focus=NAPA' }
       ]
     },
     { label: 'Kuhusu Sisi', path: '/about' },

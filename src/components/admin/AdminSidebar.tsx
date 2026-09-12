@@ -1,7 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { useTranslation } from '../../context/LanguageContext';
 import { canAccessSection, AdminSectionId, ADMIN_ROLE_CONFIGS } from '../../utils/adminPermissions';
 import {
   LayoutDashboard,
@@ -37,14 +36,14 @@ interface AdminSidebarProps {
 interface NavItemConfig {
   id: AdminSectionId;
   path: string;
-  labelKey: string;
+  label: string;
   icon: React.ComponentType<{ className?: string }>;
   badgeCount?: number;
   badgeVariant?: 'amber' | 'blue' | 'emerald' | 'rose' | 'slate';
 }
 
 interface NavGroupConfig {
-  groupKey: string;
+  groupTitle: string;
   items: NavItemConfig[];
 }
 
@@ -55,7 +54,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 }) => {
   const { currentPath, navigateTo, orders, serviceTickets, quoteRequests, products } = useApp();
   const { userProfile, userRole, logout } = useAuth();
-  const { t } = useTranslation();
 
   // Calculate live badge counts
   const pendingOrdersCount = orders.filter(o => o.status === 'Submitted' || o.status === 'Processing').length;
@@ -67,23 +65,23 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   const navGroups: NavGroupConfig[] = [
     {
-      groupKey: 'admin.group.overview',
+      groupTitle: 'Muhtasari',
       items: [
         {
           id: 'dashboard',
           path: '/admin',
-          labelKey: 'admin.nav.dashboard',
+          label: 'Dashibodi Kuu',
           icon: LayoutDashboard
         }
       ]
     },
     {
-      groupKey: 'admin.group.commerce',
+      groupTitle: 'Mauzo & Stoo',
       items: [
         {
           id: 'orders',
           path: '/admin/orders',
-          labelKey: 'admin.nav.orders',
+          label: 'Oda za Wateja',
           icon: ShoppingBag,
           badgeCount: pendingOrdersCount > 0 ? pendingOrdersCount : undefined,
           badgeVariant: 'amber'
@@ -91,25 +89,25 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {
           id: 'payments',
           path: '/admin/payments',
-          labelKey: 'admin.nav.payments',
+          label: 'Malipo',
           icon: CreditCard
         },
         {
           id: 'products',
           path: '/admin/products',
-          labelKey: 'admin.nav.products',
+          label: 'Bidhaa',
           icon: Package
         },
         {
           id: 'categories',
           path: '/admin/categories',
-          labelKey: 'admin.nav.categories',
+          label: 'Kategoria',
           icon: FolderTree
         },
         {
           id: 'inventory',
           path: '/admin/inventory',
-          labelKey: 'admin.nav.inventory',
+          label: 'Hesabu ya Stoo',
           icon: Boxes,
           badgeCount: lowStockCount > 0 ? lowStockCount : undefined,
           badgeVariant: 'rose'
@@ -117,18 +115,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       ]
     },
     {
-      groupKey: 'admin.group.customers',
+      groupTitle: 'Wateja & Huduma',
       items: [
         {
           id: 'customers',
           path: '/admin/customers',
-          labelKey: 'admin.nav.customers',
+          label: 'Wateja',
           icon: Users
         },
         {
           id: 'service-requests',
           path: '/admin/service-requests',
-          labelKey: 'admin.nav.service_requests',
+          label: 'Maombi ya Huduma',
           icon: FileCheck,
           badgeCount: activeTicketsCount > 0 ? activeTicketsCount : undefined,
           badgeVariant: 'blue'
@@ -136,7 +134,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {
           id: 'quotes',
           path: '/admin/quotes',
-          labelKey: 'admin.nav.quotes',
+          label: 'Nukuu za Bei',
           icon: Globe,
           badgeCount: newQuotesCount > 0 ? newQuotesCount : undefined,
           badgeVariant: 'emerald'
@@ -144,59 +142,59 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {
           id: 'documents',
           path: '/admin/documents',
-          labelKey: 'admin.nav.documents',
+          label: 'Nyaraka & Faili',
           icon: FileText
         }
       ]
     },
     {
-      groupKey: 'admin.group.marketing',
+      groupTitle: 'Maudhui & Matangazo',
       items: [
         {
           id: 'advertisements',
           path: '/admin/advertisements',
-          labelKey: 'admin.nav.advertisements',
+          label: 'Mabango ya Matangazo',
           icon: Megaphone
         },
         {
           id: 'content',
           path: '/admin/content',
-          labelKey: 'admin.nav.content',
+          label: 'Maudhui ya Tovuti',
           icon: Layers
         },
         {
           id: 'services',
           path: '/admin/services',
-          labelKey: 'admin.nav.services',
+          label: 'Usimamizi wa Huduma',
           icon: Wrench
         },
         {
           id: 'notifications',
           path: '/admin/notifications',
-          labelKey: 'admin.nav.notifications',
+          label: 'Arifa za Mfumo',
           icon: Bell
         }
       ]
     },
     {
-      groupKey: 'admin.group.system',
+      groupTitle: 'Mfumo & Usalama',
       items: [
         {
           id: 'staff',
           path: '/admin/staff',
-          labelKey: 'admin.nav.staff',
+          label: 'Wafanyakazi & Majukumu',
           icon: ShieldCheck
         },
         {
           id: 'audit-logs',
           path: '/admin/audit-logs',
-          labelKey: 'admin.nav.audit_logs',
+          label: 'Kumbukumbu za Mfumo',
           icon: History
         },
         {
           id: 'settings',
           path: '/admin/settings',
-          labelKey: 'admin.nav.settings',
+          label: 'Mipangilio ya Mfumo',
           icon: Settings
         }
       ]
@@ -239,7 +237,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
               </div>
               <p className="text-[11px] font-semibold text-amber-400/90 truncate uppercase tracking-wider">
-                Admin Control Center
+                Kituo cha Usimamizi
               </p>
             </div>
           )}
@@ -248,7 +246,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         <button
           onClick={onToggleCollapse}
           className="hidden md:flex p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={isCollapsed ? 'Panua menyu' : 'Kunja menyu'}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
@@ -262,10 +260,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           if (accessibleItems.length === 0) return null;
 
           return (
-            <div key={group.groupKey} className="space-y-1">
+            <div key={group.groupTitle} className="space-y-1">
               {!isCollapsed && (
                 <h4 className="px-3 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-                  {t(group.groupKey)}
+                  {group.groupTitle}
                 </h4>
               )}
 
@@ -278,7 +276,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                     <button
                       key={item.id}
                       onClick={() => handleLinkClick(item.path)}
-                      title={isCollapsed ? t(item.labelKey) : undefined}
+                      title={isCollapsed ? item.label : undefined}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group relative min-h-[44px] ${
                         active
                           ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-bold'
@@ -292,7 +290,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                       />
 
                       {!isCollapsed && (
-                        <span className="truncate flex-1 text-left">{t(item.labelKey)}</span>
+                        <span className="truncate flex-1 text-left">{item.label}</span>
                       )}
 
                       {!isCollapsed && item.badgeCount !== undefined && item.badgeCount > 0 && (
@@ -316,7 +314,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                       {/* Floating Tooltip if collapsed */}
                       {isCollapsed && (
                         <div className="absolute left-full ml-2 px-2.5 py-1 bg-slate-900 text-white text-xs rounded-md shadow-xl whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-slate-700">
-                          {t(item.labelKey)}
+                          {item.label}
                           {item.badgeCount !== undefined && ` (${item.badgeCount})`}
                         </div>
                       )}
@@ -348,10 +346,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           {!isCollapsed && (
             <div className="min-w-0 flex-1">
               <p className="text-xs font-bold text-white truncate">
-                {userProfile?.fullName || 'Admin User'}
+                {userProfile?.fullName || 'Msimamizi'}
               </p>
               <span className={`inline-block text-[9px] px-2 py-0.5 rounded-md ${roleConfig.badgeClass}`}>
-                {userRole === 'super_admin' ? 'Super Admin' : userRole === 'admin' ? 'Admin' : 'Staff'}
+                {userRole === 'super_admin' ? 'Super Admin' : userRole === 'admin' ? 'Admin' : 'Mhudumu (Staff)'}
               </span>
             </div>
           )}
@@ -359,7 +357,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           {!isCollapsed && (
             <button
               onClick={() => logout()}
-              title={t('account.sign_out')}
+              title="Toka kwenye akaunti"
               className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />

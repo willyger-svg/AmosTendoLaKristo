@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useAuth } from '../../../context/AuthContext';
-import { useTranslation } from '../../../context/LanguageContext';
 import { orderService } from '../../../services/orders/orderService';
 import { auditLogService } from '../../../services/audit/auditLogService';
 import { Order, OrderStatus } from '../../../types';
@@ -22,7 +21,6 @@ import {
 export const AdminOrdersView: React.FC = () => {
   const { orders, updateOrderStatus, showToast } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
-  const { language, t } = useTranslation();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -62,14 +60,14 @@ export const AdminOrdersView: React.FC = () => {
 
       showToast({
         type: 'success',
-        title: language === 'sw' ? 'Hali ya Oda Imesasishwa' : 'Order Status Updated',
-        message: `${orderId} -> ${newStatus}`
+        title: 'Hali ya Oda Imesasishwa',
+        message: `Oda #${orderId} imesasishwa kuwa ${newStatus}.`
       });
     } catch {
       showToast({
         type: 'error',
-        title: 'Error',
-        message: 'Could not update order status.'
+        title: 'Hitilafu',
+        message: 'Imeshindwa kusasisha hali ya oda.'
       });
     } finally {
       setUpdatingId(null);
@@ -102,7 +100,7 @@ export const AdminOrdersView: React.FC = () => {
             type="text"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Search order #, customer or phone..."
+            placeholder="Tafuta namba ya oda, mteja au simu..."
             className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
           />
         </div>
@@ -114,12 +112,12 @@ export const AdminOrdersView: React.FC = () => {
             onChange={e => setStatusFilter(e.target.value)}
             className="w-full sm:w-auto px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
           >
-            <option value="all">All Statuses ({orders.length})</option>
-            <option value="Submitted">Submitted ({orders.filter(o => o.status === 'Submitted').length})</option>
-            <option value="Processing">Processing ({orders.filter(o => o.status === 'Processing').length})</option>
-            <option value="Out for Delivery">Out for Delivery</option>
-            <option value="Completed">Completed ({orders.filter(o => o.status === 'Completed').length})</option>
-            <option value="Cancelled">Cancelled</option>
+            <option value="all">Hali Zote ({orders.length})</option>
+            <option value="Submitted">Zilizopokelewa ({orders.filter(o => o.status === 'Submitted').length})</option>
+            <option value="Processing">Zinazoshughulikiwa ({orders.filter(o => o.status === 'Processing').length})</option>
+            <option value="Out for Delivery">Zilizo Njiani</option>
+            <option value="Completed">Zilizokamilika ({orders.filter(o => o.status === 'Completed').length})</option>
+            <option value="Cancelled">Zilizoghairiwa</option>
           </select>
         </div>
       </div>
@@ -129,20 +127,20 @@ export const AdminOrdersView: React.FC = () => {
         {filteredOrders.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
             <ShoppingBag className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />
-            <p className="text-sm font-semibold">No orders matching your criteria</p>
+            <p className="text-sm font-semibold">Hakuna oda inayolingana na vigezo vyako</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="p-4">Order ID & Date</th>
-                  <th className="p-4">Customer</th>
-                  <th className="p-4">Items</th>
-                  <th className="p-4">Total Amount</th>
-                  <th className="p-4">Payment</th>
-                  <th className="p-4">Status & Action</th>
-                  <th className="p-4 text-right">Details</th>
+                  <th className="p-4">Namba ya Oda & Tarehe</th>
+                  <th className="p-4">Mteja</th>
+                  <th className="p-4">Bidhaa</th>
+                  <th className="p-4">Jumla ya Malipo</th>
+                  <th className="p-4">Malipo</th>
+                  <th className="p-4">Hali ya Oda</th>
+                  <th className="p-4 text-right">Maelezo</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -157,7 +155,7 @@ export const AdminOrdersView: React.FC = () => {
                       <p className="text-[11px] text-slate-400 font-mono mt-0.5">{order.customerPhone}</p>
                     </td>
                     <td className="p-4">
-                      <span className="font-semibold text-slate-700 dark:text-slate-300">{order.items.length} item(s)</span>
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">{order.items.length} bidhaa</span>
                       <p className="text-[11px] text-slate-400 truncate max-w-[180px]">
                         {order.items.map(i => `${i.quantity}x ${i.product.title}`).join(', ')}
                       </p>
@@ -173,7 +171,7 @@ export const AdminOrdersView: React.FC = () => {
                             : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
                         }`}
                       >
-                        {order.paymentStatus || 'pending'}
+                        {order.paymentStatus === 'successful' ? 'Imelipwa' : order.paymentStatus || 'Inasubiri'}
                       </span>
                     </td>
                     <td className="p-4">
@@ -186,11 +184,11 @@ export const AdminOrdersView: React.FC = () => {
                             order.status
                           )}`}
                         >
-                          <option value="Submitted">Submitted</option>
-                          <option value="Processing">Processing</option>
-                          <option value="Out for Delivery">Out for Delivery</option>
-                          <option value="Completed">Completed</option>
-                          <option value="Cancelled">Cancelled</option>
+                          <option value="Submitted">Imepokelewa</option>
+                          <option value="Processing">Inashughulikiwa</option>
+                          <option value="Out for Delivery">Ipo Njiani</option>
+                          <option value="Completed">Imekamilika</option>
+                          <option value="Cancelled">Imeghairiwa</option>
                         </select>
                       </div>
                     </td>
@@ -198,7 +196,7 @@ export const AdminOrdersView: React.FC = () => {
                       <button
                         onClick={() => setSelectedOrder(order)}
                         className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                        title="View Full Order Summary"
+                        title="Tazama Maelezo Kamili ya Oda"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -218,7 +216,7 @@ export const AdminOrdersView: React.FC = () => {
             <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div>
                 <h3 className="text-base font-black text-slate-900 dark:text-white">
-                  Order Details #{selectedOrder.id}
+                  Maelezo ya Oda #{selectedOrder.id}
                 </h3>
                 <p className="text-xs text-slate-400">{formatDate(selectedOrder.createdAt)}</p>
               </div>
@@ -234,16 +232,16 @@ export const AdminOrdersView: React.FC = () => {
               {/* Customer Info */}
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-1 text-xs">
                 <p className="font-bold text-slate-900 dark:text-white">{selectedOrder.customerName}</p>
-                <p className="text-slate-600 dark:text-slate-300">Phone: {selectedOrder.customerPhone}</p>
-                {selectedOrder.customerEmail && <p className="text-slate-600 dark:text-slate-300">Email: {selectedOrder.customerEmail}</p>}
+                <p className="text-slate-600 dark:text-slate-300">Simu: {selectedOrder.customerPhone}</p>
+                {selectedOrder.customerEmail && <p className="text-slate-600 dark:text-slate-300">Barua Pepe: {selectedOrder.customerEmail}</p>}
                 <p className="text-slate-600 dark:text-slate-300">
-                  Delivery: {selectedOrder.deliveryMethod} {selectedOrder.deliveryAddress ? `(${selectedOrder.deliveryAddress})` : ''}
+                  Uwasilishaji: {selectedOrder.deliveryMethod} {selectedOrder.deliveryAddress ? `(${selectedOrder.deliveryAddress})` : ''}
                 </p>
               </div>
 
               {/* Items List */}
               <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Order Items</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Bidhaa za Oda Hii</h4>
                 <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
                   {selectedOrder.items.map((item, idx) => (
                     <div key={idx} className="p-3.5 flex items-center justify-between text-xs">
@@ -264,8 +262,8 @@ export const AdminOrdersView: React.FC = () => {
               {/* Order Financials */}
               <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-bold text-slate-900 dark:text-white">Total Order Value</p>
-                  <p className="text-[11px] text-slate-500">Payment: {selectedOrder.paymentMethod.toUpperCase()} ({selectedOrder.paymentStatus})</p>
+                  <p className="text-xs font-bold text-slate-900 dark:text-white">Jumla ya Thamani ya Oda</p>
+                  <p className="text-[11px] text-slate-500">Malipo: {selectedOrder.paymentMethod.toUpperCase()} ({selectedOrder.paymentStatus === 'successful' ? 'Yamekamilika' : 'Yanasubiri'})</p>
                 </div>
                 <p className="text-xl font-black text-amber-600 dark:text-amber-400">
                   {formatPrice(selectedOrder.totalAmount)}
@@ -278,7 +276,7 @@ export const AdminOrdersView: React.FC = () => {
                 onClick={() => setSelectedOrder(null)}
                 className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold"
               >
-                Close
+                Funga
               </button>
             </div>
           </div>

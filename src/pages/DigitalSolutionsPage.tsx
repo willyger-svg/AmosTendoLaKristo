@@ -38,22 +38,22 @@ export const DigitalSolutionsPage: React.FC = () => {
     <div className="py-8 space-y-16">
       <Container>
         {/* Breadcrumb */}
-        <Breadcrumbs items={[{ label: 'Digital Solutions & Custom Software' }]} />
+        <Breadcrumbs items={[{ label: 'Mifumo ya Kidijitali & Programu za Kompyuta' }]} />
 
         {/* Hero Section */}
         <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 border border-slate-800 relative overflow-hidden mt-4">
           <div className="max-w-3xl space-y-4 relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-950 border border-indigo-700/60 text-indigo-300 text-xs font-semibold">
               <Globe className="w-3.5 h-3.5" />
-              <span>Full-Stack Engineering & Business Systems</span>
+              <span>Uhandisi wa Mifumo ya Biashara na TEHAMA</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-              Software Engineering, POS Systems & Web Applications
+              Utengenezaji wa Mifumo, POS na Tovuti za Biashara
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              We design, build, and deploy production-grade digital solutions for Tanzanian enterprises. From multi-branch POS cashiers and inventory management to custom mobile apps with M-Pesa automated payment reconciliations.
+              Tunabuni, kutengeneza, na kusimika mifumo imara ya kidijitali kwa biashara na taasisi nchini Tanzania. Kuanzia mifumo ya mauzo na stoo (POS), programu za simu hadi mifumo ya malipo ya kiotomatiki ya M-Pesa, Tigo Pesa na Airtel Money.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-2">
@@ -63,16 +63,16 @@ export const DigitalSolutionsPage: React.FC = () => {
                 onClick={handleScrollToBuilder}
                 icon={<Sparkles className="w-4 h-4" />}
               >
-                Launch Interactive Scope Builder
+                Kadiria Gharama ya Mradi Wako
               </Button>
 
               <Button
                 variant="whatsapp"
                 size="md"
-                onClick={() => window.open(createWhatsAppUrl('Hello TK Digital Solutions team! I want to discuss a software project.'), '_blank')}
+                onClick={() => window.open(createWhatsAppUrl('Habari timu ya TK Digital! Nahitaji ushauri na huduma ya mradi wa mfumo wa kidijitali.'), '_blank')}
                 icon={<MessageSquare className="w-4 h-4" />}
               >
-                Chat with Solutions Architect
+                Ongea na Mtaalamu Wetu WhatsApp
               </Button>
             </div>
           </div>
@@ -81,9 +81,9 @@ export const DigitalSolutionsPage: React.FC = () => {
         {/* 1. Core Solutions Pillars */}
         <div>
           <SectionHeader
-            eyebrow="Enterprise Capabilities"
-            title="Software Pillars Designed for African Business"
-            subtitle="Tailored to operate reliably on local networks, low-bandwidth environments, and power cuts."
+            eyebrow="Uwezo Wetu wa Kiteknolojia"
+            title="Mifumo Imara Iliyobuniwa kwa Mazingira ya Kibiashara"
+            subtitle="Imebuniwa kufanya kazi vizuri hata kwenye mtandao mdogo na kusaidia biashara yako bila kukwama."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -111,7 +111,7 @@ export const DigitalSolutionsPage: React.FC = () => {
 
                   <div className="mt-5 pt-4 border-t border-slate-100 space-y-2">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                      Core Modules & Integrations:
+                      Moduli Muhimu & Muunganisho:
                     </span>
                     <ul className="space-y-1 text-xs text-slate-700">
                       {sol.coreFeatures.map((feat, idx) => (
@@ -127,7 +127,7 @@ export const DigitalSolutionsPage: React.FC = () => {
                 <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
                   <div>
                     <span className="text-[10px] text-slate-400 block uppercase font-bold">
-                      Estimated Range
+                      Makadirio ya Bei
                     </span>
                     <span className="text-xs font-black text-amber-600">
                       {sol.startingEstimate}
@@ -139,7 +139,7 @@ export const DigitalSolutionsPage: React.FC = () => {
                     size="sm"
                     onClick={handleScrollToBuilder}
                   >
-                    Configure &rarr;
+                    Sanidi Mradi &rarr;
                   </Button>
                 </div>
               </div>
@@ -150,9 +150,9 @@ export const DigitalSolutionsPage: React.FC = () => {
         {/* 2. Interactive Project Quote Builder */}
         <div id="interactive-scope-builder" className="scroll-mt-28">
           <SectionHeader
-            eyebrow="Instant Project Scoping"
-            title="Interactive Digital Project Scope Builder"
-            subtitle="Select your requirements, features, scale, and timeline to generate an estimated investment range."
+            eyebrow="Makadirio ya Papo Hapo"
+            title="Kikokotoo cha Makadirio ya Mradi wa Kidijitali"
+            subtitle="Chagua mahitaji, vipengele, ukubwa, na muda wa mradi ili kupata makadirio ya uwekezaji wako."
           />
 
           <InteractiveQuoteBuilder />
@@ -161,9 +161,9 @@ export const DigitalSolutionsPage: React.FC = () => {
         {/* 3. Tech Stack & Engineering Architecture */}
         <div className="pt-8">
           <SectionHeader
-            eyebrow="Modern Standards"
-            title="Engineered with Production-Grade Technology"
-            subtitle="We build high-performance web, mobile, and cloud architectures built to scale."
+            eyebrow="Teknolojia za Kisasa"
+            title="Imejengwa kwa Zana Imara na Salama za Kiteknolojia"
+            subtitle="Tunajenga mifumo imara ya wavuti, simu, na 'cloud' inayokua sambamba na biashara yako."
           />
 
           <TechStackGrid />

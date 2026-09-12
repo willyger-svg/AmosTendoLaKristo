@@ -47,68 +47,68 @@ export const InteractiveQuoteBuilder: React.FC = () => {
     {
       type: 'Website Development',
       icon: Globe,
-      desc: 'Corporate websites, schools, law firms, and online stores.',
+      desc: 'Tovuti za kampuni, shule, ofisi za sheria, na maduka ya mtandaoni.',
       baseRange: 'TSh 450,000 - 1,200,000'
     },
     {
       type: 'Business POS & System',
       icon: Store,
-      desc: 'Point-of-Sale, barcode cashiering, and multi-store inventory.',
+      desc: 'Mfumo wa mauzo, stoo, usomaji barcode, na mashine ya risiti.',
       baseRange: 'TSh 800,000 - 2,500,000'
     },
     {
       type: 'Mobile App Development',
       icon: Smartphone,
-      desc: 'Android & iOS applications with M-Pesa mobile money integration.',
+      desc: 'Programu za Android & iOS zenye malipo ya M-Pesa, Tigo Pesa na Airtel Money.',
       baseRange: 'TSh 1,500,000 - 4,500,000'
     },
     {
       type: 'Monitoring Dashboard',
       icon: BarChart3,
-      desc: 'Real-time multi-branch sales, profit/loss, and expense analytics.',
+      desc: 'Uchambuzi wa mauzo ya matawi moja kwa moja, faida/hasara na ripoti za matumizi.',
       baseRange: 'TSh 950,000 - 3,000,000'
     },
     {
       type: 'Custom Software',
       icon: Cpu,
-      desc: 'Tailor-made portals for schools, hospitals, or logistics.',
+      desc: 'Mifumo maalum ya shule, hospitali, usafirishaji na taasisi.',
       baseRange: 'TSh 1,200,000 - 5,000,000'
     }
   ];
 
   const availableFeaturesMap: Record<string, string[]> = {
     'Website Development': [
-      'Mobile-first responsive design',
-      'Direct WhatsApp inquiry floating chat',
-      'Google Maps SEO & local indexing',
-      'Custom company domain (.co.tz) & email setup',
-      'Content management portal (Self-edit)'
+      'Muundo unaovutia kwenye simu na kompyuta',
+      'Ujumbe wa WhatsApp moja kwa moja kutoka kwenye tovuti',
+      'Usajili wa Google Maps na SEO ya ndani',
+      'Usajili wa jina la kikoa (.co.tz) na barua pepe za kikazi',
+      'Mfumo rahisi wa kuhariri taarifa mwenyewe'
     ],
     'Business POS & System': [
-      'Barcode Scanning & Thermal Receipt Print',
-      'Multi-cashier permissions & roles',
-      'Daily WhatsApp sales summary to owner',
-      'Low stock automated SMS alerts',
-      'Offline sync mode (Works during outages)'
+      'Kuskani Barcode & Kuchapa Risiti za Mashine',
+      'Ruksa na ngazi tofauti za watumiaji (Cashier/Admin)',
+      'Muhtasari wa mauzo ya siku kutumwa WhatsApp kwa mmiliki',
+      'Ujumbe wa SMS bidhaa zikikaribia kuisha stoo',
+      'Kufanya kazi bila mtandao (Offline mode)'
     ],
     'Mobile App Development': [
-      'M-Pesa / Tigo Pesa payment gateway',
-      'Push notification alerts',
-      'Live GPS map courier tracking',
-      'Google Play Store deployment',
-      'Offline local data caching'
+      'Muunganisho wa malipo ya M-Pesa / Tigo Pesa',
+      'Taarifa za papo hapo kwa wateja (Push Notifications)',
+      'Ufuatiliaji wa eneo kwa ramani ya GPS',
+      'Kuweka programu Google Play Store',
+      'Kuhifadhi data kwenye simu bila intaneti'
     ],
     'Monitoring Dashboard': [
-      'Live branch revenue graphs & charts',
-      'Daily automated PDF sales report to WhatsApp',
-      'Multi-branch stock transfer ledger',
-      'Staff attendance & shift monitoring'
+      'Grafu za mapato ya kila tawi moja kwa moja',
+      'Ripoti ya PDF ya mauzo ya kila siku WhatsApp',
+      'Daftari la uhamisho wa mzigo kati ya matawi',
+      'Mahudhurio na zamu za wafanyakazi'
     ],
     'Custom Software': [
-      'Custom database tailored to your paperwork',
-      'Multi-tier approval workflows',
-      'Automated printable invoices & certificates',
-      'Audit log tracking all employee actions'
+      'Hifadhidata iliyosanifiwa kulingana na fomu zako za kazi',
+      'Mfumo wa uidhinishaji wa ngazi kadhaa',
+      'Ankara (Invoices) na vyeti vya kuchapa kiotomatiki',
+      'Daftari la kumbukumbu ya kila kitendo cha mfanyakazi'
     ]
   };
 
@@ -120,7 +120,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
 
   const calculateEstimatedRange = (): string => {
     const selectedObj = projectTypeOptions.find(p => p.type === projectType);
-    return selectedObj ? selectedObj.baseRange : 'Requires Technical Consultation';
+    return selectedObj ? selectedObj.baseRange : 'Inahitaji Kikao cha Kiufundi';
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -128,8 +128,8 @@ export const InteractiveQuoteBuilder: React.FC = () => {
     if (!customerName || !customerPhone) {
       showToast({
         type: 'error',
-        title: 'Missing Contact Details',
-        message: 'Please provide your name and phone number.'
+        title: 'Taarifa Zinakosekana',
+        message: 'Tafadhali weka jina lako na namba yako ya simu.'
       });
       return;
     }
@@ -143,10 +143,10 @@ export const InteractiveQuoteBuilder: React.FC = () => {
       timeline,
       estimatedRange: calculateEstimatedRange(),
       customerName,
-      customerCompany: customerCompany || 'Individual / Business',
+      customerCompany: customerCompany || 'Mtu Binafsi / Biashara',
       customerPhone,
-      customerEmail: customerEmail || 'N/A',
-      projectNotes: projectNotes || 'Standard scope discussion requested.',
+      customerEmail: customerEmail || 'Hakuna',
+      projectNotes: projectNotes || 'Ombi la mazungumzo ya mradi.',
       status: 'New',
       createdAt: new Date().toISOString()
     };
@@ -156,8 +156,8 @@ export const InteractiveQuoteBuilder: React.FC = () => {
 
     showToast({
       type: 'success',
-      title: 'Quote Estimate Generated',
-      message: `Your project estimate ${quoteId} has been drafted.`
+      title: 'Makadirio Yamekamilika',
+      message: `Makadirio ya mradi wako ${quoteId} yameandaliwa.`
     });
   };
 
@@ -168,20 +168,20 @@ export const InteractiveQuoteBuilder: React.FC = () => {
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
             <Sparkles className="w-4 h-4" />
-            <span>Interactive Project Estimator</span>
+            <span>Kikokotoo cha Mradi wa Kiteknolojia</span>
           </span>
           <h3 className="text-xl sm:text-2xl font-extrabold text-white mt-1">
-            Build Your Custom Technology Project Scope
+            Sanidi Mahitaji ya Mradi Wako wa Kidijitali
           </h3>
           <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
-            Select your software requirements to generate an estimated investment range and schedule a technical discovery call with TK engineering.
+            Chagua vipengele unavyohitaji ili kupata makadirio ya gharama na kupanga kikao cha kiufundi na wahandisi wa TK.
           </p>
         </div>
 
         {/* Step Indicator */}
         {!submittedQuote && (
           <div className="flex items-center gap-2 bg-slate-800/80 px-4 py-2 rounded-xl shrink-0">
-            <span className="text-xs text-slate-400 font-semibold">Step {step} of 4</span>
+            <span className="text-xs text-slate-400 font-semibold">Hatua ya {step} kati ya 4</span>
             <div className="flex gap-1">
               {[1, 2, 3, 4].map(s => (
                 <div
@@ -205,39 +205,39 @@ export const InteractiveQuoteBuilder: React.FC = () => {
 
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
-                Estimate Successfully Generated
+                Makadirio Yamekamilika Kikamilifu
               </span>
               <h3 className="text-2xl font-extrabold text-slate-900 mt-3">
-                Project Quote Ref: {submittedQuote.id}
+                Namba ya Makadirio: {submittedQuote.id}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
-                Thank you, <strong>{submittedQuote.customerName}</strong>. Our engineering lead will review your scope for <strong>{submittedQuote.projectType}</strong> and contact you within 24 business hours.
+                Asante, <strong>{submittedQuote.customerName}</strong>. Kiongozi wetu wa uhandisi atapitia mradi wako wa <strong>{submittedQuote.projectType}</strong> na kuwasiliana nawe ndani ya saa 24 za kazi.
               </p>
             </div>
 
             {/* Scope Summary Box */}
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 text-left text-xs space-y-2.5">
               <div className="flex justify-between text-slate-600">
-                <span>Project Solution:</span>
+                <span>Aina ya Mradi:</span>
                 <span className="font-bold text-slate-900">{submittedQuote.projectType}</span>
               </div>
               <div className="flex justify-between text-slate-600">
-                <span>Organization Scale:</span>
+                <span>Ukubwa wa Biashara/Taasisi:</span>
                 <span className="font-bold text-slate-900">{submittedQuote.businessScale}</span>
               </div>
               <div className="flex justify-between text-slate-600">
-                <span>Estimated Investment Range:</span>
+                <span>Makadirio ya Uwekezaji:</span>
                 <span className="font-extrabold text-amber-600 text-sm">
                   {submittedQuote.estimatedRange}
                 </span>
               </div>
               <div className="flex justify-between text-slate-600">
-                <span>Target Timeline:</span>
+                <span>Muda Unaotarajiwa:</span>
                 <span className="font-bold text-slate-900">{submittedQuote.timeline}</span>
               </div>
 
               <div className="pt-2 border-t border-slate-200 text-[11px] text-slate-500 italic">
-                * Note: Estimate only — final quotation requires technical consultation.
+                * Angalizo: Haya ni makadirio ya awali — bei kamili inathibitishwa baada ya kikao cha kiufundi.
               </div>
             </div>
 
@@ -247,12 +247,12 @@ export const InteractiveQuoteBuilder: React.FC = () => {
                 variant="whatsapp"
                 size="md"
                 onClick={() => {
-                  const msg = `Hello TK Digital Solutions team! 👋\n\nI have generated quote request *${submittedQuote.id}* for *${submittedQuote.customerCompany}*.\nProject: ${submittedQuote.projectType}\nEstimated: ${submittedQuote.estimatedRange}\n\nPlease let me know when we can arrange a brief technical consultation.`;
+                  const msg = `Habari timu ya TK Digital Solutions! 👋\n\nNimetengeneza ombi la makadirio ya mradi *${submittedQuote.id}* kwa ajili ya *${submittedQuote.customerCompany}*.\nAina ya Mradi: ${submittedQuote.projectType}\nMakadirio: ${submittedQuote.estimatedRange}\n\nTafadhali nijulishe lini tunaweza kufanya kikao kifupi cha kiufundi.`;
                   window.open(createWhatsAppUrl(msg), '_blank');
                 }}
                 icon={<MessageSquare className="w-4 h-4" />}
               >
-                Forward Scope to WhatsApp Lead
+                Tuma Makadirio Haya WhatsApp
               </Button>
 
               <Button
@@ -263,7 +263,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
                   setStep(1);
                 }}
               >
-                Create Another Scope
+                Tengeneza Makadirio Mengine
               </Button>
             </div>
           </div>
@@ -274,10 +274,10 @@ export const InteractiveQuoteBuilder: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <h4 className="text-base font-bold text-slate-900">
-                    1. What type of digital solution does your organization need?
+                    1. Je, shirika au biashara yako inahitaji mfumo wa aina gani?
                   </h4>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Select the category that best matches your primary technical objective.
+                    Chagua kundi linalolingana vyema na lengo lako kuu la kiufundi.
                   </p>
                 </div>
 
@@ -320,7 +320,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
 
                         <div className="mt-3 pt-2 border-t border-slate-100">
                           <span className="text-[10px] text-slate-400 block uppercase font-bold">
-                            Typical Range
+                            Makadirio ya Kawaida
                           </span>
                           <span className="text-xs font-black text-amber-700">
                             {opt.baseRange}
@@ -340,7 +340,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
                     icon={<ArrowRight className="w-4 h-4" />}
                     iconPosition="right"
                   >
-                    Continue to Business Scale
+                    Endelea kwenye Ukubwa wa Biashara
                   </Button>
                 </div>
               </div>
@@ -351,23 +351,23 @@ export const InteractiveQuoteBuilder: React.FC = () => {
               <div className="space-y-6">
                 <div>
                   <h4 className="text-base font-bold text-slate-900">
-                    2. Select Business Scale & Key Modules for {projectType}
+                    2. Chagua Ukubwa wa Biashara & Moduli za {projectType}
                   </h4>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Tailor the system capacity and choose key functional integrations.
+                    Weka ukubwa wa mfumo na uchague mifumo ya ziada unayohitaji kuunganisha.
                   </p>
                 </div>
 
                 {/* Scale buttons */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                    Operational Scale
+                    Ukubwa wa Shughuli za Kazi
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
-                      { scale: 'Solo / Startup', desc: 'Single location, 1-3 users, focused essential features' },
-                      { scale: 'Growing SME', desc: '1-3 branches, 5-15 staff, synchronized inventory & permissions' },
-                      { scale: 'Corporate / Multi-Branch', desc: 'Multi-branch enterprise, high transaction volume, custom ERP' }
+                      { scale: 'Solo / Startup', desc: 'Eneo moja, watumiaji 1-3, vipengele muhimu vya msingi' },
+                      { scale: 'Growing SME', desc: 'Matawi 1-3, wafanyakazi 5-15, stoo iliyounganishwa na ruksa' },
+                      { scale: 'Corporate / Multi-Branch', desc: 'Matawi mengi, miamala mikubwa ya biashara, mfumo kamili wa ERP' }
                     ].map(s => (
                       <button
                         key={s.scale}
@@ -393,7 +393,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
                 {/* Features Checkboxes */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                    Key Features Needed
+                    Vipengele Muhimu Vinavyohitajika
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {(availableFeaturesMap[projectType] || []).map(feat => {
@@ -428,7 +428,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
                     onClick={() => setStep(1)}
                     icon={<ArrowLeft className="w-4 h-4" />}
                   >
-                    Back
+                    Rudi Nyuma
                   </Button>
 
                   <Button
@@ -439,7 +439,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
                     icon={<ArrowRight className="w-4 h-4" />}
                     iconPosition="right"
                   >
-                    Next: Timeline & Schedule
+                    Mbele: Muda wa Kukamilisha
                   </Button>
                 </div>
               </div>
@@ -450,18 +450,18 @@ export const InteractiveQuoteBuilder: React.FC = () => {
               <div className="space-y-6">
                 <div>
                   <h4 className="text-base font-bold text-slate-900">
-                    3. Target Launch Timeline
+                    3. Muda Unaolengwa wa Kukamilisha Mradi
                   </h4>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    When do you need the application or system deployed and operational?
+                    Je, ungependa mfumo au programu yako iwe tayari kuanza kufanya kazi lini?
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
-                    { label: 'Fast Track (1 - 2 Weeks)', value: '1 - 2 Weeks', desc: 'Urgent rollout with core essential modules' },
-                    { label: 'Standard (2 - 4 Weeks)', value: '2 - 4 Weeks', desc: 'Balanced timeline with thorough staff testing' },
-                    { label: 'Strategic (1 - 2 Months)', value: '1 - 2 Months', desc: 'Complex multi-branch integration & data migration' }
+                    { label: 'Haraka (Wiki 1 - 2)', value: '1 - 2 Weeks', desc: 'Kukamilisha kwa haraka moduli za msingi' },
+                    { label: 'Kawaida (Wiki 2 - 4)', value: '2 - 4 Weeks', desc: 'Muda wa kawaida unaojumuisha mafunzo ya watumishi' },
+                    { label: 'Mradi Mkubwa (Mwezi 1 - 2)', value: '1 - 2 Months', desc: 'Mifumo mikubwa yenye matawi mengi na uhamishaji wa data' }
                   ].map(t => (
                     <button
                       key={t.value}
@@ -487,7 +487,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
                     onClick={() => setStep(2)}
                     icon={<ArrowLeft className="w-4 h-4" />}
                   >
-                    Back
+                    Rudi Nyuma
                   </Button>
 
                   <Button
@@ -498,7 +498,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
                     icon={<ArrowRight className="w-4 h-4" />}
                     iconPosition="right"
                   >
-                    Next: Contact Details & Estimate
+                    Mbele: Taarifa za Mawasiliano
                   </Button>
                 </div>
               </div>
@@ -509,10 +509,10 @@ export const InteractiveQuoteBuilder: React.FC = () => {
               <div className="space-y-6">
                 <div>
                   <h4 className="text-base font-bold text-slate-900">
-                    4. Contact Details & Preliminary Estimate Summary
+                    4. Taarifa za Mawasiliano & Muhtasari wa Makadirio
                   </h4>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Enter your contact information so our engineering team can send the detailed quotation.
+                    Weka taarifa zako za mawasiliano ili timu yetu ya TEHAMA iweze kukutumia dondoo kamili ya bei.
                   </p>
                 </div>
 
@@ -520,7 +520,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
                 <div className="p-4 rounded-2xl bg-amber-50/90 border border-amber-200 flex flex-col sm:flex-row items-center justify-between gap-3">
                   <div>
                     <span className="text-[10px] uppercase font-bold text-amber-800 block">
-                      Estimated Project Range
+                      Makadirio ya Gharama ya Mradi
                     </span>
                     <span className="text-xl font-black text-amber-950">
                       {calculateEstimatedRange()}
@@ -533,32 +533,32 @@ export const InteractiveQuoteBuilder: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
-                    label="Contact Person Name"
-                    placeholder="e.g. Goodluck Mtei"
+                    label="Jina la Mhusika"
+                    placeholder="mfano: Goodluck Mtei"
                     value={customerName}
                     onChange={e => setCustomerName(e.target.value)}
                     required
                   />
 
                   <Input
-                    label="Company / School / Business Name"
-                    placeholder="e.g. Mtei Hardware Ltd"
+                    label="Jina la Kampuni / Shule / Biashara"
+                    placeholder="mfano: Mtei Hardware Ltd"
                     value={customerCompany}
                     onChange={e => setCustomerCompany(e.target.value)}
                   />
 
                   <Input
-                    label="Phone Number (WhatsApp Active)"
-                    placeholder="e.g. +255 784 556 778"
+                    label="Namba ya Simu (Inayotumika WhatsApp)"
+                    placeholder="mfano: +255 784 556 778"
                     value={customerPhone}
                     onChange={e => setCustomerPhone(e.target.value)}
                     required
                   />
 
                   <Input
-                    label="Email Address"
+                    label="Barua Pepe (Email)"
                     type="email"
-                    placeholder="e.g. info@mteihardware.co.tz"
+                    placeholder="mfano: info@mteihardware.co.tz"
                     value={customerEmail}
                     onChange={e => setCustomerEmail(e.target.value)}
                   />
@@ -566,13 +566,13 @@ export const InteractiveQuoteBuilder: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Specific Workflow Notes / Details
+                    Maelezo ya Ziada au Mahitaji Maalum
                   </label>
                   <textarea
                     rows={3}
                     value={projectNotes}
                     onChange={e => setProjectNotes(e.target.value)}
-                    placeholder="Describe any special requirements, existing paper forms, branch locations, or hardware needs..."
+                    placeholder="Elezea mahitaji yoyote maalum, mifumo unayotumia sasa, idadi ya matawi, au vifaa unavyohitaji..."
                     className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
                   />
                 </div>
@@ -585,7 +585,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
                     onClick={() => setStep(3)}
                     icon={<ArrowLeft className="w-4 h-4" />}
                   >
-                    Back
+                    Rudi Nyuma
                   </Button>
 
                   <Button
@@ -594,7 +594,7 @@ export const InteractiveQuoteBuilder: React.FC = () => {
                     size="lg"
                     icon={<CheckCircle2 className="w-5 h-5" />}
                   >
-                    Submit Scope & Request Technical Call
+                    Tuma Maombi & Panga Kikao cha Kiufundi
                   </Button>
                 </div>
               </div>

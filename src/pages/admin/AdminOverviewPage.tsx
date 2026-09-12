@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { useTranslation } from '../../context/LanguageContext';
 import { auditLogService } from '../../services/audit/auditLogService';
 import { AdminAuditLog } from '../../types';
 import { formatPrice, formatTimeAgo, formatDate } from '../../utils/formatters';
@@ -30,7 +29,6 @@ import {
 export const AdminOverviewPage: React.FC = () => {
   const { orders, products, serviceTickets, quoteRequests, navigateTo, isLoadingData, refreshData } = useApp();
   const { userProfile, userRole } = useAuth();
-  const { t, language } = useTranslation();
 
   const [auditLogs, setAuditLogs] = useState<AdminAuditLog[]>([]);
   const [loadingLogs, setLoadingLogs] = useState<boolean>(true);
@@ -78,22 +76,18 @@ export const AdminOverviewPage: React.FC = () => {
           <div className="space-y-2 max-w-xl">
             <div className="flex items-center gap-2">
               <span className={`text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full font-black ${roleConfig.badgeClass}`}>
-                {roleConfig.labelEn}
+                {roleConfig.labelSw || roleConfig.labelEn}
               </span>
               <span className="text-xs text-amber-400 font-bold flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                Live Command Center
+                Kituo cha Amri (Muda Halisi)
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              {language === 'sw'
-                ? `Habari, ${userProfile?.fullName?.split(' ')[0] || 'Msimamizi'}`
-                : `Welcome back, ${userProfile?.fullName?.split(' ')[0] || 'Admin'}`}
+              {`Habari, ${userProfile?.fullName?.split(' ')[0] || 'Msimamizi'}`}
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              {language === 'sw'
-                ? 'Muhtasari wa wakati halisi wa mauzo, maombi ya wateja, malipo na hesabu za duka la TK Stationery.'
-                : 'Real-time operational visibility into customer orders, payments, print jobs, and stock inventory.'}
+              Muhtasari wa wakati halisi wa mauzo, maombi ya wateja, malipo na hesabu za duka la TK Stationery.
             </p>
           </div>
 
@@ -103,7 +97,7 @@ export const AdminOverviewPage: React.FC = () => {
               className="px-4 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2 active:scale-95"
             >
               <ShoppingBag className="w-4 h-4" />
-              <span>{language === 'sw' ? 'Shughulikia Oda Zilizopo' : 'Process Pending Orders'}</span>
+              <span>Shughulikia Oda Zilizopo</span>
               {pendingOrders.length > 0 && (
                 <span className="px-1.5 py-0.5 rounded-full bg-slate-950 text-amber-400 text-[10px] font-black">
                   {pendingOrders.length}
@@ -115,7 +109,7 @@ export const AdminOverviewPage: React.FC = () => {
               className="px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-all border border-slate-700 flex items-center gap-2"
             >
               <CreditCard className="w-4 h-4 text-emerald-400" />
-              <span>{language === 'sw' ? 'Hakiki Malipo' : 'Verify Payments'}</span>
+              <span>Hakiki Malipo</span>
             </button>
           </div>
         </div>
@@ -133,7 +127,7 @@ export const AdminOverviewPage: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              {t('admin.metric.gross_orders')}
+              Jumla ya Oda
             </span>
             <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
               <ShoppingBag className="w-4 h-4" />
@@ -142,9 +136,9 @@ export const AdminOverviewPage: React.FC = () => {
           <div className="mt-3">
             <p className="text-2xl font-black text-slate-900 dark:text-white">{totalOrdersCount}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
-              <span className="font-bold text-emerald-600 dark:text-emerald-400">{completedOrders.length} Completed</span>
+              <span className="font-bold text-emerald-600 dark:text-emerald-400">{completedOrders.length} Zimekamilika</span>
               <span>•</span>
-              <span className="font-medium text-amber-600 dark:text-amber-400">{pendingOrders.length} Pending</span>
+              <span className="font-medium text-amber-600 dark:text-amber-400">{pendingOrders.length} Zinazosubiri</span>
             </p>
           </div>
         </div>
@@ -156,7 +150,7 @@ export const AdminOverviewPage: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              {language === 'sw' ? 'Mapato ya Oda Zilizokamilika' : 'Completed Revenue'}
+              Mapato ya Oda Zilizokamilika
             </span>
             <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
               <TrendingUp className="w-4 h-4" />
@@ -165,7 +159,7 @@ export const AdminOverviewPage: React.FC = () => {
           <div className="mt-3">
             <p className="text-2xl font-black text-slate-900 dark:text-white">{formatPrice(grossRevenue)}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              {language === 'sw' ? 'Kutoka oda zilizothibitishwa' : 'From finalized store orders'}
+              Kutoka oda zilizothibitishwa
             </p>
           </div>
         </div>
@@ -177,7 +171,7 @@ export const AdminOverviewPage: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              {t('admin.metric.active_tickets')}
+              Tiketi za Huduma
             </span>
             <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-slate-800 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
               <FileCheck className="w-4 h-4" />
@@ -186,7 +180,7 @@ export const AdminOverviewPage: React.FC = () => {
           <div className="mt-3">
             <p className="text-2xl font-black text-slate-900 dark:text-white">{activeTickets.length}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              {serviceTickets.length} total tickets filed
+              Jumla ya tiketi {serviceTickets.length} zimewasilishwa
             </p>
           </div>
         </div>
@@ -198,7 +192,7 @@ export const AdminOverviewPage: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              {t('admin.metric.low_stock')}
+              Uhaba wa Stoo
             </span>
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
               lowStockProducts.length > 0
@@ -211,7 +205,7 @@ export const AdminOverviewPage: React.FC = () => {
           <div className="mt-3">
             <p className="text-2xl font-black text-slate-900 dark:text-white">{lowStockProducts.length}</p>
             <p className="text-xs text-rose-600 dark:text-rose-400 font-semibold mt-1">
-              {outOfStockProducts.length > 0 ? `${outOfStockProducts.length} completely out of stock` : 'Requires restocking'}
+              {outOfStockProducts.length > 0 ? `Bidhaa ${outOfStockProducts.length} zimeisha kabisa` : 'Zinahitaji kuongezwa stoo'}
             </p>
           </div>
         </div>
@@ -224,8 +218,8 @@ export const AdminOverviewPage: React.FC = () => {
             <Package className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">{t('admin.metric.total_products')}</p>
-            <p className="text-sm font-black text-slate-900 dark:text-white">{products.length} items</p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Jumla ya Bidhaa</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">Bidhaa {products.length}</p>
           </div>
         </div>
 
@@ -234,8 +228,8 @@ export const AdminOverviewPage: React.FC = () => {
             <Globe className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">{t('admin.metric.new_quotes')}</p>
-            <p className="text-sm font-black text-slate-900 dark:text-white">{pendingQuotes.length} active leads</p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Maombi ya Bei</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">Maombi {pendingQuotes.length} yanaendelea</p>
           </div>
         </div>
 
@@ -244,8 +238,8 @@ export const AdminOverviewPage: React.FC = () => {
             <CreditCard className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">{t('admin.metric.pending_payments')}</p>
-            <p className="text-sm font-black text-slate-900 dark:text-white">{pendingPayments.length} transactions</p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Malipo Yanayosubiri</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">Miamala {pendingPayments.length}</p>
           </div>
         </div>
 
@@ -254,8 +248,8 @@ export const AdminOverviewPage: React.FC = () => {
             <Users className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">{t('admin.metric.registered_customers')}</p>
-            <p className="text-sm font-black text-slate-900 dark:text-white">{uniqueCustomerCount} unique contacts</p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Wateja Waliojisajili</p>
+            <p className="text-sm font-black text-slate-900 dark:text-white">Wateja {uniqueCustomerCount} wa kipekee</p>
           </div>
         </div>
       </div>
@@ -267,65 +261,76 @@ export const AdminOverviewPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-black text-slate-900 dark:text-white">
-                {language === 'sw' ? 'Oda za Hivi Karibuni' : 'Recent Customer Orders'}
+                Oda za Hivi Karibuni
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {language === 'sw' ? 'Mlolongo wa oda zilizowasilishwa mtandaoni' : 'Live order dispatch queue from storefront'}
+                Mlolongo wa oda zilizowasilishwa mtandaoni
               </p>
             </div>
             <button
               onClick={() => navigateTo('/admin/orders')}
               className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
             >
-              <span>{language === 'sw' ? 'Tazama Zote' : 'View All Orders'}</span>
+              <span>Tazama Zote</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
-            {orders.slice(0, 6).map(order => (
-              <div
-                key={order.id}
-                onClick={() => navigateTo('/admin/orders')}
-                className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors flex items-center justify-between gap-4 group"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs flex-shrink-0 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
-                    <ShoppingBag className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                        {order.customerName}
-                      </p>
-                      <span className="text-[10px] font-mono text-slate-400">#{order.id}</span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-                      {order.items.length} items • {order.customerPhone} • {formatDate(order.createdAt)}
-                    </p>
-                  </div>
-                </div>
+            {orders.slice(0, 6).map(order => {
+              const statusLabel =
+                order.status === 'Completed'
+                  ? 'Imekamilika'
+                  : order.status === 'Processing'
+                  ? 'Inashughulikiwa'
+                  : order.status === 'Cancelled'
+                  ? 'Imeghairiwa'
+                  : 'Imewasilishwa';
 
-                <div className="text-right flex-shrink-0">
-                  <p className="text-xs font-black text-slate-900 dark:text-white">
-                    {formatPrice(order.totalAmount)}
-                  </p>
-                  <span
-                    className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 ${
-                      order.status === 'Completed'
-                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
-                        : order.status === 'Processing'
-                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400'
-                        : order.status === 'Cancelled'
-                        ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'
-                        : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
-                    }`}
-                  >
-                    {order.status}
-                  </span>
+              return (
+                <div
+                  key={order.id}
+                  onClick={() => navigateTo('/admin/orders')}
+                  className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors flex items-center justify-between gap-4 group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs flex-shrink-0 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
+                      <ShoppingBag className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                          {order.customerName}
+                        </p>
+                        <span className="text-[10px] font-mono text-slate-400">#{order.id}</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+                        Bidhaa {order.items.length} • {order.customerPhone} • {formatDate(order.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-xs font-black text-slate-900 dark:text-white">
+                      {formatPrice(order.totalAmount)}
+                    </p>
+                    <span
+                      className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mt-1 ${
+                        order.status === 'Completed'
+                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
+                          : order.status === 'Processing'
+                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400'
+                          : order.status === 'Cancelled'
+                          ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'
+                          : 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                      }`}
+                    >
+                      {statusLabel}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -336,13 +341,13 @@ export const AdminOverviewPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5">
                 <Boxes className="w-4 h-4 text-rose-500" />
-                <span>{language === 'sw' ? 'Uhaba wa Stoo' : 'Low Stock Watchlist'}</span>
+                <span>Uhaba wa Stoo</span>
               </h3>
               <button
                 onClick={() => navigateTo('/admin/inventory')}
                 className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:underline"
               >
-                {language === 'sw' ? 'Kagua Stoo' : 'Manage Inventory'}
+                Kagua Stoo
               </button>
             </div>
 
@@ -350,7 +355,7 @@ export const AdminOverviewPage: React.FC = () => {
               {lowStockProducts.length === 0 ? (
                 <div className="py-4 text-center text-xs text-slate-400">
                   <CheckCircle2 className="w-5 h-5 mx-auto text-emerald-500 mb-1" />
-                  <span>All inventory units healthy ({products.length} products).</span>
+                  <span>Bidhaa zote {products.length} zipo kwa kiwango cha kuridhisha.</span>
                 </div>
               ) : (
                 lowStockProducts.slice(0, 4).map(product => (
@@ -374,7 +379,7 @@ export const AdminOverviewPage: React.FC = () => {
                           : 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300'
                       }`}
                     >
-                      {product.stockCount} left
+                      {product.stockCount === 0 ? 'Imeisha' : `Baki ${product.stockCount}`}
                     </span>
                   </div>
                 ))
@@ -387,25 +392,25 @@ export const AdminOverviewPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5">
                 <History className="w-4 h-4 text-amber-500" />
-                <span>{language === 'sw' ? 'Kumbukumbu za Usalama (Audit)' : 'Security Audit Trail'}</span>
+                <span>Kumbukumbu za Usalama (Audit)</span>
               </h3>
               {canAccessSection(userRole, 'audit-logs') && (
                 <button
                   onClick={() => navigateTo('/admin/audit-logs')}
                   className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:underline"
                 >
-                  {language === 'sw' ? 'Fungua Zote' : 'Full Stream'}
+                  Fungua Zote
                 </button>
               )}
             </div>
 
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-3 space-y-2.5">
               {loadingLogs ? (
-                <div className="py-6 text-center text-xs text-slate-400">Loading audit records...</div>
+                <div className="py-6 text-center text-xs text-slate-400">Inapakia kumbukumbu...</div>
               ) : auditLogs.length === 0 ? (
                 <div className="py-6 text-center text-xs text-slate-400">
                   <ShieldCheck className="w-5 h-5 mx-auto text-slate-300 dark:text-slate-700 mb-1" />
-                  <span>No administrative mutations recorded yet.</span>
+                  <span>Hakuna mabadiliko ya kiutawala yaliyorekodiwa bado.</span>
                 </div>
               ) : (
                 auditLogs.map(log => (
@@ -419,7 +424,7 @@ export const AdminOverviewPage: React.FC = () => {
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                      By <span className="font-semibold text-slate-700 dark:text-slate-300">{log.actorName || log.actorRole}</span> • target: {log.targetType} #{log.targetId.slice(-6)}
+                      Na <span className="font-semibold text-slate-700 dark:text-slate-300">{log.actorName || log.actorRole}</span> • lengwa: {log.targetType} #{log.targetId.slice(-6)}
                     </p>
                   </div>
                 ))

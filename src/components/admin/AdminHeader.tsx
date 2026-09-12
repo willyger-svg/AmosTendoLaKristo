@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { useTranslation } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { AdminNotificationsPopover } from './AdminNotificationsPopover';
 import { ADMIN_ROLE_CONFIGS } from '../../utils/adminPermissions';
 import {
@@ -13,7 +13,6 @@ import {
   Bell,
   Sun,
   Moon,
-  Globe2,
   ChevronDown,
   LogOut,
   Settings,
@@ -39,7 +38,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 }) => {
   const { navigateTo, refreshData, isLoadingData, showToast, orders, serviceTickets } = useApp();
   const { userProfile, userRole, logout } = useAuth();
-  const { language, setLanguage, theme, setTheme, isDark, t } = useTranslation();
+  const { theme, setTheme, isDark } = useTheme();
 
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -70,21 +69,16 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       await refreshData();
       showToast({
         type: 'success',
-        title: language === 'sw' ? 'Firestore Imesawazishwa' : 'Firestore Synchronized',
-        message: language === 'sw' ? 'Mifumo na kumbukumbu za hivi karibuni zimesasishwa.' : 'Live collections refreshed from Firestore database.'
+        title: 'Firestore Imesawazishwa',
+        message: 'Mifumo na kumbukumbu za hivi karibuni zimesasishwa.'
       });
     } catch {
       showToast({
         type: 'warning',
-        title: 'Sync Warning',
-        message: 'Could not sync live records from remote server.'
+        title: 'Onyo la Usawazishaji',
+        message: 'Imeshindwa kusawazisha kumbukumbu za hivi karibuni kutoka seva.'
       });
     }
-  };
-
-  const toggleLanguage = () => {
-    const next = language === 'sw' ? 'en' : 'sw';
-    setLanguage(next);
   };
 
   const toggleTheme = () => {
@@ -99,7 +93,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         <button
           onClick={onOpenMobileMenu}
           className="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          title="Open Menu"
+          title="Fungua Menyu"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -146,8 +140,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-slate-700/80 hover:border-amber-400 dark:hover:border-amber-500 text-xs font-medium transition-all"
         >
           <Search className="w-3.5 h-3.5 text-amber-500" />
-          <span className="hidden lg:inline">{t('admin.search.placeholder').slice(0, 24)}...</span>
-          <span className="lg:hidden">Search</span>
+          <span className="hidden lg:inline">Tafuta oda, bidhaa, wateja...</span>
+          <span className="lg:hidden">Tafuta</span>
           <kbd className="hidden md:inline-block px-1.5 py-0.5 text-[10px] font-mono bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 text-slate-400">
             Ctrl+K
           </kbd>
@@ -157,7 +151,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         <button
           onClick={onOpenSearch}
           className="sm:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          title="Search"
+          title="Tafuta"
         >
           <Search className="w-4 h-4 text-amber-500" />
         </button>
@@ -166,20 +160,20 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         <button
           onClick={onOpenQuickActions}
           className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all active:scale-95"
-          title={t('admin.quick_actions.title')}
+          title="Vitendo vya Haraka"
         >
           <Zap className="w-4 h-4 fill-current" />
-          <span className="hidden md:inline">{t('admin.quick_actions.title')}</span>
+          <span className="hidden md:inline">Vitendo vya Haraka</span>
         </button>
 
         {/* Live Storefront Link */}
         <button
           onClick={() => navigateTo('/')}
           className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors"
-          title={t('admin.live_store')}
+          title="Tovuti Kuu"
         >
           <Store className="w-3.5 h-3.5 text-blue-500" />
-          <span>{t('admin.live_store')}</span>
+          <span>Tovuti Kuu</span>
         </button>
 
         {/* Sync Firestore Button */}
@@ -187,7 +181,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           onClick={handleSyncFirestore}
           disabled={isLoadingData}
           className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
-          title={t('admin.sync_firestore')}
+          title="Sawazisha Data"
         >
           <RefreshCw className={`w-4 h-4 text-emerald-600 dark:text-emerald-400 ${isLoadingData ? 'animate-spin' : ''}`} />
         </button>
@@ -197,7 +191,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           <button
             onClick={() => setIsNotificationsOpen(prev => !prev)}
             className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative"
-            title="Operational Alerts"
+            title="Taarifa za Mfumo"
           >
             <Bell className="w-4 h-4" />
             {pendingItemsCount > 0 && (
@@ -215,21 +209,11 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           />
         </div>
 
-        {/* Language Toggle (SW / EN) */}
-        <button
-          onClick={toggleLanguage}
-          className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1 text-xs font-bold"
-          title="Switch Language (Swahili / English)"
-        >
-          <Globe2 className="w-4 h-4 text-indigo-500" />
-          <span className="uppercase">{language}</span>
-        </button>
-
         {/* Theme Toggle (Light / Dark) */}
         <button
           onClick={toggleTheme}
           className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          title="Toggle Theme"
+          title="Badili Mwonekano"
         >
           {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
         </button>
@@ -256,10 +240,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             </div>
             <div className="hidden lg:block text-left">
               <p className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[110px]">
-                {userProfile?.fullName || 'Admin User'}
+                {userProfile?.fullName || 'Msimamizi'}
               </p>
               <p className="text-[10px] text-slate-400 capitalize">
-                {userRole.replace('_', ' ')}
+                {userRole === 'super_admin' ? 'Super Admin' : userRole === 'admin' ? 'Admin' : 'Staff'}
               </p>
             </div>
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-white transition-transform" />
@@ -270,18 +254,18 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               {/* Profile Card Header */}
               <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
                 <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                  {userProfile?.fullName || 'Admin User'}
+                  {userProfile?.fullName || 'Msimamizi'}
                 </p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
                   {userProfile?.email || 'admin@tkstationery.co.tz'}
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold ${roleConfig.badgeClass}`}>
-                    {roleConfig.labelEn}
+                    {roleConfig.labelSw || roleConfig.labelEn}
                   </span>
                   <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Authorized
+                    Imeidhinishwa
                   </span>
                 </div>
               </div>
@@ -296,7 +280,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   <Settings className="w-4 h-4 text-slate-400" />
-                  <span>{t('admin.nav.settings')}</span>
+                  <span>Mipangilio ya Mfumo</span>
                 </button>
 
                 <button
@@ -307,7 +291,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   <Store className="w-4 h-4 text-blue-500" />
-                  <span>{t('admin.live_store')}</span>
+                  <span>Tovuti Kuu</span>
                 </button>
 
                 <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
@@ -321,7 +305,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span>{t('account.sign_out')}</span>
+                  <span>Toka Kwenye Akaunti</span>
                 </button>
               </div>
             </div>

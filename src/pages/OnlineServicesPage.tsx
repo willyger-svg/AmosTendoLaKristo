@@ -39,12 +39,12 @@ export const OnlineServicesPage: React.FC = () => {
   }, []);
 
   const agencies = [
-    { id: 'ALL', label: 'All Public Services' },
-    { id: 'NIDA', label: 'NIDA (National ID)' },
-    { id: 'TRA', label: 'TRA (TIN & Tax)' },
-    { id: 'POLICE', label: 'Police Loss Reports' },
-    { id: 'RITA', label: 'RITA Certificates' },
-    { id: 'NAPA', label: 'NAPA / Ajira Portal' },
+    { id: 'ALL', label: 'Huduma Zote' },
+    { id: 'NIDA', label: 'NIDA (Vitambulisho)' },
+    { id: 'TRA', label: 'TRA (TIN & Kodi)' },
+    { id: 'POLICE', label: 'Ripoti ya Upotevu Polisi' },
+    { id: 'RITA', label: 'Vyeti vya RITA' },
+    { id: 'NAPA', label: 'Ajira Portal / NAPA' },
     { id: 'OTHER', label: 'BRELA & HESLB' }
   ];
 
@@ -68,32 +68,32 @@ export const OnlineServicesPage: React.FC = () => {
     <div className="py-8 space-y-12">
       <Container>
         {/* Breadcrumb */}
-        <Breadcrumbs items={[{ label: 'Online Public Services Assistance' }]} />
+        <Breadcrumbs items={[{ label: 'Msaada wa Huduma za Serikali Mtandaoni' }]} />
 
         {/* Page Hero */}
         <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 border border-slate-800 relative overflow-hidden mt-4">
           <div className="max-w-3xl space-y-4 relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950 border border-emerald-700/60 text-emerald-400 text-xs font-semibold">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Accredited Private Typing & Internet Portal Assistance</span>
+              <span>Dawati Binafsi la Usaidizi wa Mifumo na Maombi Mtandaoni</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-              Government & Public Online Services Bureau
+              Kituo cha Huduma za Serikali na Taasisi za Umma Mtandaoni
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Navigating online government portals can be complicated. Our trained digital assistants help you fill online forms accurately, scan required identity documents, generate official GePG payment control numbers, and print certificates.
+              Kutumia mifumo ya kiserikali mtandaoni kunaweza kuwa na changamoto. Wasaidizi wetu wenye uzoefu watakusaidia kujaza fomu kwa usahihi, kuskani nyaraka zinazohitajika, kupata namba za malipo za GePG (Control Number), na kuchapa vyeti au risiti zako.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-2">
               <Button
                 variant="whatsapp"
                 size="md"
-                onClick={() => window.open(createWhatsAppUrl('Hello TK Stationery! I need help with an online government application.'), '_blank')}
+                onClick={() => window.open(createWhatsAppUrl('Habari TK Stationery! Nahitaji msaada wa kufanya maombi ya mtandaoni.'), '_blank')}
                 icon={<MessageSquare className="w-4 h-4" />}
               >
-                Inquire via WhatsApp Desk
+                Wasiliana WhatsApp Kupata Msaada
               </Button>
             </div>
           </div>
@@ -153,7 +153,7 @@ export const OnlineServicesPage: React.FC = () => {
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-700 block flex items-center gap-1.5">
                       <FileText className="w-3.5 h-3.5 text-amber-600" />
-                      <span>Required Documents Checklist:</span>
+                      <span>Orodha ya Nyaraka Zinazohitajika:</span>
                     </span>
                     <ul className="text-xs text-slate-600 space-y-1.5">
                       {service.typicalRequirements.map((doc, idx) => (
@@ -168,7 +168,7 @@ export const OnlineServicesPage: React.FC = () => {
                   {/* Workflow Steps Preview */}
                   <div className="space-y-2">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
-                      Assistance Scope & Support:
+                      Usaidizi Utakaoupata:
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                       {service.features.map((step, idx) => (
@@ -185,11 +185,11 @@ export const OnlineServicesPage: React.FC = () => {
                   {/* Fee Breakdown Notice */}
                   <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-amber-950 space-y-1">
                     <div className="flex items-center justify-between font-bold">
-                      <span>TK Assistance & Typing Fee:</span>
+                      <span>Gharama ya Usaidizi na Taipu ya TK:</span>
                       <span className="text-amber-900 font-black">{service.tkAssistanceFeeNote}</span>
                     </div>
                     <p className="text-[11px] text-amber-800 leading-tight">
-                      <strong>Statutory Govt Fees:</strong> {service.officialGovFeeNote}
+                      <strong>Ada Rasmi ya Serikali:</strong> {service.officialGovFeeNote}
                     </p>
                   </div>
                 </div>
@@ -203,7 +203,7 @@ export const OnlineServicesPage: React.FC = () => {
                       rel="noopener noreferrer"
                       className="text-xs text-slate-500 hover:text-slate-800 flex items-center gap-1 font-semibold underline"
                     >
-                      <span>Visit Official Portal</span>
+                      <span>Tembelea Tovuti Rasmi</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
@@ -215,13 +215,13 @@ export const OnlineServicesPage: React.FC = () => {
                       onClick={() => handleStartAssistance(service)}
                       icon={<FileCheck className="w-4 h-4" />}
                     >
-                      Start Assisted Application
+                      Anza Maombi kwa Usaidizi
                     </Button>
 
                     <Button
                       variant="whatsapp"
                       size="sm"
-                      onClick={() => window.open(createWhatsAppUrl(`Hello TK Stationery! I need assistance with ${service.title} (${service.agencyName}).`), '_blank')}
+                      onClick={() => window.open(createWhatsAppUrl(`Habari TK Stationery! Nahitaji msaada wa ${service.title} (${service.agencyName}).`), '_blank')}
                       icon={<MessageSquare className="w-4 h-4" />}
                     >
                       WhatsApp

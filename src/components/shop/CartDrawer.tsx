@@ -29,7 +29,7 @@ export const CartDrawer: React.FC = () => {
       .map(item => `• ${item.product.name} (x${item.quantity}) - TSh ${(item.product.price * item.quantity).toLocaleString()}`)
       .join('\n');
 
-    const msg = `Hello TK Stationery! 👋\n\nI would like to order the following items from my cart:\n\n${summary}\n\n*Cart Total: ${formatTSh(cartSubtotal)}*\n\nPlease confirm availability and delivery dispatch.`;
+    const msg = `Habari TK Stationery! 👋\n\nNingependa kuagiza vifaa hivi kutoka kwenye kikapu changu:\n\n${summary}\n\n*Jumla ya Kikapu: ${formatTSh(cartSubtotal)}*\n\nTafadhali thibitisha upatikanaji na utayari wa mzigo wangu. Asante!`;
     window.open(createWhatsAppUrl(msg), '_blank');
   };
 
@@ -40,7 +40,7 @@ export const CartDrawer: React.FC = () => {
       title={
         <div className="flex items-center gap-2">
           <ShoppingBag className="w-5 h-5 text-amber-500" />
-          <span>Shopping Cart ({cartCount})</span>
+          <span>Kikapu cha Manunuzi ({cartCount})</span>
         </div>
       }
       maxWidth="md"
@@ -51,9 +51,9 @@ export const CartDrawer: React.FC = () => {
             <ShoppingBag className="w-8 h-8" />
           </div>
           <div>
-            <h3 className="font-bold text-slate-800 text-base">Your cart is empty</h3>
+            <h3 className="font-bold text-slate-800 text-base">Kikapu chako kiko tupu kwa sasa</h3>
             <p className="text-xs text-slate-500 mt-1 max-w-xs">
-              Explore our stationery, office supplies, computer accessories, and reams of paper.
+              Gundua vifaa bora vya shule na ofisi, ream za karatasi, na vifaa vya kompyuta vilivyopo stoo yetu.
             </p>
           </div>
           <Button
@@ -64,7 +64,7 @@ export const CartDrawer: React.FC = () => {
               navigateTo('/shop');
             }}
           >
-            Browse Stationery Store
+            Angalia Vifaa vya Duka
           </Button>
         </div>
       ) : (
@@ -149,15 +149,15 @@ export const CartDrawer: React.FC = () => {
           <div className="p-6 bg-slate-50 border-t border-slate-200 space-y-4">
             <div className="space-y-1.5 text-xs">
               <div className="flex items-center justify-between text-slate-600">
-                <span>Subtotal</span>
+                <span>Jumla Ndogo</span>
                 <span className="font-semibold text-slate-900">{formatTSh(cartSubtotal)}</span>
               </div>
               <div className="flex items-center justify-between text-slate-600">
-                <span>Estimated Delivery</span>
-                <span className="text-slate-500">Calculated at checkout</span>
+                <span>Gharama ya Usafiri</span>
+                <span className="text-slate-500">Hupimwa kwenye ukamilishaji</span>
               </div>
               <div className="flex items-center justify-between text-sm font-black text-slate-950 pt-2 border-t border-slate-200">
-                <span>Cart Total</span>
+                <span>Jumla Kuu</span>
                 <span className="text-amber-600">{formatTSh(cartSubtotal)}</span>
               </div>
             </div>
@@ -171,7 +171,7 @@ export const CartDrawer: React.FC = () => {
                 icon={<ArrowRight className="w-4 h-4" />}
                 iconPosition="right"
               >
-                Proceed to Checkout
+                Kamilisha Oda & Malipo
               </Button>
 
               <Button
@@ -181,13 +181,13 @@ export const CartDrawer: React.FC = () => {
                 onClick={handleWhatsAppCheckout}
                 icon={<MessageSquare className="w-4 h-4" />}
               >
-                Instant WhatsApp Order
+                Agiza Haraka Kupitia WhatsApp
               </Button>
             </div>
 
             <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-500">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Safe Store Pickup or Local Dar es Salaam Dispatch</span>
+              <span>Chukua Dukani Manzese au Letewa Popote Dar es Salaam</span>
             </div>
           </div>
         </div>

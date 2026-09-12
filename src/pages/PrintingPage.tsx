@@ -36,7 +36,7 @@ export const PrintingPage: React.FC = () => {
     <div className="py-8 space-y-16">
       <Container>
         {/* Breadcrumb */}
-        <Breadcrumbs items={[{ label: 'Printing & Document Services' }]} />
+        <Breadcrumbs items={[{ label: 'Huduma za Uchapishaji na Nyaraka' }]} />
 
         {/* Hero Banner */}
         <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 border border-slate-800 relative overflow-hidden mt-4">
@@ -44,15 +44,15 @@ export const PrintingPage: React.FC = () => {
             <div className="lg:col-span-7 space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 text-amber-400 text-xs font-semibold">
                 <Printer className="w-3.5 h-3.5" />
-                <span>High-Speed Laser Production Engines</span>
+                <span>Mashine za Kisasa za Kasi Kubwa za Laser</span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-                High-Volume Printing, Binding & Document Center
+                Kituo cha Uchapishaji Mkubwa, Kufunga Vitabu na Nyaraka
               </h1>
 
               <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-                We handle urgent court documents, university thesis binding with gold embossing, passport-size photo studio sessions, and corporate report printing with strict privacy and same-day turnaround.
+                Tunachapa nyaraka za dharura za mahakama, kufunga tasnifu (thesis) za chuo zenye maandishi ya dhahabu (hardcover), picha za pasipoti za kisasa, na ripoti za ofisi kwa usiri mkubwa na kukamilisha siku hiyo hiyo.
               </p>
 
               <div className="flex flex-wrap gap-3 pt-2">
@@ -62,16 +62,16 @@ export const PrintingPage: React.FC = () => {
                   onClick={() => openModal({ type: 'print-wizard' })}
                   icon={<UploadCloud className="w-4 h-4" />}
                 >
-                  Upload File & Start Print Job
+                  Pakia Faili & Anza Uchapishaji
                 </Button>
 
                 <Button
                   variant="whatsapp"
                   size="md"
-                  onClick={() => window.open(createWhatsAppUrl('Hello TK Stationery! I need urgent document printing.'), '_blank')}
+                  onClick={() => window.open(createWhatsAppUrl('Habari TK Stationery! Nahitaji huduma ya kuchapa nyaraka zangu.'), '_blank')}
                   icon={<MessageSquare className="w-4 h-4" />}
                 >
-                  WhatsApp Print Desk
+                  Wasiliana WhatsApp Dawati la Chapa
                 </Button>
               </div>
             </div>
@@ -79,23 +79,23 @@ export const PrintingPage: React.FC = () => {
             {/* Quick Pricing Pill Matrix */}
             <div className="lg:col-span-5 bg-slate-800/80 rounded-2xl p-5 border border-slate-700 space-y-3">
               <span className="text-xs font-bold uppercase tracking-wider text-amber-400 block">
-                Standard Base Rates
+                Viwango vya Msingi vya Bei
               </span>
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-700/60">
-                  <span className="text-slate-400 block text-[11px]">B&W Laser Print</span>
-                  <span className="font-bold text-white text-sm">From TSh 100 / pg</span>
+                  <span className="text-slate-400 block text-[11px]">Uchapishaji Mweusi & Mweupe</span>
+                  <span className="font-bold text-white text-sm">Kuanzia TSh 100 / ukurasa</span>
                 </div>
                 <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-700/60">
-                  <span className="text-slate-400 block text-[11px]">Color Laser Print</span>
-                  <span className="font-bold text-amber-400 text-sm">From TSh 500 / pg</span>
+                  <span className="text-slate-400 block text-[11px]">Uchapishaji wa Rangi (Color)</span>
+                  <span className="font-bold text-amber-400 text-sm">Kuanzia TSh 500 / ukurasa</span>
                 </div>
                 <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-700/60">
-                  <span className="text-slate-400 block text-[11px]">Passport Photos (Set of 6)</span>
+                  <span className="text-slate-400 block text-[11px]">Picha za Pasipoti (Seti ya 6)</span>
                   <span className="font-bold text-white text-sm">TSh 5,000</span>
                 </div>
                 <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-700/60">
-                  <span className="text-slate-400 block text-[11px]">Hardcover Thesis Binding</span>
+                  <span className="text-slate-400 block text-[11px]">Kufunga Thesis (Hardcover Dhahabu)</span>
                   <span className="font-bold text-emerald-400 text-sm">TSh 25,000</span>
                 </div>
               </div>
@@ -106,9 +106,9 @@ export const PrintingPage: React.FC = () => {
         {/* 1. Interactive Print Estimator Calculator */}
         <div className="pt-12">
           <SectionHeader
-            eyebrow="Instant Estimation"
-            title="Configure Your Print Job"
-            subtitle="Select your color mode, paper weight, binding finish, and copies to get an instant cost calculation."
+            eyebrow="Kadirio la Papo Hapo"
+            title="Kadiria Gharama ya Uchapishaji Wako"
+            subtitle="Chagua aina ya rangi, unene wa karatasi, jalada au aina ya kufunga, na nakala ili kupata hesabu ya haraka ya bei."
           />
           <PrintPriceEstimator />
         </div>
@@ -116,9 +116,9 @@ export const PrintingPage: React.FC = () => {
         {/* 2. Core Printing & Copying Services Grid */}
         <div className="pt-16">
           <SectionHeader
-            eyebrow="Specialized Services"
-            title="Printing & Document Finishing Services"
-            subtitle="From individual passport photography to thousand-page conference packs."
+            eyebrow="Huduma Zetu za Uchapishaji"
+            title="Huduma za Uchapishaji na Kumalizia Nyaraka"
+            subtitle="Kuanzia picha binafsi za pasipoti hadi makabrasha ya mamia ya kurasa za mikutano."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -163,13 +163,13 @@ export const PrintingPage: React.FC = () => {
                     onClick={() => handleOrderService(service.title)}
                     icon={<Printer className="w-3.5 h-3.5" />}
                   >
-                    Request Service
+                    Agiza Huduma Hii
                   </Button>
 
                   <Button
                     variant="whatsapp"
                     size="sm"
-                    onClick={() => window.open(createWhatsAppUrl(`Hello TK Stationery! I want to order ${service.title}.`), '_blank')}
+                    onClick={() => window.open(createWhatsAppUrl(`Habari TK Stationery! Nahitaji huduma ya ${service.title}.`), '_blank')}
                   >
                     WhatsApp
                   </Button>
@@ -182,9 +182,9 @@ export const PrintingPage: React.FC = () => {
         {/* 3. Document Typing, Formatting & Professional CV Bureau */}
         <div className="pt-16">
           <SectionHeader
-            eyebrow="Secretarial & Typing Bureau"
-            title="Typing, CV Preparation & Document Formatting"
-            subtitle="Let our expert typists format university dissertations, type contracts, and prepare ATS-friendly professional CVs."
+            eyebrow="Huduma za Uhazigi na Kuandika"
+            title="Kuandika Nyaraka, Kutengeneza CV na Kupanga Miundo"
+            subtitle="Wataalamu wetu wa taipu watapangilia tasnifu zako, kuandika mikataba, na kuandaa wasifu wa kazi (CV) wa kitaalamu."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -207,7 +207,7 @@ export const PrintingPage: React.FC = () => {
 
                 <div className="mt-6 pt-4 border-t border-slate-200 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] text-slate-400 block">Service Fee</span>
+                    <span className="text-[10px] text-slate-400 block">Gharama ya Huduma</span>
                     <span className="text-xs font-black text-slate-900">{doc.pricingLabel}</span>
                   </div>
                   <Button
@@ -215,7 +215,7 @@ export const PrintingPage: React.FC = () => {
                     size="sm"
                     onClick={() => openModal({ type: 'print-wizard' })}
                   >
-                    Book Typing &rarr;
+                    Pata Huduma Hii &rarr;
                   </Button>
                 </div>
               </div>

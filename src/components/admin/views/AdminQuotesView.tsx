@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useAuth } from '../../../context/AuthContext';
-import { useTranslation } from '../../../context/LanguageContext';
 import { auditLogService } from '../../../services/audit/auditLogService';
 import { QuoteRequest } from '../../../types';
 import { formatDate } from '../../../utils/formatters';
@@ -20,7 +19,6 @@ import {
 export const AdminQuotesView: React.FC = () => {
   const { quoteRequests, updateQuoteStatus, showToast } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
-  const { language } = useTranslation();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -59,11 +57,11 @@ export const AdminQuotesView: React.FC = () => {
       }
       showToast({
         type: 'success',
-        title: language === 'sw' ? 'Hali ya Nukuu Imesasishwa' : 'Quote Status Updated',
-        message: `${quoteId} -> ${newStatus}`
+        title: 'Hali ya Nukuu Imesasishwa',
+        message: `Nukuu #${quoteId} imesasishwa kuwa ${newStatus}.`
       });
     } catch {
-      showToast({ type: 'error', title: 'Error', message: 'Could not update quote status.' });
+      showToast({ type: 'error', title: 'Hitilafu', message: 'Imeshindwa kuboresha hali ya nukuu.' });
     } finally {
       setUpdatingId(null);
     }

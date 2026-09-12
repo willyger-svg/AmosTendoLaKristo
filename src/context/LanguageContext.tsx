@@ -168,15 +168,17 @@ const LANGUAGE_STORAGE_KEY = 'tk_preferred_language_v1';
 const THEME_STORAGE_KEY = 'tk_preferred_theme_v1';
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Default language: Kiswahili ('sw')
-  const [language, setLanguageState] = useState<Language>(() => {
+  // Always default strictly to Kiswahili ('sw')
+  const [language, setLanguageState] = useState<Language>('sw');
+
+  // Clear any old 'en' preference if present
+  useEffect(() => {
     try {
-      const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-      return (saved === 'en' || saved === 'sw') ? saved : 'sw';
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, 'sw');
     } catch {
-      return 'sw';
+      // ignore
     }
-  });
+  }, []);
 
   // Default theme: Light ('light')
   const [theme, setThemeState] = useState<ThemeMode>(() => {
@@ -189,9 +191,9 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   });
 
   const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
+    setLanguageState('sw');
     try {
-      localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, 'sw');
     } catch {
       // ignore
     }

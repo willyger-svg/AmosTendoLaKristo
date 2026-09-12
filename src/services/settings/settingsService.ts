@@ -4,7 +4,7 @@ import { StoreSettings } from '../../types';
 
 export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   id: 'general',
-  storeName: 'TK STATIONERY',
+  storeName: 'TK STATIONERY (Tendo La Kristo)',
   paymentWhatsAppNumber: '0787754202',
   displayPhoneNumber: '+255 787 754 202',
   businessEmail: 'info@tkstationery.co.tz',

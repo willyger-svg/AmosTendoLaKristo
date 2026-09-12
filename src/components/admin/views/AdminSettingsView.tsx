@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useAuth } from '../../../context/AuthContext';
-import { useTranslation } from '../../../context/LanguageContext';
 import { auditLogService } from '../../../services/audit/auditLogService';
 import { StoreSettings } from '../../../types';
 import {
@@ -18,7 +17,6 @@ import {
 export const AdminSettingsView: React.FC = () => {
   const { storeSettings, updateStoreSettings, showToast } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
-  const { language } = useTranslation();
 
   const [form, setForm] = useState<StoreSettings>(storeSettings);
   const [isSaving, setIsSaving] = useState(false);
@@ -55,14 +53,14 @@ export const AdminSettingsView: React.FC = () => {
 
       showToast({
         type: 'success',
-        title: language === 'sw' ? 'Mipangilio Imehifadhiwa' : 'Settings Saved',
-        message: 'Store configurations updated in database.'
+        title: 'Mipangilio Imehifadhiwa',
+        message: 'Mipangilio ya duka imesasishwa kikamilifu.'
       });
     } catch {
       showToast({
         type: 'error',
-        title: 'Error',
-        message: 'Could not save store settings.'
+        title: 'Hitilafu',
+        message: 'Imeshindwa kuhifadhi mipangilio ya duka.'
       });
     } finally {
       setIsSaving(false);
@@ -76,10 +74,10 @@ export const AdminSettingsView: React.FC = () => {
         <div>
           <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
             <Settings className="w-5 h-5 text-amber-500" />
-            <span>Store Settings & WhatsApp Dispatch</span>
+            <span>Mipangilio ya Duka & Usafirishaji wa WhatsApp</span>
           </h3>
           <p className="text-xs text-slate-400 mt-1">
-            Global store metadata, Tanzanian mobile money receiving numbers, and order delivery fees.
+            Taarifa kuu za duka, namba za kupokelea malipo ya simu (M-Pesa / Tigo Pesa), na gharama za uwasilishaji.
           </p>
         </div>
       </div>
@@ -89,13 +87,13 @@ export const AdminSettingsView: React.FC = () => {
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
           <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
             <Store className="w-4 h-4 text-amber-500" />
-            <span>General Shop Identity</span>
+            <span>Utambulisho wa Duka</span>
           </h4>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Store Name
+                Jina la Duka
               </label>
               <input
                 type="text"
@@ -107,7 +105,7 @@ export const AdminSettingsView: React.FC = () => {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Storefront Currency
+                Sarafu ya Duka
               </label>
               <input
                 type="text"
@@ -121,7 +119,7 @@ export const AdminSettingsView: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Support Phone
+                Namba ya Huduma kwa Wateja
               </label>
               <input
                 type="text"
@@ -134,7 +132,7 @@ export const AdminSettingsView: React.FC = () => {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                WhatsApp Order Dispatch Line
+                Namba ya WhatsApp ya Kupokea Oda
               </label>
               <input
                 type="text"
@@ -147,7 +145,7 @@ export const AdminSettingsView: React.FC = () => {
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Standard Delivery Fee (TZS)
+                Gharama ya Kawaida ya Uwasilishaji (TZS)
               </label>
               <input
                 type="number"
@@ -164,10 +162,10 @@ export const AdminSettingsView: React.FC = () => {
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
           <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
             <CreditCard className="w-4 h-4 text-emerald-500" />
-            <span>Tanzanian Mobile Money & Bank Lipa Numbers</span>
+            <span>Namba za Malipo ya Simu (Lipa Namba)</span>
           </h4>
           <p className="text-xs text-slate-400">
-            These account credentials are automatically displayed to customers when choosing manual transfer during checkout.
+            Namba hizi huonyeshwa moja kwa moja kwa wateja wanapochagua kulipa kwa mtandao wa simu wakati wa kulipia oda.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -176,7 +174,7 @@ export const AdminSettingsView: React.FC = () => {
                 M-Pesa (Vodacom)
               </span>
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">Till / Lipa Namba</label>
+                <label className="block text-[11px] text-slate-500 mb-1">Lipa Namba / Till</label>
                 <input
                   type="text"
                   value={form.paymentAccounts?.mpesa?.number || ''}
@@ -194,7 +192,7 @@ export const AdminSettingsView: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">Account / Registered Name</label>
+                <label className="block text-[11px] text-slate-500 mb-1">Jina Lililosajiliwa</label>
                 <input
                   type="text"
                   value={form.paymentAccounts?.mpesa?.name || ''}
@@ -218,7 +216,7 @@ export const AdminSettingsView: React.FC = () => {
                 Tigo Pesa / Mixx by Yas
               </span>
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">Till / Lipa Namba</label>
+                <label className="block text-[11px] text-slate-500 mb-1">Lipa Namba / Till</label>
                 <input
                   type="text"
                   value={form.paymentAccounts?.tigoPesa?.number || ''}
@@ -236,7 +234,7 @@ export const AdminSettingsView: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">Account / Registered Name</label>
+                <label className="block text-[11px] text-slate-500 mb-1">Jina Lililosajiliwa</label>
                 <input
                   type="text"
                   value={form.paymentAccounts?.tigoPesa?.name || ''}
@@ -265,7 +263,7 @@ export const AdminSettingsView: React.FC = () => {
             className="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
-            <span>{isSaving ? 'Saving Configurations...' : 'Save All Settings'}</span>
+            <span>{isSaving ? 'Inahifadhi Mipangilio...' : 'Hifadhi Mipangilio Yote'}</span>
           </button>
         </div>
       </form>

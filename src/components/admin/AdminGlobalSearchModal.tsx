@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { useTranslation } from '../../context/LanguageContext';
 import { canAccessSection } from '../../utils/adminPermissions';
 import {
   Search,
@@ -39,7 +38,6 @@ export const AdminGlobalSearchModal: React.FC<AdminGlobalSearchModalProps> = ({
 }) => {
   const { orders, products, serviceTickets, quoteRequests, navigateTo } = useApp();
   const { userRole } = useAuth();
-  const { t, language } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -82,8 +80,8 @@ export const AdminGlobalSearchModal: React.FC<AdminGlobalSearchModalProps> = ({
         list.push({
           id: order.id,
           type: 'order',
-          title: `Order ${order.id} • ${order.customerName}`,
-          subtitle: `${order.items.length} item(s) • ${formatPrice(order.totalAmount)} • ${order.customerPhone}`,
+          title: `Oda #${order.id} • ${order.customerName}`,
+          subtitle: `Bidhaa ${order.items.length} • ${formatPrice(order.totalAmount)} • ${order.customerPhone}`,
           badge: order.status,
           badgeClass: order.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
           targetPath: '/admin/orders',
@@ -103,8 +101,8 @@ export const AdminGlobalSearchModal: React.FC<AdminGlobalSearchModalProps> = ({
           id: product.id,
           type: 'product',
           title: product.title,
-          subtitle: `Category: ${product.category} • Stock: ${product.stockCount} units • ${formatPrice(product.price)}`,
-          badge: product.stockCount <= 5 ? 'Low Stock' : 'Active',
+          subtitle: `Kategoria: ${product.category} • Stoo: vipande ${product.stockCount} • ${formatPrice(product.price)}`,
+          badge: product.stockCount <= 5 ? 'Stoo Chini' : 'Inapatikana',
           badgeClass: product.stockCount <= 5 ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-blue-50 text-blue-700 border-blue-200',
           targetPath: canAccessSection(userRole, 'products') ? '/admin/products' : '/admin/inventory',
           rawItem: product
@@ -122,8 +120,8 @@ export const AdminGlobalSearchModal: React.FC<AdminGlobalSearchModalProps> = ({
         list.push({
           id: ticket.id,
           type: 'ticket',
-          title: `Ticket ${ticket.id} • ${ticket.serviceType}`,
-          subtitle: `Customer: ${ticket.customerName} (${ticket.customerPhone})`,
+          title: `Tiketi #${ticket.id} • ${ticket.serviceType}`,
+          subtitle: `Mteja: ${ticket.customerName} (${ticket.customerPhone})`,
           badge: ticket.status,
           badgeClass: ticket.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-purple-50 text-purple-700 border-purple-200',
           targetPath: '/admin/service-requests',
@@ -142,8 +140,8 @@ export const AdminGlobalSearchModal: React.FC<AdminGlobalSearchModalProps> = ({
         list.push({
           id: quote.id,
           type: 'quote',
-          title: `Quote ${quote.id} • ${quote.projectType}`,
-          subtitle: `Lead: ${quote.customerName} (${quote.customerPhone}) • Timeline: ${quote.timeline || 'Flexible'}`,
+          title: `Ombi la Bei #${quote.id} • ${quote.projectType}`,
+          subtitle: `Mteja: ${quote.customerName} (${quote.customerPhone}) • Muda: ${quote.timeline || 'Kawaida'}`,
           badge: quote.status,
           badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
           targetPath: '/admin/quotes',
@@ -153,7 +151,7 @@ export const AdminGlobalSearchModal: React.FC<AdminGlobalSearchModalProps> = ({
     });
 
     return list.slice(0, 15);
-  }, [searchTerm, orders, products, serviceTickets, quoteRequests]);
+  }, [searchTerm, orders, products, serviceTickets, quoteRequests, userRole]);
 
   const handleSelect = (item: SearchResultItem) => {
     navigateTo(item.targetPath);
@@ -173,7 +171,7 @@ export const AdminGlobalSearchModal: React.FC<AdminGlobalSearchModalProps> = ({
             type="text"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            placeholder={t('admin.search.placeholder')}
+            placeholder="Tafuta oda, bidhaa, tiketi, maombi ya bei au mteja..."
             className="w-full bg-transparent border-0 text-base font-medium text-slate-900 dark:text-white focus:outline-none placeholder:text-slate-400"
           />
           {searchTerm && (
@@ -198,16 +196,14 @@ export const AdminGlobalSearchModal: React.FC<AdminGlobalSearchModalProps> = ({
             <div className="py-12 text-center text-slate-400">
               <Search className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-700" />
               <p className="text-sm font-medium">
-                {language === 'sw'
-                  ? 'Andika neno la utafutaji (k.m namba ya oda, jina la bidhaa au simu ya mteja)'
-                  : 'Type to search across orders, products, customers, and requests'}
+                Andika neno la utafutaji (k.m namba ya oda, jina la bidhaa au simu ya mteja)
               </p>
             </div>
           ) : results.length === 0 ? (
             <div className="py-12 text-center text-slate-400">
               <AlertCircle className="w-8 h-8 mx-auto mb-2 text-amber-500" />
               <p className="text-sm font-medium">
-                {language === 'sw' ? 'Hakuna matokeo yaliyopatikana.' : 'No matching administrative records found.'}
+                Hakuna matokeo yaliyopatikana.
               </p>
             </div>
           ) : (
@@ -255,13 +251,13 @@ export const AdminGlobalSearchModal: React.FC<AdminGlobalSearchModalProps> = ({
 
         {/* Footer shortcuts */}
         <div className="p-3 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-          <span>{results.length} results</span>
+          <span>{results.length} matokeo yamepatikana</span>
           <div className="flex items-center gap-2">
-            <span>Press</span>
+            <span>Bonyeza</span>
             <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 rounded border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300">
               ESC
             </kbd>
-            <span>to dismiss</span>
+            <span>kufunga</span>
           </div>
         </div>
       </div>

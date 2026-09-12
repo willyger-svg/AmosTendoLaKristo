@@ -25,7 +25,7 @@ export const ContactPage: React.FC = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [department, setDepartment] = useState('Stationery Supplies');
+  const [department, setDepartment] = useState('Vifaa vya Ofisi na Shule');
   const [message, setMessage] = useState('');
   const [isSent, setIsSent] = useState(false);
 
@@ -34,8 +34,8 @@ export const ContactPage: React.FC = () => {
     if (!name || !phone || !message) {
       showToast({
         type: 'error',
-        title: 'Missing Fields',
-        message: 'Please fill in your name, phone number, and message.'
+        title: 'Tafadhali Jaza Taarifa Muhimu',
+        message: 'Jaza jina lako, namba ya simu, na ujumbe unaotaka kutuma.'
       });
       return;
     }
@@ -43,8 +43,8 @@ export const ContactPage: React.FC = () => {
     setIsSent(true);
     showToast({
       type: 'success',
-      title: 'Message Sent Successfully',
-      message: 'Thank you! Our support team will contact you shortly.'
+      title: 'Ujumbe Umetumwa Kikamilifu',
+      message: 'Asante sana! Wahudumu wetu watawasiliana nawe haraka iwezekanavyo.'
     });
   };
 
@@ -52,18 +52,18 @@ export const ContactPage: React.FC = () => {
     <div className="py-8 space-y-16">
       <Container>
         {/* Breadcrumb */}
-        <Breadcrumbs items={[{ label: 'Contact Us' }]} />
+        <Breadcrumbs items={[{ label: 'Wasiliana Nasi' }]} />
 
         {/* Header */}
         <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 border border-slate-800 text-center max-w-3xl mx-auto space-y-3 mt-4">
           <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-            Reach Out to Our Team
+            Wasiliana na Wahudumu Wetu
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white">
-            Visit Our Center or Send an Inquiry
+            Tembelea Duka Letu au Tuma Ujumbe Moja kwa Moja
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            Whether you need wholesale stationery supplies, high-volume document printing, online government portal guidance, or a custom POS quote, we are ready to assist.
+            Iwe unahitaji vifaa vya ofisi au shule kwa jumla, uchapishaji mkubwa wa nyaraka, msaada wa mifumo ya serikali ya mtandao, au mifumo ya mauzo ya biashara, tupo tayari kukusaidia.
           </p>
         </div>
 
@@ -73,7 +73,7 @@ export const ContactPage: React.FC = () => {
           <div className="lg:col-span-5 space-y-6">
             <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs space-y-5">
               <h3 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">
-                Center Contact Information
+                Mawasiliano ya Duka Letu
               </h3>
 
               <div className="space-y-4 text-xs">
@@ -82,7 +82,7 @@ export const ContactPage: React.FC = () => {
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-slate-900 block">Physical Center Location</span>
+                    <span className="font-bold text-slate-900 block">Mahali Lilipo Duka</span>
                     <span className="text-slate-600 leading-relaxed block mt-0.5">
                       Manzese, Dar es Salaam, Tanzania (Karibia na Kituo cha Mwendokasi cha Bakhresa)
                     </span>
@@ -94,12 +94,12 @@ export const ContactPage: React.FC = () => {
                     <Clock className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-slate-900 block">Operating Hours</span>
+                    <span className="font-bold text-slate-900 block">Muda wa Kazi</span>
                     <span className="text-slate-600 block mt-0.5">
-                      Mon - Sat: 8:00 AM – 7:30 PM
+                      Jumatatu - Jumamosi: Saa 2:00 Asubuhi – Saa 1:30 Jioni
                     </span>
                     <span className="text-slate-500 block">
-                      Sunday & Public Holidays: 10:00 AM – 4:00 PM
+                      Jumapili na Sikukuu: Saa 4:00 Asubuhi – Saa 10:00 Jioni
                     </span>
                   </div>
                 </div>
@@ -109,9 +109,9 @@ export const ContactPage: React.FC = () => {
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-slate-900 block">Phone & WhatsApp Support</span>
-                    <span className="text-slate-600 block mt-0.5">
-                      Hotline: {TK_PHONE_DISPLAY}
+                    <span className="font-bold text-slate-900 block">Simu na Huduma ya WhatsApp</span>
+                    <span className="text-slate-600 block mt-0.5 font-mono font-bold">
+                      {TK_PHONE_DISPLAY}
                     </span>
                   </div>
                 </div>
@@ -121,7 +121,7 @@ export const ContactPage: React.FC = () => {
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-slate-900 block">Email Inquiries</span>
+                    <span className="font-bold text-slate-900 block">Barua Pepe (Email)</span>
                     <span className="text-slate-600 block mt-0.5">
                       info@tkstationery.co.tz
                     </span>
@@ -135,10 +135,10 @@ export const ContactPage: React.FC = () => {
                   variant="whatsapp"
                   size="md"
                   fullWidth
-                  onClick={() => window.open(createWhatsAppUrl('Hello TK Stationery! I am visiting your center.'), '_blank')}
+                  onClick={() => window.open(createWhatsAppUrl('Habari TK Stationery! Ninahitaji huduma / maelezo zaidi.'), '_blank')}
                   icon={<MessageSquare className="w-4 h-4" />}
                 >
-                  Instant WhatsApp Chat
+                  Ongea Nasi WhatsApp Papo Hapo
                 </Button>
               </div>
             </div>
@@ -151,32 +151,32 @@ export const ContactPage: React.FC = () => {
                 <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-10 h-10" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900">Message Received!</h3>
+                <h3 className="text-xl font-bold text-slate-900">Ujumbe Umepokelewa!</h3>
                 <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  Thank you, <strong>{name}</strong>. Our team for <strong>{department}</strong> will reply to {phone} as soon as possible.
+                  Asante sana ndugu <strong>{name}</strong>. Timu yetu ya idara ya <strong>{department}</strong> itawasiliana nawe kupitia namba <strong>{phone}</strong> haraka iwezekanavyo.
                 </p>
                 <Button variant="outline" size="sm" onClick={() => setIsSent(false)}>
-                  Send Another Message
+                  Tuma Ujumbe Mwingine
                 </Button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <h3 className="text-base font-bold text-slate-900 pb-2 border-b border-slate-100">
-                  Send an Inquiry or Quote Request
+                  Tuma Ujumbe au Ombi la Bei
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
-                    label="Full Name"
-                    placeholder="e.g. Flora Minja"
+                    label="Jina Kamili"
+                    placeholder="Mfano: Flora Minja"
                     value={name}
                     onChange={e => setName(e.target.value)}
                     required
                   />
 
                   <Input
-                    label="Phone Number (WhatsApp)"
-                    placeholder="e.g. 0712 345 678"
+                    label="Namba ya Simu (WhatsApp)"
+                    placeholder="Mfano: 0712 345 678"
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
                     required
@@ -185,37 +185,37 @@ export const ContactPage: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
-                    label="Email Address (Optional)"
+                    label="Barua Pepe (Si lazima)"
                     type="email"
-                    placeholder="e.g. flora@company.co.tz"
+                    placeholder="Mfano: flora@kampuni.co.tz"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                   />
 
                   <Select
-                    label="Department / Service Needed"
+                    label="Idara / Huduma Unayohitaji"
                     value={department}
                     onChange={e => setDepartment(e.target.value)}
                     options={[
-                      { value: 'Stationery Supplies', label: 'Stationery Supplies & Bulk Orders' },
-                      { value: 'Online Public Services', label: 'Online Public Services (NIDA/TRA/Police)' },
-                      { value: 'Printing & Binding', label: 'Printing, Binding & Photocopy' },
-                      { value: 'Graphic Design', label: 'Graphic Design & Branding' },
-                      { value: 'IT Support & Hardware', label: 'IT Support & PC Repair' },
-                      { value: 'Custom Software & Systems', label: 'Custom Software / POS Systems' }
+                      { value: 'Vifaa vya Ofisi na Shule', label: 'Vifaa vya Shule & Ofisi (Rejareja na Jumla)' },
+                      { value: 'Huduma za Serikali Mtandaoni', label: 'Msaada wa Mifumo (NIDA, TRA, Polisi, RITA)' },
+                      { value: 'Uchapaji na Binding', label: 'Uchapaji (Printing), Photocopy & Binding' },
+                      { value: 'Ubunifu wa Graphics', label: 'Ubunifu wa Vipeperushi, Logo & Kadi' },
+                      { value: 'Matengenezo ya Kompyuta', label: 'Matengenezo ya Kompyuta na Printer' },
+                      { value: 'Mifumo ya Mauzo (POS)', label: 'Mifumo ya Mauzo na Tovuti' }
                     ]}
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Your Message / Project Details
+                    Ujumbe Wako au Maelezo ya Mahitaji
                   </label>
                   <textarea
                     rows={4}
                     value={message}
                     onChange={e => setMessage(e.target.value)}
-                    placeholder="Please explain how we can help you..."
+                    placeholder="Tueleze kwa ufupi jinsi tunavyoweza kukusaidia..."
                     className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
                     required
                   />
@@ -227,7 +227,7 @@ export const ContactPage: React.FC = () => {
                   size="md"
                   icon={<Send className="w-4 h-4" />}
                 >
-                  Send Inquiry Message
+                  Tuma Ujumbe Huu
                 </Button>
               </form>
             )}

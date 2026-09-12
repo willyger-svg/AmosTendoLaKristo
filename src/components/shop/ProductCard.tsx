@@ -46,12 +46,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="flex flex-col gap-1">
           {product.isBestSeller && (
             <Badge variant="brand" size="sm">
-              Best Seller
+              Inauzwa Sana
             </Badge>
           )}
           {product.originalPrice && product.originalPrice > product.price && (
             <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-600 text-white shadow-xs">
-              Save {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+              Punguzo {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
             </span>
           )}
         </div>
@@ -59,11 +59,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div>
           {product.inStock ? (
             <Badge variant="success" size="sm">
-              In Stock
+              Ipo Stoo
             </Badge>
           ) : (
             <Badge variant="danger" size="sm">
-              Out of Stock
+              Imeisha
             </Badge>
           )}
         </div>
@@ -86,7 +86,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             className="px-3.5 py-2 bg-white/95 hover:bg-white text-slate-900 text-xs font-bold rounded-xl shadow-lg flex items-center gap-1.5 transform translate-y-2 group-hover:translate-y-0 transition-all"
           >
             <Eye className="w-3.5 h-3.5 text-amber-600" />
-            <span>Quick View</span>
+            <span>Tazama Haraka</span>
           </button>
         </div>
       </div>
@@ -122,7 +122,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
 
             <span className="text-[10px] text-slate-400 font-medium">
-              per {product.unit || 'unit'}
+              kwa {product.unit || 'kimoja'}
             </span>
           </div>
 
@@ -137,7 +137,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 type="button"
                 onClick={() => setQuantity(q => Math.max(1, q - 1))}
                 className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white rounded transition-colors"
-                aria-label="Decrease quantity"
+                aria-label="Punguza idadi"
               >
                 <Minus className="w-3 h-3" />
               </button>
@@ -148,7 +148,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 type="button"
                 onClick={() => setQuantity(q => q + 1)}
                 className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white rounded transition-colors"
-                aria-label="Increase quantity"
+                aria-label="Ongeza idadi"
               >
                 <Plus className="w-3 h-3" />
               </button>
@@ -168,12 +168,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {isAdded ? (
                 <>
                   <Check className="w-3.5 h-3.5" />
-                  <span>Added!</span>
+                  <span>Imewekwa!</span>
                 </>
               ) : (
                 <>
                   <ShoppingCart className="w-3.5 h-3.5" />
-                  <span>Add to Cart</span>
+                  <span>Weka Kikapuni</span>
                 </>
               )}
             </button>
@@ -182,9 +182,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <button
               type="button"
               onClick={handleWhatsAppOrder}
-              title="Order this item directly on WhatsApp"
+              title="Agiza moja kwa moja kupitia WhatsApp"
               className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg border border-emerald-200 transition-colors"
-              aria-label="Order on WhatsApp"
+              aria-label="Agiza WhatsApp"
             >
               <MessageSquare className="w-4 h-4" />
             </button>

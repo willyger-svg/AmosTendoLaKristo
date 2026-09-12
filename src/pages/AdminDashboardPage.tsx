@@ -1,7 +1,5 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { useAuth } from '../context/AuthContext';
-import { useTranslation } from '../context/LanguageContext';
 import { AdminLayout } from '../components/admin/AdminLayout';
 import { AdminSectionId } from '../utils/adminPermissions';
 
@@ -26,7 +24,6 @@ import { AdminSettingsView } from '../components/admin/views/AdminSettingsView';
 
 export const AdminDashboardPage: React.FC = () => {
   const { currentPath } = useApp();
-  const { t, language } = useTranslation();
 
   const getSectionFromPath = (path: string): AdminSectionId => {
     if (path === '/admin' || path === '/admin/' || path === '/admin/dashboard') return 'dashboard';
@@ -55,88 +52,88 @@ export const AdminDashboardPage: React.FC = () => {
     switch (section) {
       case 'orders':
         return {
-          title: language === 'sw' ? 'Mlolongo wa Oda (Orders)' : 'Orders Fulfillment Queue',
-          breadcrumbs: [{ label: t('admin.nav.orders') }]
+          title: 'Mlolongo wa Oda (Orders)',
+          breadcrumbs: [{ label: 'Oda za Wateja' }]
         };
       case 'payments':
         return {
-          title: language === 'sw' ? 'Malipo ya Kitanzania (Ledger)' : 'Payments & Transaction Ledger',
-          breadcrumbs: [{ label: t('admin.nav.payments') }]
+          title: 'Malipo ya Kitanzania (Ledger)',
+          breadcrumbs: [{ label: 'Malipo' }]
         };
       case 'products':
         return {
-          title: language === 'sw' ? 'Katalogi ya Bidhaa' : 'Stationery Products Catalog',
-          breadcrumbs: [{ label: t('admin.nav.products') }]
+          title: 'Katalogi ya Bidhaa',
+          breadcrumbs: [{ label: 'Bidhaa' }]
         };
       case 'categories':
         return {
-          title: language === 'sw' ? 'Makundi ya Bidhaa' : 'Product Categories & Taxonomies',
-          breadcrumbs: [{ label: t('admin.nav.categories') }]
+          title: 'Makundi ya Bidhaa',
+          breadcrumbs: [{ label: 'Kategoria' }]
         };
       case 'inventory':
         return {
-          title: language === 'sw' ? 'Usimamizi wa Stoo' : 'Inventory & Warehouse Stock',
-          breadcrumbs: [{ label: t('admin.nav.inventory') }]
+          title: 'Usimamizi wa Stoo',
+          breadcrumbs: [{ label: 'Hesabu ya Stoo' }]
         };
       case 'customers':
         return {
-          title: language === 'sw' ? 'Orodha ya Wateja' : 'Customer Accounts Directory',
-          breadcrumbs: [{ label: t('admin.nav.customers') }]
+          title: 'Orodha ya Wateja',
+          breadcrumbs: [{ label: 'Wateja' }]
         };
       case 'service-requests':
         return {
-          title: language === 'sw' ? 'Maombi ya Huduma (Print & Portals)' : 'Print & Portal Service Requests',
-          breadcrumbs: [{ label: t('admin.nav.service_requests') }]
+          title: 'Maombi ya Huduma (Print & Portals)',
+          breadcrumbs: [{ label: 'Maombi ya Huduma' }]
         };
       case 'quotes':
         return {
-          title: language === 'sw' ? 'Nukuu za Mifumo (Quotes)' : 'Software & Tech Quotes',
-          breadcrumbs: [{ label: t('admin.nav.quotes') }]
+          title: 'Nukuu za Mifumo (Quotes)',
+          breadcrumbs: [{ label: 'Nukuu za Bei' }]
         };
       case 'documents':
         return {
-          title: language === 'sw' ? 'Hifadhi ya Nyaraka za Wateja' : 'Customer Documents Repository',
-          breadcrumbs: [{ label: t('admin.nav.documents') }]
+          title: 'Hifadhi ya Nyaraka za Wateja',
+          breadcrumbs: [{ label: 'Nyaraka & Faili' }]
         };
       case 'advertisements':
         return {
-          title: language === 'sw' ? 'Mabango ya Matangazo (CMS)' : 'Advertisements & Banners CMS',
-          breadcrumbs: [{ label: t('admin.nav.advertisements') }]
+          title: 'Mabango ya Matangazo (CMS)',
+          breadcrumbs: [{ label: 'Mabango ya Matangazo' }]
         };
       case 'content':
         return {
-          title: language === 'sw' ? 'Maudhui ya Ukurasa Mkuu' : 'Homepage Content & Merchandising',
-          breadcrumbs: [{ label: t('admin.nav.content') }]
+          title: 'Maudhui ya Ukurasa Mkuu',
+          breadcrumbs: [{ label: 'Maudhui ya Tovuti' }]
         };
       case 'services':
         return {
-          title: language === 'sw' ? 'Katalogi ya Huduma za Umma' : 'Public Portals & IT Services',
-          breadcrumbs: [{ label: t('admin.nav.services') }]
+          title: 'Katalogi ya Huduma za Umma',
+          breadcrumbs: [{ label: 'Usimamizi wa Huduma' }]
         };
       case 'notifications':
         return {
-          title: language === 'sw' ? 'Kituo cha Arifa' : 'Operations Notification Center',
-          breadcrumbs: [{ label: t('admin.nav.notifications') }]
+          title: 'Kituo cha Arifa',
+          breadcrumbs: [{ label: 'Arifa za Mfumo' }]
         };
       case 'staff':
         return {
-          title: language === 'sw' ? 'Usimamizi wa Wafanyakazi (RBAC)' : 'Staff & Team RBAC Management',
-          breadcrumbs: [{ label: t('admin.nav.staff') }]
+          title: 'Usimamizi wa Wafanyakazi (RBAC)',
+          breadcrumbs: [{ label: 'Wafanyakazi & Majukumu' }]
         };
       case 'audit-logs':
         return {
-          title: language === 'sw' ? 'Kumbukumbu za Usalama (Audit)' : 'Security Audit Trail',
-          breadcrumbs: [{ label: t('admin.nav.audit_logs') }]
+          title: 'Kumbukumbu za Usalama (Audit)',
+          breadcrumbs: [{ label: 'Kumbukumbu za Mfumo' }]
         };
       case 'settings':
         return {
-          title: language === 'sw' ? 'Mipangilio ya Duka & WhatsApp' : 'Store Settings & Payment Numbers',
-          breadcrumbs: [{ label: t('admin.nav.settings') }]
+          title: 'Mipangilio ya Duka & WhatsApp',
+          breadcrumbs: [{ label: 'Mipangilio ya Mfumo' }]
         };
       case 'dashboard':
       default:
         return {
-          title: language === 'sw' ? 'Kituo Kikuu cha Uongozi' : 'Control Center Overview',
+          title: 'Kituo Kikuu cha Uongozi',
           breadcrumbs: []
         };
     }

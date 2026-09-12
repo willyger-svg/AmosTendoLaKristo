@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useAuth } from '../../../context/AuthContext';
-import { useTranslation } from '../../../context/LanguageContext';
 import { productService } from '../../../services/products/productService';
 import { auditLogService } from '../../../services/audit/auditLogService';
 import { Product, ProductCategory } from '../../../types';
@@ -23,7 +22,6 @@ import {
 export const AdminProductsView: React.FC = () => {
   const { products, refreshData, showToast } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
-  const { language } = useTranslation();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -120,8 +118,8 @@ export const AdminProductsView: React.FC = () => {
         }
         showToast({
           type: 'success',
-          title: language === 'sw' ? 'Bidhaa Imesasishwa' : 'Product Updated',
-          message: `${title} updated successfully.`
+          title: 'Bidhaa Imesasishwa',
+          message: `${title} imesasishwa kwa mafanikio.`
         });
       } else {
         const created = await productService.createProduct(productPayload);
@@ -140,8 +138,8 @@ export const AdminProductsView: React.FC = () => {
         }
         showToast({
           type: 'success',
-          title: language === 'sw' ? 'Bidhaa Mpya Imeongezwa' : 'New Product Added',
-          message: `${title} created in catalog.`
+          title: 'Bidhaa Mpya Imeongezwa',
+          message: `${title} imeongezwa kwenye katalogi.`
         });
       }
 
@@ -150,8 +148,8 @@ export const AdminProductsView: React.FC = () => {
     } catch {
       showToast({
         type: 'error',
-        title: 'Error',
-        message: 'Could not save product.'
+        title: 'Hitilafu',
+        message: 'Imeshindwa kuhifadhi taarifa za bidhaa.'
       });
     } finally {
       setIsSubmitting(false);
@@ -177,7 +175,7 @@ export const AdminProductsView: React.FC = () => {
       }
       await refreshData();
     } catch {
-      showToast({ type: 'error', title: 'Error', message: 'Could not toggle product.' });
+      showToast({ type: 'error', title: 'Hitilafu', message: 'Imeshindwa kubadili hali ya bidhaa.' });
     }
   };
 
@@ -203,7 +201,7 @@ export const AdminProductsView: React.FC = () => {
               type="text"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Search by title, SKU or brand..."
+              placeholder="Tafuta kwa jina, SKU au chapa..."
               className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
             />
           </div>
@@ -213,7 +211,7 @@ export const AdminProductsView: React.FC = () => {
             onChange={e => setCategoryFilter(e.target.value)}
             className="w-full sm:w-auto px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
           >
-            <option value="all">All Categories ({products.length})</option>
+            <option value="all">Makundi Yote ({products.length})</option>
             {categories.map(c => (
               <option key={c} value={c}>
                 {c} ({products.filter(p => p.category === c).length})
@@ -227,7 +225,7 @@ export const AdminProductsView: React.FC = () => {
           className="w-full sm:w-auto px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
         >
           <Plus className="w-4 h-4" />
-          <span>Add New Product</span>
+          <span>Ongeza Bidhaa Mpya</span>
         </button>
       </div>
 
@@ -236,19 +234,19 @@ export const AdminProductsView: React.FC = () => {
         {filteredProducts.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
             <Package className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />
-            <p className="text-sm font-semibold">No catalog products match your search</p>
+            <p className="text-sm font-semibold">Hakuna bidhaa inayolingana na utafutaji wako</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="p-4">Product Info</th>
-                  <th className="p-4">Category</th>
-                  <th className="p-4">Price</th>
-                  <th className="p-4">Stock Level</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4 text-right">Actions</th>
+                  <th className="p-4">Taarifa ya Bidhaa</th>
+                  <th className="p-4">Kundi</th>
+                  <th className="p-4">Bei</th>
+                  <th className="p-4">Idadi Stoo</th>
+                  <th className="p-4">Hali</th>
+                  <th className="p-4 text-right">Vitendo</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -289,7 +287,7 @@ export const AdminProductsView: React.FC = () => {
                             : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
                         }`}
                       >
-                        {p.stockCount} units
+                        {p.stockCount} zipo
                       </span>
                     </td>
                     <td className="p-4">
@@ -301,14 +299,14 @@ export const AdminProductsView: React.FC = () => {
                             : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
                         }`}
                       >
-                        {p.isActive ? 'Active' : 'Disabled'}
+                        {p.isActive ? 'Inatumika' : 'Imezimwa'}
                       </button>
                     </td>
                     <td className="p-4 text-right">
                       <button
                         onClick={() => handleOpenEdit(p)}
                         className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                        title="Edit Product"
+                        title="Hariri Bidhaa"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -326,20 +324,20 @@ export const AdminProductsView: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 max-h-[90vh] overflow-y-auto">
             <h3 className="text-base font-black text-slate-900 dark:text-white mb-4">
-              {editingProduct ? 'Edit Catalog Product' : 'Add New Stationery Product'}
+              {editingProduct ? 'Hariri Bidhaa ya Katalogi' : 'Ongeza Bidhaa Mpya ya Vifaa'}
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Product Title *
+                  Jina la Bidhaa *
                 </label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  placeholder="e.g. A4 Paper Rim 80gsm (Box of 5)"
+                  placeholder="mf. Ream ya Karatasi A4 80gsm (Box ya 5)"
                   className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:border-amber-500 text-slate-900 dark:text-white"
                 />
               </div>
@@ -347,7 +345,7 @@ export const AdminProductsView: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Category *
+                    Kundi la Bidhaa *
                   </label>
                   <select
                     value={category}
@@ -364,7 +362,7 @@ export const AdminProductsView: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    SKU Code
+                    Namba ya SKU
                   </label>
                   <input
                     type="text"
@@ -378,7 +376,7 @@ export const AdminProductsView: React.FC = () => {
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Selling Price (TZS) *
+                    Bei ya Kuuza (TZS) *
                   </label>
                   <input
                     type="number"
@@ -391,7 +389,7 @@ export const AdminProductsView: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Original Price (TZS)
+                    Bei ya Awali (TZS)
                   </label>
                   <input
                     type="number"
@@ -403,7 +401,7 @@ export const AdminProductsView: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Stock Quantity *
+                    Idadi ya Bidhaa Stoo *
                   </label>
                   <input
                     type="number"
@@ -418,7 +416,7 @@ export const AdminProductsView: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Image URL
+                  Kiungo cha Picha (URL)
                 </label>
                 <input
                   type="url"
@@ -430,7 +428,7 @@ export const AdminProductsView: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Brief Description
+                  Maelezo Mafupi
                 </label>
                 <textarea
                   value={shortDescription}
@@ -446,14 +444,14 @@ export const AdminProductsView: React.FC = () => {
                   onClick={() => setIsAddModalOpen(false)}
                   className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold"
                 >
-                  Cancel
+                  Ghairi
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition-all shadow-md"
                 >
-                  {isSubmitting ? 'Saving...' : editingProduct ? 'Update Product' : 'Create Product'}
+                  {isSubmitting ? 'Inahifadhi...' : editingProduct ? 'Sasisha Bidhaa' : 'Unda Bidhaa'}
                 </button>
               </div>
             </form>

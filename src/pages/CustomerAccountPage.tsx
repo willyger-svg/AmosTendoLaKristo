@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
-import { useTranslation } from '../context/LanguageContext';
 import { Container } from '../components/layout/Container';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Button } from '../components/common/Button';
@@ -64,8 +63,6 @@ export const CustomerAccountPage: React.FC = () => {
     removeProfilePhoto
   } = useAuth();
 
-  const { t, language } = useTranslation();
-
   // Determine active tab from current URL path
   const getTabFromPath = (path: string): AccountTabId => {
     const clean = path.replace(/\/$/, '');
@@ -82,7 +79,7 @@ export const CustomerAccountPage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<AccountTabId>(getTabFromPath(currentPath));
 
-  // Sync tab when currentPath updates (e.g. browser back/forward or programmatic navigation)
+  // Sync tab when currentPath updates
   useEffect(() => {
     setActiveTab(getTabFromPath(currentPath));
   }, [currentPath]);
@@ -184,8 +181,8 @@ export const CustomerAccountPage: React.FC = () => {
     if (!validation.isValid) {
       showToast({
         type: 'error',
-        title: language === 'sw' ? 'Faili Halifai' : 'Invalid File',
-        message: (language === 'sw' ? validation.errorSw : validation.errorEn) || 'Invalid file format or size.'
+        title: 'Faili Halifai',
+        message: validation.errorSw || 'Faili halina vigezo vinavyotakiwa.'
       });
       return;
     }
@@ -215,8 +212,8 @@ export const CustomerAccountPage: React.FC = () => {
       });
       showToast({
         type: 'success',
-        title: language === 'sw' ? 'Picha Imepakiwa' : 'Photo Uploaded',
-        message: language === 'sw' ? 'Picha ya wasifu imesasishwa kikamilifu!' : 'Profile photo updated successfully!'
+        title: 'Picha Imepakiwa',
+        message: 'Picha ya wasifu imesasishwa kikamilifu!'
       });
       setIsPhotoModalOpen(false);
       setSelectedPhotoFile(null);
@@ -225,8 +222,8 @@ export const CustomerAccountPage: React.FC = () => {
       console.warn('Profile photo upload error:', err);
       showToast({
         type: 'error',
-        title: language === 'sw' ? 'Hitilafu ya Upakiaji' : 'Upload Failed',
-        message: err.message || (language === 'sw' ? 'Haikuweza kupakia picha. Tafadhali jaribu tena.' : 'Could not upload photo. Please try again.')
+        title: 'Hitilafu ya Upakiaji',
+        message: err.message || 'Haikuweza kupakia picha. Tafadhali jaribu tena.'
       });
     } finally {
       setIsUploadingPhoto(false);
@@ -235,9 +232,7 @@ export const CustomerAccountPage: React.FC = () => {
   };
 
   const handleRemovePhoto = async () => {
-    const confirmMessage = language === 'sw'
-      ? 'Je, una uhakika unataka kuondoa picha yako ya wasifu?'
-      : 'Are you sure you want to remove your profile photo?';
+    const confirmMessage = 'Je, una uhakika unataka kuondoa picha yako ya wasifu?';
 
     if (window.confirm && !window.confirm(confirmMessage)) return;
 
@@ -246,8 +241,8 @@ export const CustomerAccountPage: React.FC = () => {
       await removeProfilePhoto();
       showToast({
         type: 'info',
-        title: language === 'sw' ? 'Picha Imeondolewa' : 'Photo Removed',
-        message: language === 'sw' ? 'Picha ya wasifu imeondolewa.' : 'Profile photo removed.'
+        title: 'Picha Imeondolewa',
+        message: 'Picha ya wasifu imeondolewa kikamilifu.'
       });
       setIsPhotoModalOpen(false);
       setSelectedPhotoFile(null);
@@ -255,8 +250,8 @@ export const CustomerAccountPage: React.FC = () => {
     } catch (err: any) {
       showToast({
         type: 'error',
-        title: language === 'sw' ? 'Hitilafu' : 'Error',
-        message: err.message || 'Could not remove photo.'
+        title: 'Hitilafu',
+        message: err.message || 'Haikuweza kuondoa picha.'
       });
     } finally {
       setIsUploadingPhoto(false);
@@ -268,8 +263,8 @@ export const CustomerAccountPage: React.FC = () => {
     await logout();
     showToast({
       type: 'info',
-      title: language === 'sw' ? 'Umetoka Salama' : 'Signed Out',
-      message: language === 'sw' ? 'Umetoka salama kwenye akaunti yako.' : 'You have been signed out of your account.'
+      title: 'Umetoka Salama',
+      message: 'Umetoka salama kwenye akaunti yako.'
     });
     navigateTo('/');
   };
@@ -279,7 +274,7 @@ export const CustomerAccountPage: React.FC = () => {
     return (
       <div className="py-12 space-y-8 bg-slate-50 dark:bg-slate-950 min-h-[75vh] flex items-center">
         <Container>
-          <Breadcrumbs items={[{ label: language === 'sw' ? 'Akaunti ya Mteja' : 'Customer Account' }]} />
+          <Breadcrumbs items={[{ label: 'Akaunti ya Mteja' }]} />
 
           <div className="max-w-xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden mt-6">
             <div className="bg-slate-900 text-white p-8 sm:p-10 text-center space-y-3">
@@ -287,12 +282,10 @@ export const CustomerAccountPage: React.FC = () => {
                 TK
               </div>
               <h1 className="text-xl sm:text-2xl font-black">
-                {language === 'sw' ? 'Akaunti ya Mteja — TK Stationery' : 'TK Customer Portal'}
+                Akaunti ya Mteja — TK Stationery
               </h1>
               <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-                {language === 'sw'
-                  ? 'Fuatilia maagizo yako ya vifaa, kazi za uchapaji, maombi ya mtandaoni, na risiti zako zote mahali pamoja.'
-                  : 'Manage your office supply orders, printing requests, tech quotes, and digital documents in one secure workspace.'}
+                Fuatilia maagizo yako ya vifaa, kazi za uchapaji, maombi ya mtandaoni, na risiti zako zote mahali pamoja.
               </p>
             </div>
 
@@ -304,7 +297,7 @@ export const CustomerAccountPage: React.FC = () => {
                   onClick={() => openModal({ type: 'auth', initialTab: 'login' })}
                   className="w-full justify-center min-h-[48px]"
                 >
-                  {language === 'sw' ? 'Ingia (Sign In)' : 'Sign In'}
+                  Ingia Kwenye Akaunti
                 </Button>
                 <Button
                   variant="outline"
@@ -312,13 +305,13 @@ export const CustomerAccountPage: React.FC = () => {
                   onClick={() => openModal({ type: 'auth', initialTab: 'register' })}
                   className="w-full justify-center min-h-[48px]"
                 >
-                  {language === 'sw' ? 'Fungua Akaunti (Register)' : 'Create Account'}
+                  Fungua Akaunti Mpya
                 </Button>
               </div>
 
               <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-center text-xs text-slate-500 gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>{language === 'sw' ? 'Mfumo salama unaolinda taarifa zako (256-Bit SSL Secured)' : 'Protected by 256-Bit SSL Encryption'}</span>
+                <span>Mfumo salama unaolinda taarifa zako (256-Bit SSL Secured)</span>
               </div>
             </div>
           </div>
@@ -350,26 +343,26 @@ export const CustomerAccountPage: React.FC = () => {
         <div className="mb-4">
           <Breadcrumbs
             items={[
-              { label: language === 'sw' ? 'Akaunti ya Mteja' : 'Customer Account', path: '/account' },
+              { label: 'Akaunti ya Mteja', path: '/account' },
               {
                 label:
                   activeTab === 'overview'
-                    ? (language === 'sw' ? 'Muhtasari' : 'Overview')
+                    ? 'Muhtasari'
                     : activeTab === 'orders'
-                    ? (language === 'sw' ? 'Oda Zangu' : 'Orders')
+                    ? 'Oda Zangu'
                     : activeTab === 'service-requests'
-                    ? (language === 'sw' ? 'Huduma & Uchapaji' : 'Service Requests')
+                    ? 'Huduma & Uchapaji'
                     : activeTab === 'quotes'
-                    ? (language === 'sw' ? 'Nukuu za Software' : 'Tech Quotes')
+                    ? 'Nukuu za Mifumo'
                     : activeTab === 'documents'
-                    ? (language === 'sw' ? 'Nyaraka & Mafaili' : 'Documents Vault')
+                    ? 'Nyaraka & Mafaili'
                     : activeTab === 'profile'
-                    ? (language === 'sw' ? 'Wasifu & Taarifa' : 'Profile')
+                    ? 'Wasifu & Taarifa'
                     : activeTab === 'notifications'
-                    ? (language === 'sw' ? 'Meseji & Taarifa' : 'Notifications')
+                    ? 'Meseji & Taarifa'
                     : activeTab === 'saved'
-                    ? (language === 'sw' ? 'Bidhaa Zilizohifadhiwa' : 'Saved Products')
-                    : (language === 'sw' ? 'Mipangilio' : 'Settings')
+                    ? 'Bidhaa Zilizohifadhiwa'
+                    : 'Mipangilio'
               }
             ]}
           />
@@ -393,10 +386,10 @@ export const CustomerAccountPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-sm font-bold text-white">
-                  {language === 'sw' ? 'Umeingia kama Msimamizi' : 'Signed in as Administrator'} ({userProfile.fullName || 'Admin'})
+                  Umeingia kama Msimamizi ({userProfile.fullName || 'Admin'})
                 </p>
                 <p className="text-xs text-slate-400">
-                  {language === 'sw' ? 'Una ruhusa kamili za kiutawala za kuona maagizo na kusimamia duka.' : 'You have administrator privileges to manage the store and requests.'}
+                  Una ruhusa kamili za kiutawala za kuona maagizo na kusimamia duka.
                 </p>
               </div>
             </div>
@@ -406,7 +399,7 @@ export const CustomerAccountPage: React.FC = () => {
               onClick={() => navigateTo('/admin')}
               className="shrink-0 w-full sm:w-auto"
             >
-              {language === 'sw' ? 'Fungua Jopo Kuu la Admin →' : 'Open Admin Dashboard →'}
+              Fungua Jopo Kuu la Admin →
             </Button>
           </div>
         )}
@@ -529,10 +522,10 @@ export const CustomerAccountPage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                    {language === 'sw' ? 'Picha ya Wasifu ya Mteja' : 'Customer Profile Photo'}
+                    Picha ya Wasifu ya Mteja
                   </h3>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    {language === 'sw' ? 'Itahifadhiwa kwenye Firebase Storage' : 'Secured via Firebase Storage'}
+                    Itahifadhiwa kwenye mfumo salama wa data
                   </p>
                 </div>
               </div>
@@ -580,7 +573,7 @@ export const CustomerAccountPage: React.FC = () => {
                       onClick={() => modalFileInputRef.current?.click()}
                       className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline mt-1 inline-block py-1 min-h-[36px]"
                     >
-                      {language === 'sw' ? 'Chagua picha tofauti' : 'Choose different image'}
+                      Chagua picha tofauti
                     </button>
                   </div>
                 </div>
@@ -606,10 +599,10 @@ export const CustomerAccountPage: React.FC = () => {
                     <UploadCloud className="w-6 h-6" />
                   </div>
                   <p className="font-bold text-slate-800 dark:text-slate-200">
-                    {language === 'sw' ? 'Bofya kupakia au kokota picha hapa' : 'Click to select or drag & drop image'}
+                    Bofya kupakia au kokota picha hapa
                   </p>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                    PNG, JPG, WEBP (Max 5MB)
+                    PNG, JPG, WEBP (Upeo 5MB)
                   </p>
 
                   {userProfile?.avatarUrl && (
@@ -620,7 +613,7 @@ export const CustomerAccountPage: React.FC = () => {
                         className="w-7 h-7 rounded-full object-cover border border-slate-300 dark:border-slate-600"
                       />
                       <span className="text-[11px] text-slate-500">
-                        {language === 'sw' ? 'Picha ya sasa inafanya kazi' : 'Current photo active'}
+                        Picha ya sasa inatumika
                       </span>
                     </div>
                   )}
@@ -633,7 +626,7 @@ export const CustomerAccountPage: React.FC = () => {
                   <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
                     <span className="flex items-center gap-1.5">
                       <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-600" />
-                      <span>{language === 'sw' ? 'Inapakia kwenye Firebase Storage...' : 'Uploading to Firebase Storage...'}</span>
+                      <span>Inapakia picha kwenye mfumo...</span>
                     </span>
                     <span>{uploadProgress}%</span>
                   </div>
@@ -658,7 +651,7 @@ export const CustomerAccountPage: React.FC = () => {
                     className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 flex items-center gap-1 min-h-[44px] px-2 rounded-lg"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                    <span>{language === 'sw' ? 'Ondoa Picha' : 'Remove Photo'}</span>
+                    <span>Ondoa Picha</span>
                   </button>
                 )}
               </div>
@@ -676,7 +669,7 @@ export const CustomerAccountPage: React.FC = () => {
                   disabled={isUploadingPhoto}
                   className="min-h-[44px]"
                 >
-                  {language === 'sw' ? 'Ghairi' : 'Cancel'}
+                  Ghairi
                 </Button>
 
                 <Button
@@ -689,8 +682,8 @@ export const CustomerAccountPage: React.FC = () => {
                   className="min-h-[44px]"
                 >
                   {isUploadingPhoto
-                    ? (language === 'sw' ? 'Inapakia...' : 'Uploading...')
-                    : (language === 'sw' ? 'Hifadhi Picha' : 'Save Photo')}
+                    ? 'Inapakia...'
+                    : 'Hifadhi Picha'}
                 </Button>
               </div>
             </div>
@@ -713,12 +706,10 @@ export const CustomerAccountPage: React.FC = () => {
 
             <div className="text-center space-y-1">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                {language === 'sw' ? 'Ungependa Kutoka kwenye Akaunti?' : 'Sign Out of Your Account?'}
+                Ungependa Kutoka kwenye Akaunti?
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {language === 'sw'
-                  ? 'Utahitaji kuingiza tena barua pepe na nenosiri lako ili kufungua akaunti hii baadaye.'
-                  : 'You will need to sign in again to view your orders, tickets, and stored documents.'}
+                Utahitaji kuingiza tena barua pepe na nenosiri lako ili kufungua akaunti hii baadaye.
               </p>
             </div>
 
@@ -728,14 +719,14 @@ export const CustomerAccountPage: React.FC = () => {
                 onClick={() => setIsSignOutModalOpen(false)}
                 className="w-full py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 font-bold text-xs transition-colors min-h-[44px]"
               >
-                {language === 'sw' ? 'Baki Hapa' : 'Stay Signed In'}
+                Baki Hapa
               </button>
               <button
                 type="button"
                 onClick={handleConfirmSignOut}
                 className="w-full py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition-colors min-h-[44px]"
               >
-                {language === 'sw' ? 'Toka Sasa' : 'Sign Out'}
+                Toka Sasa
               </button>
             </div>
           </div>
@@ -746,3 +737,4 @@ export const CustomerAccountPage: React.FC = () => {
 };
 
 export { OrderHistory } from '../components/account/OrderHistory';
+

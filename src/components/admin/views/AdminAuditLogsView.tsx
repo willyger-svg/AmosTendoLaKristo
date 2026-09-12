@@ -47,14 +47,14 @@ export const AdminAuditLogsView: React.FC = () => {
           <div className="flex items-center gap-2">
             <History className="w-5 h-5 text-amber-500" />
             <h3 className="text-base font-black text-slate-900 dark:text-white">
-              Immutable Security Audit Trail
+              Kumbukumbu Isiyobadilika ya Usalama (Audit Trail)
             </h3>
             <span className="text-[10px] px-2 py-0.5 rounded-full font-black bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 uppercase tracking-wider">
-              Append-Only
+              Kurekodi Pekee
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Tamper-resistant ledger recording every administrative mutation, status change, and payment verification.
+            Daftari salama linalorekodi kila mabadiliko ya kiutawala, mabadiliko ya hali ya oda, na uthibitishaji wa malipo.
           </p>
         </div>
 
@@ -63,7 +63,7 @@ export const AdminAuditLogsView: React.FC = () => {
             onClick={fetchLogs}
             disabled={loading}
             className="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all disabled:opacity-50"
-            title="Refresh logs"
+            title="Sasisha kumbukumbu"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -78,7 +78,7 @@ export const AdminAuditLogsView: React.FC = () => {
             type="text"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Search action, actor email or target ID..."
+            placeholder="Tafuta kitendo, barua pepe au namba..."
             className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none"
           />
         </div>
@@ -90,16 +90,16 @@ export const AdminAuditLogsView: React.FC = () => {
             onChange={e => setActionFilter(e.target.value)}
             className="w-full sm:w-auto px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
           >
-            <option value="all">All Actions ({logs.length})</option>
-            <option value="order_status_updated">Order Status Updated</option>
-            <option value="payment_verified">Payment Verified</option>
-            <option value="payment_refunded">Payment Refunded</option>
-            <option value="product_created">Product Created</option>
-            <option value="product_updated">Product Updated</option>
-            <option value="inventory_adjusted">Inventory Adjusted</option>
-            <option value="user_role_updated">User Role Updated</option>
-            <option value="store_settings_updated">Store Settings Updated</option>
-            <option value="ad_created">Ad Banner Created</option>
+            <option value="all">Vitendo Vyote ({logs.length})</option>
+            <option value="order_status_updated">Hali ya Oda Imesasishwa</option>
+            <option value="payment_verified">Malipo Yamethibitishwa</option>
+            <option value="payment_refunded">Pesa Zimerudishwa</option>
+            <option value="product_created">Bidhaa Mpya Imeundwa</option>
+            <option value="product_updated">Bidhaa Imesasishwa</option>
+            <option value="inventory_adjusted">Stoo / Idadi Imerekebishwa</option>
+            <option value="user_role_updated">Jukumu la Mtumiaji Limesasishwa</option>
+            <option value="store_settings_updated">Mipangilio ya Duka Imesasishwa</option>
+            <option value="ad_created">Bango la Tangazo Limeundwa</option>
           </select>
         </div>
       </div>
@@ -107,22 +107,22 @@ export const AdminAuditLogsView: React.FC = () => {
       {/* Logs Table */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
         {loading ? (
-          <div className="py-16 text-center text-xs text-slate-400">Loading security logs...</div>
+          <div className="py-16 text-center text-xs text-slate-400">Inapakia kumbukumbu za usalama...</div>
         ) : filteredLogs.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
             <ShieldCheck className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />
-            <p className="text-sm font-semibold">No audit logs matching query</p>
+            <p className="text-sm font-semibold">Hakuna kumbukumbu za ukaguzi zinazolingana na utafutaji wako</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="p-4">Timestamp</th>
-                  <th className="p-4">Actor</th>
-                  <th className="p-4">Action Recorded</th>
-                  <th className="p-4">Target Entity</th>
-                  <th className="p-4">Metadata Payload</th>
+                  <th className="p-4">Muda na Tarehe</th>
+                  <th className="p-4">Mtekelezaji (Actor)</th>
+                  <th className="p-4">Kitendo Kilichorekodiwa</th>
+                  <th className="p-4">Lengo / Kilichoathiriwa</th>
+                  <th className="p-4">Maelezo ya Ziada</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">

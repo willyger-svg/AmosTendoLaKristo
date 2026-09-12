@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { Button } from '../components/common/Button';
+import { TKLogo } from '../components/common/TKLogo';
 import {
   Lock,
   Mail,
@@ -192,11 +193,9 @@ export const CustomerLoginPage: React.FC = () => {
       <div className="w-full max-w-md bg-white/95 backdrop-blur-md rounded-3xl border border-slate-200 shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-slate-900 text-white p-7 text-center space-y-2 relative border-b border-slate-800">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center mx-auto shadow-md shadow-amber-500/20">
-            <ShoppingBag className="w-6 h-6" />
-          </div>
+          <TKLogo size="lg" className="mx-auto shadow-xl" />
           <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-950/80 border border-amber-500/40 text-[10px] font-bold text-amber-300">
-            TK STATIONERY & DIGITAL
+            TK STATIONERY • TENDO LA KRISTO
           </div>
           <h1 className="text-xl font-black text-white">
             {mode === 'login' && 'Ingia Kwenye Akaunti Yako'}

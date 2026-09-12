@@ -47,7 +47,7 @@ export const ProductFilterSidebar: React.FC<ProductFilterSidebarProps> = ({
       <div className="flex items-center justify-between pb-4 border-b border-slate-100">
         <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
           <Filter className="w-4 h-4 text-amber-500" />
-          <span>Filters ({totalResults})</span>
+          <span>Vichujio ({totalResults})</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export const ProductFilterSidebar: React.FC<ProductFilterSidebarProps> = ({
             onClick={onReset}
             className="text-xs text-amber-600 hover:text-amber-700 font-semibold hover:underline"
           >
-            Reset All
+            Weka Upya
           </button>
           {isMobileDrawer && onCloseMobileDrawer && (
             <button
@@ -73,24 +73,24 @@ export const ProductFilterSidebar: React.FC<ProductFilterSidebarProps> = ({
       {/* Sort Option */}
       <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-          Sort Products By
+          Panga Vifaa Kwa
         </label>
         <select
           value={filters.sortBy}
           onChange={handleSortChange}
           className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:border-amber-500"
         >
-          <option value="featured">Featured & Recommended</option>
-          <option value="price-asc">Price: Low to High (TSh)</option>
-          <option value="price-desc">Price: High to Low (TSh)</option>
-          <option value="rating">Highest Rated</option>
+          <option value="featured">Vilivyoangaziwa & Pendekezo</option>
+          <option value="price-asc">Bei: Ndogo hadi Kubwa (TSh)</option>
+          <option value="price-desc">Bei: Kubwa hadi Ndogo (TSh)</option>
+          <option value="rating">Vilivyopendwa Zaidi</option>
         </select>
       </div>
 
       {/* Categories Filter */}
       <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2.5">
-          Departments & Categories
+          Makundi ya Vifaa
         </label>
         <div className="space-y-1">
           {productCategories.map(cat => {
@@ -118,7 +118,7 @@ export const ProductFilterSidebar: React.FC<ProductFilterSidebarProps> = ({
       {/* Availability Filter */}
       <div className="pt-2 border-t border-slate-100">
         <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2.5">
-          Availability
+          Upatikanaji
         </label>
         <label className="flex items-center gap-2.5 cursor-pointer text-xs text-slate-700">
           <input
@@ -127,23 +127,23 @@ export const ProductFilterSidebar: React.FC<ProductFilterSidebarProps> = ({
             onChange={handleStockToggle}
             className="w-4 h-4 text-amber-500 rounded border-slate-300 focus:ring-amber-400"
           />
-          <span>Show In-Stock Items Only</span>
+          <span>Onyesha Vifaa Vilivyopo Dukani Tu</span>
         </label>
       </div>
 
       {/* Direct WhatsApp Bulk Ordering Note */}
       <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-2">
-        <p className="font-bold text-slate-900">Need Bulk School / Office Supplies?</p>
+        <p className="font-bold text-slate-900">Unahitaji Vifaa kwa Jumla au Ofisi?</p>
         <p className="text-[11px] leading-relaxed text-slate-500">
-          We offer wholesale pricing on bulk cartons of copy paper, pens, and custom branded stationery.
+          Tunatoa bei nafuu ya jumla kwa maboksi ya karatasi za ream, kalamu, na vifaa maalum vya shule na ofisi.
         </p>
         <Button
           variant="outline"
           size="sm"
           fullWidth
-          onClick={() => window.open('https://wa.me/255700000000?text=Hello%20TK%20Stationery,%20I%20need%20a%20bulk%20wholesale%20order%20quotation.', '_blank')}
+          onClick={() => window.open('https://wa.me/255787754202?text=Habari%20TK%20Stationery,%20nahitaji%20nukuu%20ya%20vifaa%20vya%20jumla.', '_blank')}
         >
-          Inquire Wholesale
+          Ulizia Bei ya Jumla (WhatsApp)
         </Button>
       </div>
     </div>

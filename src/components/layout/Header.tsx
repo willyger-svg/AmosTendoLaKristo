@@ -18,7 +18,6 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { useTranslation } from '../../context/LanguageContext';
 import { Button } from '../common/Button';
 import { mockProducts } from '../../data/products';
 import { printingServices } from '../../data/services';
@@ -28,6 +27,7 @@ import { formatTSh } from '../../utils/formatters';
 import { createWhatsAppUrl } from '../../utils/whatsapp';
 import { notificationService } from '../../services/notifications/notificationService';
 import { NotificationItem } from '../../types';
+import { TKLogo } from '../common/TKLogo';
 import { DesktopNavigation } from './DesktopNavigation';
 import { Tooltip } from '../common/Tooltip';
 import { HelpCircle } from 'lucide-react';
@@ -47,7 +47,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
     openModal
   } = useApp();
 
-  const { language, setLanguage } = useTranslation();
   const { currentUser, userProfile, isStaff } = useAuth();
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -165,15 +164,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
               onClick={() => navigateTo('/')}
               className="flex items-center gap-2.5 text-left group"
             >
-              <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-amber-400 font-extrabold text-xl shadow-xs group-hover:bg-slate-800 transition-colors">
-                TK
-              </div>
+              <TKLogo size="md" className="group-hover:scale-105 transition-transform" />
               <div className="flex flex-col">
-                <span className="text-lg font-black tracking-tight text-slate-900 leading-none">
-                  TK STATIONERY
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-lg font-black tracking-tight text-slate-900 leading-none">
+                    TK STATIONERY
+                  </span>
+                  <span className="hidden lg:inline-block px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-amber-100 text-amber-800">
+                    Tendo La Kristo
+                  </span>
+                </div>
                 <span className="text-[10px] font-bold text-amber-600 tracking-wider uppercase mt-0.5">
-                  Manzese, Dar es Salaam (Bakhresa)
+                  Amos Stationery • Manzese (Bakhresa)
                 </span>
               </div>
             </button>
@@ -191,7 +193,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
-                placeholder="Search stationery, print services, NIDA, TRA, websites..."
+                placeholder="Tafuta vifaa vya shule/ofisi, huduma za chapisho, NIDA, TRA..."
                 className="w-full pl-10 pr-9 py-2.5 bg-slate-100 hover:bg-slate-50 focus:bg-white text-sm text-slate-900 rounded-xl border border-transparent focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all placeholder:text-slate-400"
               />
               {searchQuery && (
@@ -215,10 +217,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
                       <div className="py-2">
                         <div className="flex items-center justify-between px-2 mb-1.5">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                            Stationery Products ({filteredProducts.length})
+                            Vifaa vya Duka ({filteredProducts.length})
                           </span>
                           <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">
-                            PRODUCT
+                            BIDHAA
                           </span>
                         </div>
                         <div className="space-y-1">
@@ -254,10 +256,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
                       <div className="py-2">
                         <div className="flex items-center justify-between px-2 mb-1.5">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                            Services & Assistance
+                            Huduma & Msaada
                           </span>
                           <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-100 text-sky-800">
-                            SERVICE
+                            HUDUMA
                           </span>
                         </div>
                         <div className="space-y-1">
@@ -298,9 +300,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
                   </div>
                 ) : (
                   <div className="p-6 text-center text-slate-500 text-xs">
-                    No exact matches found for "{searchQuery}". Try searching for{' '}
-                    <span className="font-semibold text-slate-700">Paper, Pens, NIDA, TRA</span>, or{' '}
-                    <span className="font-semibold text-slate-700">Website</span>.
+                    Hakuna matokeo yaliyopatikana kwa "{searchQuery}". Jaribu kutafuta{' '}
+                    <span className="font-semibold text-slate-700">Karatasi, Kalamu, NIDA, TRA</span>, au{' '}
+                    <span className="font-semibold text-slate-700">Printing</span>.
                   </div>
                 )}
               </div>
@@ -316,13 +318,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
               className="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100/80 text-amber-900 border border-amber-200 text-xs font-bold transition-all shadow-2xs hover:scale-[1.02] active:scale-[0.98]"
             >
               <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
-              <span>What Do You Need?</span>
+              <span>Unahitaji Nini?</span>
             </button>
 
             {/* Direct WhatsApp CTA */}
-            <Tooltip content="Chat directly with TK Stationery support on WhatsApp">
+            <Tooltip content="Wasiliana na huduma kwa wateja moja kwa moja kupitia WhatsApp">
               <a
-                href={createWhatsAppUrl('Hello TK Stationery! I need assistance.')}
+                href={createWhatsAppUrl('Habari TK Stationery! Nahitaji msaada.')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-all active:scale-[0.98]"
@@ -412,7 +414,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
                         }}
                         className="text-xs font-bold text-slate-800 hover:text-amber-600 block w-full py-1"
                       >
-                        View All in Customer Account →
+                        Tazama Zote Kwenye Akaunti →
                       </button>
                     </div>
                   </div>
@@ -422,34 +424,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
 
             {/* Language Switcher */}
             <div className="hidden sm:flex items-center bg-slate-100 rounded-lg p-0.5 text-[11px] font-bold">
-              <button
-                type="button"
-                onClick={() => setLanguage('sw')}
-                className={`px-2 py-1 rounded-md transition-all ${
-                  language === 'sw'
-                    ? 'bg-amber-400 text-slate-950 shadow-2xs font-extrabold'
-                    : 'text-slate-600 hover:text-slate-950'
-                }`}
-                title="Badili lugha kuwa Kiswahili"
-              >
+              <span className="px-2.5 py-1 rounded-md bg-amber-400 text-slate-950 font-black shadow-2xs">
                 SW
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage('en')}
-                className={`px-2 py-1 rounded-md transition-all ${
-                  language === 'en'
-                    ? 'bg-amber-400 text-slate-950 shadow-2xs font-extrabold'
-                    : 'text-slate-600 hover:text-slate-950'
-                }`}
-                title="Switch to English"
-              >
-                EN
-              </button>
+              </span>
             </div>
 
             {/* Account Link / Sign In Trigger */}
-            <Tooltip content={currentUser || userProfile ? (isStaff || userProfile?.role === 'super_admin' || userProfile?.role === 'admin' ? `Jopo la Admin: ${userProfile?.fullName || 'Msimamizi'}` : `Akaunti: ${userProfile?.fullName || currentUser?.email}`) : 'Ingia kwenye akaunti yako'}>
+            <Tooltip content={currentUser || userProfile ? (isStaff || userProfile?.role === 'super_admin' || userProfile?.role === 'admin' ? `Jopo la Usimamizi: ${userProfile?.fullName || 'Msimamizi'}` : `Akaunti ya Mteja: ${userProfile?.fullName || currentUser?.email}`) : 'Ingia kwenye akaunti yako'}>
               <button
                 type="button"
                 onClick={() => {
@@ -464,34 +445,34 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
                   }
                 }}
                 className="p-2 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl transition-colors flex items-center gap-2 active:scale-[0.98]"
-                aria-label={currentUser ? (isStaff ? 'Admin Portal' : 'Customer Account') : 'Ingia'}
+                aria-label={currentUser ? (isStaff ? 'Jopo la Usimamizi' : 'Akaunti Yangu') : 'Ingia'}
               >
                 {userProfile?.avatarUrl ? (
                   <img
                     src={userProfile.avatarUrl}
-                    alt={userProfile.fullName || 'Avatar'}
+                    alt={userProfile.fullName || 'Picha ya Wasifu'}
                     className="w-7 h-7 rounded-full object-cover border border-amber-400/80 shadow-2xs"
                   />
                 ) : (
                   <User className="w-5 h-5" />
                 )}
                 <span className="hidden lg:inline text-xs font-medium text-slate-700 max-w-[120px] truncate">
-                  {currentUser || userProfile ? (userProfile?.fullName ? userProfile.fullName.split(' ')[0] : (isStaff ? 'Admin' : 'Akaunti')) : 'Ingia'}
+                  {currentUser || userProfile ? (userProfile?.fullName ? userProfile.fullName.split(' ')[0] : (isStaff ? 'Msimamizi' : 'Akaunti')) : 'Ingia'}
                 </span>
               </button>
             </Tooltip>
 
             {/* Shopping Cart Drawer Trigger */}
-            <Tooltip content="View your shopping cart">
+            <Tooltip content="Tazama kikapu chako cha manunuzi">
               <button
                 type="button"
                 onClick={() => setIsCartDrawerOpen(true)}
                 className="relative flex items-center gap-2 p-2 sm:px-3.5 sm:py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-all shadow-xs active:scale-[0.98]"
-                aria-label={`Cart with ${cartCount} items`}
+                aria-label={`Kikapu chenye bidhaa ${cartCount}`}
               >
                 <ShoppingCart className="w-4 h-4 text-amber-400" />
                 <span className="hidden sm:inline text-xs font-bold">
-                  {cartSubtotal > 0 ? formatTSh(cartSubtotal) : 'Cart'}
+                  {cartSubtotal > 0 ? formatTSh(cartSubtotal) : 'Kikapu'}
                 </span>
                 {cartCount > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-slate-950 text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-xs">
@@ -511,7 +492,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Search stationery, printing, NIDA..."
+              placeholder="Tafuta vifaa, uchapaji, NIDA, TRA..."
               className="w-full pl-10 pr-4 py-2 bg-slate-100 text-xs text-slate-900 rounded-lg border border-transparent focus:border-amber-500 focus:bg-white focus:outline-none"
             />
           </div>

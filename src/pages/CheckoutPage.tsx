@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
-import { useTranslation } from '../context/LanguageContext';
 import { Container } from '../components/layout/Container';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Button } from '../components/common/Button';
@@ -30,7 +29,6 @@ import {
 export const CheckoutPage: React.FC = () => {
   const { cart, cartSubtotal, createOrder, clearCart, showToast, navigateTo, storeSettings } = useApp();
   const { currentUser, userProfile } = useAuth();
-  const { t, language } = useTranslation();
 
   const [customerName, setCustomerName] = useState(userProfile?.fullName || '');
   const [customerPhone, setCustomerPhone] = useState(userProfile?.phone || '');
@@ -65,7 +63,7 @@ export const CheckoutPage: React.FC = () => {
     setCopiedText(label);
     showToast({
       type: 'info',
-      title: 'Imenakiliwa (Copied)',
+      title: 'Imenakiliwa',
       message: `${text} imenakiliwa kwenye clipboard.`
     });
     setTimeout(() => setCopiedText(null), 2500);
@@ -77,8 +75,8 @@ export const CheckoutPage: React.FC = () => {
     if (!customerName.trim() || !customerPhone.trim()) {
       showToast({
         type: 'error',
-        title: language === 'sw' ? 'Taarifa Zinakosekana' : 'Missing Contact Details',
-        message: language === 'sw' ? 'Tafadhali weka jina na namba yako ya simu.' : 'Please enter your name and phone number.'
+        title: 'Taarifa Zinakosekana',
+        message: 'Tafadhali weka jina lako na namba ya simu.'
       });
       return;
     }
@@ -86,8 +84,8 @@ export const CheckoutPage: React.FC = () => {
     if (deliveryMethod === 'delivery' && !deliveryAddress.trim()) {
       showToast({
         type: 'error',
-        title: language === 'sw' ? 'Anwani ya Usafirishaji Inahitajika' : 'Delivery Address Required',
-        message: language === 'sw' ? 'Tafadhali taja mtaa au jengo lako la Dar es Salaam.' : 'Please specify your delivery address or landmark.'
+        title: 'Anwani ya Usafirishaji Inahitajika',
+        message: 'Tafadhali taja mtaa au jengo lako la Dar es Salaam.'
       });
       return;
     }
@@ -112,10 +110,10 @@ export const CheckoutPage: React.FC = () => {
           : paymentMethod === 'airtelmoney'
           ? 'Airtel Money (0787754202)'
           : paymentMethod === 'bank'
-          ? 'Bank Transfer (CRDB/NMB)'
+          ? 'Benki (CRDB/NMB)'
           : paymentMethod === 'cash_on_delivery'
-          ? 'Cash on Delivery'
-          : 'Cash at Store (Store Pickup)';
+          ? 'Taslimu Wakati wa Kupokea'
+          : 'Taslimu Dukani (Manzese)';
 
       const newOrderPayload: Order = {
         id: orderId,
@@ -129,7 +127,7 @@ export const CheckoutPage: React.FC = () => {
         deliveryFee,
         total: totalAmount,
         totalAmount,
-        deliveryMethod: deliveryMethod === 'delivery' ? 'Dar es Salaam Delivery' : 'Store Pickup',
+        deliveryMethod: deliveryMethod === 'delivery' ? 'Usafirishaji Dar es Salaam' : 'Kuchukua Dukani Manzese',
         deliveryAddress: deliveryMethod === 'delivery' ? deliveryAddress.trim() : undefined,
         paymentMethod: paymentMethodLabel,
         paymentStatus: 'pending',
@@ -165,15 +163,15 @@ export const CheckoutPage: React.FC = () => {
 
       showToast({
         type: 'success',
-        title: language === 'sw' ? 'Oda Imepokelewa!' : 'Order Placed!',
-        message: language === 'sw' ? `Oda #${orderId} imesajiliwa kikamilifu.` : `Order #${orderId} has been successfully logged.`
+        title: 'Oda Imepokelewa!',
+        message: `Oda #${orderId} imesajiliwa kikamilifu.`
       });
     } catch (err: any) {
       console.warn('Place order error:', err);
       showToast({
         type: 'error',
-        title: 'Submission Error',
-        message: err.message || 'Could not complete order. Please try again.'
+        title: 'Hitilafu ya Usajili',
+        message: err.message || 'Haikuweza kukamilisha oda. Tafadhali jaribu tena.'
       });
     } finally {
       setIsSubmitting(false);
@@ -184,8 +182,6 @@ export const CheckoutPage: React.FC = () => {
   // PAYMENT RESULT & MANUAL PAYMENT INSTRUCTIONS
   // ----------------------------------------------------
   if (completedOrder) {
-    const isPaid = completedOrder.paymentStatus === 'Paid';
-    const isPending = !isPaid;
     const whatsAppChatUrl = getOrderWhatsAppUrl(
       completedOrder.id,
       completedOrder.total,
@@ -207,15 +203,13 @@ export const CheckoutPage: React.FC = () => {
 
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                  {language === 'sw' ? 'Oda Imesajiliwa • Inasubiri Malipo' : 'Order Registered • Payment Pending'}
+                  Oda Imesajiliwa • Inasubiri Malipo
                 </span>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
-                  Order Ref: {completedOrder.id}
+                  Namba ya Oda: {completedOrder.id}
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-md mx-auto">
-                  {language === 'sw'
-                    ? `Asante, ${completedOrder.customerName}. Oda yako imehifadhiwa. Tafadhali kamilisha malipo kwa maelekezo hapa chini.`
-                    : `Thank you, ${completedOrder.customerName}. Your order is saved. Please complete payment using the instructions below.`}
+                  Asante sana, {completedOrder.customerName}. Oda yako imehifadhiwa. Tafadhali kamilisha malipo kufuatia maelekezo hapa chini ili tukufungie na kukutumia vifaa vyako mara moja.
                 </p>
               </div>
             </div>
@@ -225,7 +219,7 @@ export const CheckoutPage: React.FC = () => {
               <div className="flex items-center justify-between border-b border-amber-200 pb-3">
                 <span className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
                   <CreditCard className="w-4 h-4 text-amber-600" />
-                  {t('payment.manual_title', 'Maelekezo ya Malipo (Manual Payment)')}
+                  Maelekezo ya Malipo (M-Pesa / Tigo Pesa / Airtel)
                 </span>
                 <span className="text-xs font-black bg-amber-500 text-slate-950 px-2.5 py-0.5 rounded-full">
                   TZS {formatTSh(completedOrder.total)}
@@ -236,13 +230,13 @@ export const CheckoutPage: React.FC = () => {
               <div className="p-4 bg-white rounded-xl border border-amber-300 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div>
                   <span className="text-[11px] font-bold text-slate-500 block uppercase">
-                    {t('payment.send_to_number', 'Namba ya Malipo / WhatsApp ya TK Stationery:')}
+                    Namba Rasmi ya Malipo & WhatsApp ya TK Stationery:
                   </span>
                   <span className="text-xl sm:text-2xl font-black text-slate-950 tracking-wider font-mono">
                     {whatsappPaymentNumber}
                   </span>
                   <span className="text-[11px] text-slate-600 block mt-0.5">
-                    (M-Pesa / Tigo Pesa / Airtel Money / WhatsApp Receipt)
+                    (Jina: Tendo La Kristo / Amos Stationery)
                   </span>
                 </div>
                 <Button
@@ -251,7 +245,7 @@ export const CheckoutPage: React.FC = () => {
                   onClick={() => copyToClipboard(whatsappPaymentNumber, 'number')}
                   icon={copiedText === 'number' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                 >
-                  {copiedText === 'number' ? 'Imenakiliwa' : 'Copy Number'}
+                  {copiedText === 'number' ? 'Imenakiliwa' : 'Nakili Namba'}
                 </Button>
               </div>
 
@@ -259,15 +253,15 @@ export const CheckoutPage: React.FC = () => {
               <div className="space-y-2 text-xs text-slate-700">
                 <div className="flex items-start gap-2">
                   <span className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 font-bold flex items-center justify-center shrink-0 text-[11px]">1</span>
-                  <span>Tuma kiasi cha <strong>{formatTSh(completedOrder.total)}</strong> kwenda namba <strong>{whatsappPaymentNumber}</strong> au akaunti ya benki.</span>
+                  <span>Tuma kiasi cha <strong>{formatTSh(completedOrder.total)}</strong> kwenda namba <strong>{whatsappPaymentNumber}</strong>.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 font-bold flex items-center justify-center shrink-0 text-[11px]">2</span>
-                  <span>Weka kumbukumbu ya oda yako: <strong>{completedOrder.id}</strong>.</span>
+                  <span>Weka kumbukumbu ya namba ya oda yako: <strong>{completedOrder.id}</strong>.</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 font-bold flex items-center justify-center shrink-0 text-[11px]">3</span>
-                  <span>Bofya kitufe cha kijani cha WhatsApp hapa chini kutuma risiti / picha ya muamala moja kwa moja.</span>
+                  <span>Bofya kitufe cha kijani cha WhatsApp hapa chini kutuma ujumbe au picha ya muamala kuthibitisha malipo papo hapo.</span>
                 </div>
               </div>
 
@@ -280,7 +274,7 @@ export const CheckoutPage: React.FC = () => {
                   className="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
                 >
                   <MessageSquare className="w-5 h-5" />
-                  <span>{t('payment.confirm_whatsapp', 'Thibitisha Malipo Kupitia WhatsApp')}</span>
+                  <span>Thibitisha Malipo Kupitia WhatsApp</span>
                 </a>
               </div>
             </div>
@@ -288,8 +282,8 @@ export const CheckoutPage: React.FC = () => {
             {/* Receipt Summary Box */}
             <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 text-left text-xs space-y-3 max-w-lg mx-auto">
               <div className="flex justify-between font-semibold text-slate-700 pb-2 border-b border-slate-200">
-                <span>{language === 'sw' ? 'Muhtasari wa Oda:' : 'Order Summary:'}</span>
-                <span>{completedOrder.items.length} {language === 'sw' ? 'Bidhaa' : 'Items'}</span>
+                <span>Muhtasari wa Oda:</span>
+                <span>{completedOrder.items.length} Bidhaa</span>
               </div>
 
               <div className="space-y-1">
@@ -303,27 +297,27 @@ export const CheckoutPage: React.FC = () => {
 
               <div className="pt-2 border-t border-slate-200 space-y-1.5 text-slate-600">
                 <div className="flex justify-between">
-                  <span>{language === 'sw' ? 'Njia ya Usafirishaji:' : 'Delivery Method:'}</span>
+                  <span>Njia ya Kupokea:</span>
                   <span className="font-bold text-slate-900">
-                    {completedOrder.deliveryMethod === 'Dar es Salaam Delivery'
-                      ? `Courier Dispatch (${completedOrder.deliveryAddress})`
-                      : 'Store Pickup (TK Center Manzese)'}
+                    {completedOrder.deliveryMethod === 'Usafirishaji Dar es Salaam' || completedOrder.deliveryMethod === 'Dar es Salaam Delivery'
+                      ? `Usafirishaji (${completedOrder.deliveryAddress})`
+                      : 'Kuchukua Dukani Manzese (Bakhresa)'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>{language === 'sw' ? 'Njia ya Malipo:' : 'Payment Method:'}</span>
+                  <span>Njia ya Malipo:</span>
                   <span className="font-bold text-slate-900">{completedOrder.paymentMethod}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>{language === 'sw' ? 'Hali ya Oda (Order Status):' : 'Order Status:'}</span>
-                  <span className="font-bold text-blue-600">{completedOrder.status || 'Submitted'}</span>
+                  <span>Hali ya Oda:</span>
+                  <span className="font-bold text-blue-600">Imesajiliwa (Inasubiri)</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>{language === 'sw' ? 'Hali ya Malipo (Payment Status):' : 'Payment Status:'}</span>
-                  <span className="font-bold text-amber-600">PENDING (Inasubiri Uhakiki)</span>
+                  <span>Hali ya Malipo:</span>
+                  <span className="font-bold text-amber-600">INASUBIRI UHAKIKI</span>
                 </div>
                 <div className="flex justify-between text-sm font-black text-slate-950 pt-2 border-t border-slate-200">
-                  <span>{language === 'sw' ? 'Jumla Kuu:' : 'Total Amount:'}</span>
+                  <span>Jumla Kuu:</span>
                   <span className="text-amber-600">{formatTSh(completedOrder.total)}</span>
                 </div>
               </div>
@@ -336,7 +330,7 @@ export const CheckoutPage: React.FC = () => {
                 size="md"
                 onClick={() => navigateTo('/track-order')}
               >
-                {t('btn.track', 'Fuatilia Oda')}
+                Fuatilia Hali ya Oda
               </Button>
 
               <Button
@@ -344,7 +338,7 @@ export const CheckoutPage: React.FC = () => {
                 size="md"
                 onClick={() => navigateTo('/shop')}
               >
-                {language === 'sw' ? 'Endelea Kununua' : 'Continue Shopping'}
+                Endelea Kununua
               </Button>
             </div>
           </div>
@@ -362,15 +356,13 @@ export const CheckoutPage: React.FC = () => {
         <Container size="sm">
           <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-4">
             <h2 className="text-xl font-bold text-slate-900">
-              {language === 'sw' ? 'Kikapu chako kiko tupu' : 'Your cart is empty'}
+              Kikapu chako kiko tupu
             </h2>
             <p className="text-xs text-slate-500">
-              {language === 'sw'
-                ? 'Tafadhali chagua vifaa kabla ya kuelekea kwenye malipo.'
-                : 'Please add stationery items before proceeding to checkout.'}
+              Tafadhali chagua vifaa vya ofisi au shule kabla ya kuelekea kwenye malipo.
             </p>
             <Button variant="primary" size="md" onClick={() => navigateTo('/shop')}>
-              {language === 'sw' ? 'Tazama Vifaa' : 'Browse Stationery'}
+              Tazama Vifaa Dukani
             </Button>
           </div>
         </Container>
@@ -383,20 +375,18 @@ export const CheckoutPage: React.FC = () => {
       <Container>
         <Breadcrumbs
           items={[
-            { label: 'Shop', path: '/shop' },
-            { label: 'Cart', path: '/cart' },
-            { label: 'Checkout' }
+            { label: 'Duka', path: '/shop' },
+            { label: 'Kikapu', path: '/cart' },
+            { label: 'Kamilisha Oda' }
           ]}
         />
 
         <div className="pb-4 border-b border-slate-200">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            {language === 'sw' ? 'Kamilisha Oda & Malipo' : 'Checkout & Manual Payment'}
+            Kamilisha Oda & Malipo
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            {language === 'sw'
-              ? 'Weka anwani yako ya Dar es Salaam na chagua njia ya malipo (M-Pesa, Tigo Pesa, Airtel au Taslimu).'
-              : 'Specify your delivery address and preferred Tanzanian manual payment method.'}
+            Weka anwani yako ya Dar es Salaam na chagua njia rahisi ya kulipa (M-Pesa, Tigo Pesa, Airtel Money au Taslimu).
           </p>
         </div>
 
@@ -407,21 +397,21 @@ export const CheckoutPage: React.FC = () => {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
                 <Phone className="w-4 h-4 text-amber-500" />
-                <span>1. {language === 'sw' ? 'Taarifa za Mpokeaji' : 'Recipient Information'}</span>
+                <span>1. Taarifa za Mpokeaji</span>
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
-                  label={language === 'sw' ? 'Jina Kamili / Kampuni' : 'Full Name / Company'}
-                  placeholder="e.g. Amisa Bakari"
+                  label="Jina Kamili au la Taasisi / Kampuni"
+                  placeholder="Mfano: Amisa Bakari"
                   value={customerName}
                   onChange={e => setCustomerName(e.target.value)}
                   required
                 />
 
                 <Input
-                  label={language === 'sw' ? 'Namba ya Simu ya Mpokeaji' : 'Recipient Phone Number'}
-                  placeholder="e.g. 0784 123 456"
+                  label="Namba ya Simu ya Mpokeaji"
+                  placeholder="Mfano: 0784 123 456"
                   value={customerPhone}
                   onChange={e => setCustomerPhone(e.target.value)}
                   required
@@ -429,9 +419,9 @@ export const CheckoutPage: React.FC = () => {
               </div>
 
               <Input
-                label={language === 'sw' ? 'Barua Pepe (Si lazima)' : 'Email Address (Optional)'}
+                label="Barua Pepe (Si lazima)"
                 type="email"
-                placeholder="e.g. amisa@gmail.com"
+                placeholder="Mfano: amisa@gmail.com"
                 value={customerEmail}
                 onChange={e => setCustomerEmail(e.target.value)}
               />
@@ -441,7 +431,7 @@ export const CheckoutPage: React.FC = () => {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
                 <Truck className="w-4 h-4 text-amber-500" />
-                <span>2. {language === 'sw' ? 'Njia ya Kupokea Vifaa' : 'Fulfillment Method'}</span>
+                <span>2. Njia ya Kupokea Vifaa</span>
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -456,12 +446,10 @@ export const CheckoutPage: React.FC = () => {
                 >
                   <div className="space-y-1">
                     <span className="font-bold text-xs text-slate-900 block">
-                      {language === 'sw' ? 'Usafirishaji Dar es Salaam' : 'Dar es Salaam Delivery'} (+{formatTSh(storeSettings?.darDeliveryFee || 3000)})
+                      Usafirishaji Dar es Salaam (+{formatTSh(storeSettings?.darDeliveryFee || 3000)})
                     </span>
                     <span className="text-[11px] text-slate-500 block">
-                      {language === 'sw'
-                        ? 'Tunakuletea hadi mlangoni kwako ndani ya masaa 2–4.'
-                        : 'Dispatched to your home, office, or school within 2–4 hours.'}
+                      Tunakuletea hadi mlangoni kwako ofisini au nyumbani ndani ya masaa 2–4.
                     </span>
                   </div>
                   {deliveryMethod === 'delivery' && <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />}
@@ -478,12 +466,10 @@ export const CheckoutPage: React.FC = () => {
                 >
                   <div className="space-y-1">
                     <span className="font-bold text-xs text-slate-900 block">
-                      {language === 'sw' ? 'Kuchukua Dukani (Bure)' : 'Store Pickup (Free)'}
+                      Kuchukua Dukani (Bure)
                     </span>
                     <span className="text-[11px] text-slate-500 block">
-                      {language === 'sw'
-                        ? 'Chukua vifaa vyako TK Stationery Center (Manzese — Karibu na kituo cha mwendokasi cha Bakhresa).'
-                        : 'Pick up ready at TK Stationery Center (Manzese — Near Bakhresa BRT Station).'}
+                      Chukua vifaa vyako dukani TK Stationery Center (Manzese — Karibu na kituo cha mwendokasi cha Bakhresa).
                     </span>
                   </div>
                   {deliveryMethod === 'pickup' && <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />}
@@ -493,8 +479,8 @@ export const CheckoutPage: React.FC = () => {
               {deliveryMethod === 'delivery' && (
                 <div className="pt-2">
                   <Input
-                    label={language === 'sw' ? 'Mtaa / Jengo / Alama ya Eneo (Dar es Salaam)' : 'Street / Building / Landmark in Dar'}
-                    placeholder="e.g. Manzese, Bakhresa, au popote Dar es Salaam"
+                    label="Mtaa / Jengo / Eneo Maarufu (Dar es Salaam)"
+                    placeholder="Mfano: Manzese karibu na Bakhresa, Mwenge, Kariakoo, n.k."
                     value={deliveryAddress}
                     onChange={e => setDeliveryAddress(e.target.value)}
                     required
@@ -508,10 +494,10 @@ export const CheckoutPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
                   <CreditCard className="w-4 h-4 text-amber-500" />
-                  <span>3. {language === 'sw' ? 'Chagua Njia ya Malipo' : 'Select Payment Method'}</span>
+                  <span>3. Chagua Njia ya Malipo</span>
                 </h3>
                 <span className="text-[10px] font-bold bg-amber-50 text-amber-800 px-2 py-0.5 rounded border border-amber-200">
-                  Manual Payment
+                  Malipo ya Moja kwa Moja
                 </span>
               </div>
 
@@ -552,7 +538,7 @@ export const CheckoutPage: React.FC = () => {
                     id: 'cash_on_delivery',
                     label: 'Taslimu Wakati wa Kupokea',
                     icon: <Banknote className="w-4 h-4 text-slate-700" />,
-                    desc: 'Lipa courier anapofika'
+                    desc: 'Lipa courier akishakukabidhi'
                   }
                 ].map(pm => (
                   <button
@@ -583,12 +569,10 @@ export const CheckoutPage: React.FC = () => {
               <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1.5">
                 <span className="font-bold text-slate-900 flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  {language === 'sw' ? 'Maelekezo ya Uhakiki wa Malipo:' : 'Payment Verification Guide:'}
+                  Maelekezo ya Uhakiki wa Malipo:
                 </span>
                 <p>
-                  {language === 'sw'
-                    ? `Baada ya kuweka oda, utapata muhtasari na namba ya oda. Tuma malipo kwa namba ${whatsappPaymentNumber} kisha bofya kitufe cha WhatsApp kutuma uthibitisho kwa mhudumu wetu.`
-                    : `After placing the order, you will receive an order reference. Send payment to ${whatsappPaymentNumber} and send the receipt on WhatsApp to confirm dispatch.`}
+                  Baada ya kuweka oda, utapata namba rasmi ya oda. Tuma malipo kwa namba {whatsappPaymentNumber} kisha bofya kitufe cha WhatsApp kutuma ujumbe wa uthibitisho ili wahudumu wakutayarishie vifaa vyako haraka.
                 </p>
               </div>
             </div>
@@ -596,12 +580,12 @@ export const CheckoutPage: React.FC = () => {
             {/* 4. Notes */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-2 shadow-xs">
               <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                {language === 'sw' ? 'Maelezo ya Ziada (Si lazima)' : 'Order Notes / Delivery Instructions'}
+                Maelezo ya Ziada (Si lazima)
               </label>
               <textarea
                 value={orderNotes}
                 onChange={e => setOrderNotes(e.target.value)}
-                placeholder="e.g. Tafadhali piga simu kabla ya kuleta..."
+                placeholder="Mfano: Tafadhali piga simu kabla ya kufika au eleza alama ya karibu na eneo lako..."
                 rows={2}
                 className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
@@ -611,7 +595,7 @@ export const CheckoutPage: React.FC = () => {
           {/* Right Summary */}
           <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs sticky top-24">
             <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 pb-3 border-b border-slate-200">
-              {language === 'sw' ? 'Muhtasari wa Malipo' : 'Order Summary'}
+              Muhtasari wa Malipo
             </h3>
 
             <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
@@ -624,7 +608,7 @@ export const CheckoutPage: React.FC = () => {
                   />
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-slate-900 truncate">{item.product.name}</p>
-                    <p className="text-[11px] text-slate-500">Qty: {item.quantity}</p>
+                    <p className="text-[11px] text-slate-500">Idadi: {item.quantity}</p>
                   </div>
                   <span className="font-bold text-slate-900">{formatTSh(item.product.price * item.quantity)}</span>
                 </div>
@@ -633,17 +617,17 @@ export const CheckoutPage: React.FC = () => {
 
             <div className="pt-3 border-t border-slate-200 space-y-2 text-xs text-slate-600">
               <div className="flex justify-between">
-                <span>{language === 'sw' ? 'Jumla ya Vifaa:' : 'Items Subtotal:'}</span>
+                <span>Jumla ya Vifaa:</span>
                 <span className="font-bold text-slate-900">{formatTSh(cartSubtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span>{language === 'sw' ? 'Ada ya Usafirishaji:' : 'Delivery Fee:'}</span>
+                <span>Ada ya Usafirishaji:</span>
                 <span className="font-bold text-slate-900">
-                  {deliveryFee === 0 ? (language === 'sw' ? 'BURE' : 'FREE') : formatTSh(deliveryFee)}
+                  {deliveryFee === 0 ? 'BURE' : formatTSh(deliveryFee)}
                 </span>
               </div>
               <div className="flex justify-between text-base font-black text-slate-950 pt-2 border-t border-slate-200">
-                <span>{language === 'sw' ? 'Jumla Kuu:' : 'Total Amount:'}</span>
+                <span>Jumla Kuu:</span>
                 <span className="text-amber-600">{formatTSh(totalAmount)}</span>
               </div>
             </div>
@@ -656,8 +640,8 @@ export const CheckoutPage: React.FC = () => {
               disabled={isSubmitting}
             >
               {isSubmitting
-                ? (language === 'sw' ? 'Inasajili Oda...' : 'Placing Order...')
-                : (language === 'sw' ? `Thibitisha Oda (${formatTSh(totalAmount)})` : `Place Order (${formatTSh(totalAmount)})`)}
+                ? 'Inasajili Oda...'
+                : `Thibitisha Oda (${formatTSh(totalAmount)})`}
             </Button>
           </div>
         </form>

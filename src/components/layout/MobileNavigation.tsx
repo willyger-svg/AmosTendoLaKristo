@@ -18,9 +18,9 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { useTranslation } from '../../context/LanguageContext';
 import { createWhatsAppUrl, TK_PHONE_DISPLAY } from '../../utils/whatsapp';
 import { HelpCircle } from 'lucide-react';
+import { TKLogo } from '../common/TKLogo';
 
 export interface MobileNavigationProps {
   isOpen: boolean;
@@ -33,7 +33,6 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
 }) => {
   const { navigateTo, currentPath, openModal } = useApp();
   const { currentUser, userProfile } = useAuth();
-  const { language, setLanguage } = useTranslation();
 
   if (!isOpen) return null;
 
@@ -66,9 +65,9 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
 
   const navLinks: MobileNavItem[] = [
     { label: 'Nyumbani', path: '/', icon: <Home className="w-5 h-5" /> },
-    { label: 'Duka la Vifaa (Shop)', path: '/shop', icon: <ShoppingBag className="w-5 h-5" />, badge: 'Duka' },
-    { label: 'Huduma za Chapisho (Printing)', path: '/printing', icon: <Printer className="w-5 h-5" /> },
-    { label: 'Huduma za Serikali (NIDA/TRA)', path: '/online-services', icon: <ShieldCheck className="w-5 h-5" />, badge: 'NIDA' },
+    { label: 'Duka la Vifaa', path: '/shop', icon: <ShoppingBag className="w-5 h-5" />, badge: 'Duka' },
+    { label: 'Huduma za Chapisho', path: '/printing', icon: <Printer className="w-5 h-5" /> },
+    { label: 'Huduma za Serikali (NIDA & TRA)', path: '/online-services', icon: <ShieldCheck className="w-5 h-5" />, badge: 'NIDA' },
     { label: 'Fuatilia Oda Yako', path: '/track-order', icon: <Search className="w-5 h-5" /> },
     { label: 'Akaunti Yangu', path: '/account', icon: <User className="w-5 h-5" /> },
     { label: 'Kuhusu Sisi', path: '/about', icon: <Info className="w-5 h-5" /> },
@@ -87,15 +86,13 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
         {/* Drawer Header */}
         <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-black text-sm flex items-center justify-center">
-              TK
-            </div>
+            <TKLogo size="sm" />
             <div>
-              <h3 className="font-extrabold text-sm tracking-tight text-white leading-tight">
-                TK STATIONERY
+              <h3 className="font-extrabold text-sm tracking-tight text-white leading-tight flex items-center gap-1.5">
+                <span>TK STATIONERY</span>
               </h3>
-              <p className="text-[10px] text-amber-400 font-medium">
-                Dar es Salaam, Tanzania
+              <p className="text-[10px] text-amber-400 font-bold">
+                Tendo La Kristo • Manzese
               </p>
             </div>
           </div>
@@ -119,7 +116,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
           >
             <div className="flex items-center gap-2.5">
               <HelpCircle className="w-5 h-5 text-slate-950" />
-              <span>What Do You Need?</span>
+              <span>Unahitaji Msaada Gani?</span>
             </div>
             <ChevronRight className="w-4 h-4 text-slate-950 opacity-70" />
           </button>
@@ -178,43 +175,22 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
 
         {/* Bottom Drawer Contact & Helpline */}
         <div className="p-4 border-t border-slate-100 bg-slate-50 space-y-2.5">
-          {/* Language Toggle */}
+          {/* Lugha */}
           <div className="flex items-center justify-between px-1">
-            <span className="text-xs font-bold text-slate-600">Lugha / Language:</span>
-            <div className="flex items-center bg-slate-200/80 rounded-lg p-0.5 text-xs font-bold">
-              <button
-                type="button"
-                onClick={() => setLanguage('sw')}
-                className={`px-3 py-1 rounded-md transition-all ${
-                  language === 'sw'
-                    ? 'bg-amber-400 text-slate-950 shadow-xs font-black'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Kiswahili
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage('en')}
-                className={`px-3 py-1 rounded-md transition-all ${
-                  language === 'en'
-                    ? 'bg-amber-400 text-slate-950 shadow-xs font-black'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                English
-              </button>
-            </div>
+            <span className="text-xs font-bold text-slate-600">Lugha ya Tovuti:</span>
+            <span className="px-2.5 py-1 rounded-md bg-amber-400 text-slate-950 text-xs font-black shadow-xs">
+              Kiswahili (Sanifu)
+            </span>
           </div>
 
           <a
-            href={createWhatsAppUrl('Hello TK Stationery! I need assistance.')}
+            href={createWhatsAppUrl('Habari TK Stationery! Nahitaji huduma.')}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center justify-center gap-2 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-xs"
           >
             <MessageSquare className="w-4 h-4" />
-            <span>Chat on WhatsApp ({TK_PHONE_DISPLAY})</span>
+            <span>Tuma Ujumbe WhatsApp ({TK_PHONE_DISPLAY})</span>
           </a>
         </div>
       </div>

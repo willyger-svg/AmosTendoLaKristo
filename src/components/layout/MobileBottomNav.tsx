@@ -8,16 +8,16 @@ export const MobileBottomNav: React.FC = () => {
   const { userProfile, currentUser } = useAuth();
 
   const items = [
-    { label: 'Home', path: '/', icon: Home },
+    { label: 'Nyumbani', path: '/', icon: Home },
     {
-      label: 'Shop',
+      label: 'Duka',
       path: '/shop',
       icon: ShoppingBag,
       badge: cartCount > 0 ? cartCount : undefined
     },
-    { label: 'Quick Help', path: 'quick-help-action', icon: Sparkles, highlight: true },
-    { label: 'Track', path: '/track-order', icon: Search },
-    { label: 'Account', path: '/account', icon: User }
+    { label: 'Msaada', path: 'quick-help-action', icon: Sparkles, highlight: true },
+    { label: 'Fuatilia', path: '/track-order', icon: Search },
+    { label: 'Akaunti', path: '/account', icon: User }
   ];
 
   const handleNavClick = (path: string) => {

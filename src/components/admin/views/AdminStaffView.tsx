@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useApp } from '../../../context/AppContext';
-import { useTranslation } from '../../../context/LanguageContext';
 import { auditLogService } from '../../../services/audit/auditLogService';
 import { ADMIN_ROLE_CONFIGS } from '../../../utils/adminPermissions';
 import { UserProfile, UserRole } from '../../../types';
@@ -19,7 +18,6 @@ import {
 export const AdminStaffView: React.FC = () => {
   const { currentUser, userRole, isSuperAdmin, getAllUsers, setUserRole } = useAuth();
   const { showToast } = useApp();
-  const { language } = useTranslation();
 
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,8 +44,8 @@ export const AdminStaffView: React.FC = () => {
     if (!isSuperAdmin) {
       showToast({
         type: 'error',
-        title: 'Permission Denied',
-        message: 'Only Super Administrators can modify organizational access roles.'
+        title: 'Huna Mamlaka',
+        message: 'Msimamizi Mkuu (Super Admin) pekee ndiye anayeweza kubadilisha majukumu ya watumiaji.'
       });
       return;
     }
@@ -55,8 +53,8 @@ export const AdminStaffView: React.FC = () => {
     if (targetUser.id === currentUser?.uid) {
       showToast({
         type: 'error',
-        title: 'Self-Modification Prohibited',
-        message: 'You cannot alter your own super administrative role.'
+        title: 'Huwezi Kujibadilisha',
+        message: 'Huwezi kubadilisha jukumu lako mwenyewe la Msimamizi Mkuu.'
       });
       return;
     }
@@ -81,8 +79,8 @@ export const AdminStaffView: React.FC = () => {
 
       showToast({
         type: 'success',
-        title: language === 'sw' ? 'Jukumu Limesasishwa' : 'Role Updated',
-        message: `${targetUser.fullName || targetUser.email} is now ${newRole}.`
+        title: 'Jukumu Limesasishwa',
+        message: `${targetUser.fullName || targetUser.email} sasa ni ${newRole}.`
       });
 
       setUsers(prev =>
@@ -91,8 +89,8 @@ export const AdminStaffView: React.FC = () => {
     } catch {
       showToast({
         type: 'error',
-        title: 'Error',
-        message: 'Failed to update user administrative permissions.'
+        title: 'Hitilafu',
+        message: 'Imeshindwa kusasisha jukumu la mtumiaji.'
       });
     } finally {
       setUpdatingId(null);
@@ -118,14 +116,14 @@ export const AdminStaffView: React.FC = () => {
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-amber-500" />
             <h3 className="text-base font-black text-slate-900 dark:text-white">
-              Staff & Team RBAC Management
+              Usimamizi wa Wafanyakazi na Majukumu (RBAC)
             </h3>
             <span className="text-[10px] px-2 py-0.5 rounded-full font-black bg-rose-500 text-white uppercase tracking-wider">
-              Super Admin Only
+              Super Admin Pekee
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Delegate operational capabilities between retail customers, shop floor staff, administrators, and executive owners.
+            Wape watumiaji na wafanyakazi majukumu na mamlaka ya kiutendaji kulingana na nafasi zao dukani.
           </p>
         </div>
 
@@ -135,7 +133,7 @@ export const AdminStaffView: React.FC = () => {
             type="text"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Search team member..."
+            placeholder="Tafuta mfanyakazi au mtumiaji..."
             className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none"
           />
         </div>
@@ -144,22 +142,22 @@ export const AdminStaffView: React.FC = () => {
       {/* Users Table */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
         {loading ? (
-          <div className="py-16 text-center text-xs text-slate-400">Loading user registry...</div>
+          <div className="py-16 text-center text-xs text-slate-400">Inapakia orodha ya watumiaji...</div>
         ) : filteredUsers.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
             <Users className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />
-            <p className="text-sm font-semibold">No users matching search</p>
+            <p className="text-sm font-semibold">Hakuna mtumiaji anayelingana na utafutaji wako</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="p-4">User Details</th>
-                  <th className="p-4">Contact Phone</th>
-                  <th className="p-4">Registered Date</th>
-                  <th className="p-4">Current Privileges</th>
-                  <th className="p-4 text-right">Assign Role</th>
+                  <th className="p-4">Taarifa za Mtumiaji</th>
+                  <th className="p-4">Namba ya Simu</th>
+                  <th className="p-4">Tarehe ya Usajili</th>
+                  <th className="p-4">Mamlaka / Jukumu</th>
+                  <th className="p-4 text-right">Badilisha Jukumu</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -188,7 +186,7 @@ export const AdminStaffView: React.FC = () => {
                       </td>
                       <td className="p-4">
                         <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${roleConfig.badgeClass}`}>
-                          {roleConfig.labelEn}
+                          {roleConfig.labelSw || roleConfig.labelEn}
                         </span>
                       </td>
                       <td className="p-4 text-right">
@@ -198,10 +196,10 @@ export const AdminStaffView: React.FC = () => {
                           onChange={e => handleRoleChange(user, e.target.value as UserRole)}
                           className="px-2.5 py-1 rounded-lg border text-xs font-semibold focus:outline-none cursor-pointer bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 disabled:opacity-50"
                         >
-                          <option value="customer">Retail Customer</option>
-                          <option value="staff">Staff Operator</option>
-                          <option value="admin">Administrator</option>
-                          <option value="super_admin">Super Admin</option>
+                          <option value="customer">Mteja wa Kawaida</option>
+                          <option value="staff">Mfanyakazi wa Duka (Staff)</option>
+                          <option value="admin">Msimamizi (Admin)</option>
+                          <option value="super_admin">Msimamizi Mkuu (Super Admin)</option>
                         </select>
                       </td>
                     </tr>

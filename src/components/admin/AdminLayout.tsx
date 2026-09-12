@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
-import { useTranslation } from '../../context/LanguageContext';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
 import { AdminMobileDrawer } from './AdminMobileDrawer';
@@ -25,7 +24,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 }) => {
   const { currentUser, userProfile, userRole, loading: authLoading } = useAuth();
   const { navigateTo } = useApp();
-  const { t, language } = useTranslation();
 
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
     try {
@@ -71,8 +69,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 mb-4 animate-pulse">
           <Lock className="w-6 h-6" />
         </div>
-        <p className="text-sm font-bold text-slate-200">Verifying Administrative Privileges...</p>
-        <p className="text-xs text-slate-500 mt-1">TK Stationery Security Protocol</p>
+        <p className="text-sm font-bold text-slate-200">Inathibitisha Ruhusa za Usimamizi...</p>
+        <p className="text-xs text-slate-500 mt-1">Itifaki ya Usalama ya TK Stationery</p>
       </div>
     );
   }
@@ -88,12 +86,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
           <div className="space-y-2">
             <h2 className="text-xl font-black tracking-tight text-white">
-              {language === 'sw' ? 'Jopo la Usimamizi Linahitaji Kuingia' : 'Administrative Authentication Required'}
+              Jopo la Usimamizi Linahitaji Kuingia
             </h2>
             <p className="text-xs text-slate-400 leading-relaxed">
-              {language === 'sw'
-                ? 'Eneo hili limetengwa kwa wafanyakazi na wasimamizi wa TK Stationery pekee. Tafadhali ingia kwa akaunti yako ya kiutawala.'
-                : 'This workspace is strictly restricted to authorized TK Stationery staff and managers. Please authenticate with your staff credentials.'}
+              Eneo hili limetengwa kwa wafanyakazi na wasimamizi wa TK Stationery pekee. Tafadhali ingia kwa akaunti yako ya kiutawala.
             </p>
           </div>
           <div className="pt-2 flex flex-col gap-3">
@@ -102,14 +98,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2"
             >
               <LogIn className="w-4 h-4" />
-              <span>{language === 'sw' ? 'Ingia Kwenye Mfumo' : 'Sign In'}</span>
+              <span>Ingia Kwenye Mfumo</span>
             </button>
             <button
               onClick={() => navigateTo('/')}
               className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl text-xs font-semibold transition-all flex items-center justify-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>{language === 'sw' ? 'Rudi Tovuti Kuu' : 'Return to Storefront'}</span>
+              <span>Rudi Tovuti Kuu</span>
             </button>
           </div>
         </div>
@@ -127,12 +123,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
           <div className="space-y-2">
             <h2 className="text-xl font-black tracking-tight text-white">
-              {language === 'sw' ? 'Ufikiaji Umekataliwa (Access Denied)' : 'Administrative Access Denied'}
+              Ufikiaji Umekataliwa
             </h2>
             <p className="text-xs text-slate-400 leading-relaxed">
-              {language === 'sw'
-                ? `Umeingia kama "${userProfile?.fullName || 'Customer'}" ukiwa na akaunti ya mteja. Akaunti za wateja hazina ruhusa ya kufikia eneo la utawala.`
-                : `You are signed in as "${userProfile?.fullName || 'Customer'}" with a retail customer profile. Customers cannot access administrative management tools.`}
+              Umeingia kama "{userProfile?.fullName || 'Mteja'}" ukiwa na akaunti ya kawaida ya mteja. Akaunti za wateja hazina ruhusa ya kufikia eneo la utawala.
             </p>
           </div>
           <div className="pt-2 flex flex-col gap-3">
@@ -140,13 +134,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               onClick={() => navigateTo('/account')}
               className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-xs font-bold transition-all shadow-md"
             >
-              {language === 'sw' ? 'Nenda Akaunti Yangu ya Mteja' : 'Go to My Customer Account'}
+              Nenda Akaunti Yangu ya Mteja
             </button>
             <button
               onClick={() => navigateTo('/')}
               className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl text-xs font-semibold transition-all"
             >
-              {language === 'sw' ? 'Rudi Duka Kuu' : 'Return to Shop'}
+              Rudi Duka Kuu
             </button>
           </div>
         </div>
@@ -163,7 +157,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           onOpenMobileMenu={() => setIsMobileDrawerOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
           onOpenQuickActions={() => setIsQuickActionsOpen(true)}
-          pageTitle="Permission Restricted"
+          pageTitle="Idhini Imezuiwa"
           breadcrumbs={breadcrumbs}
         />
         <div className="flex-1 flex items-center justify-center p-6">
@@ -172,18 +166,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               <ShieldAlert className="w-7 h-7" />
             </div>
             <h3 className="text-base font-black text-slate-900 dark:text-white">
-              {language === 'sw' ? 'Huna Idhini ya Eneo Hili' : 'Section Permission Restricted'}
+              Huna Idhini ya Eneo Hili
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {language === 'sw'
-                ? `Jukumu lako la "${userRole}" haliruhusiwi kufikia sehemu ya /admin/${activeSectionId}. Wasiliana na Super Admin kufunguliwa idhini.`
-                : `Your current role (${userRole}) is not authorized to access /admin/${activeSectionId}. Please contact a Super Administrator for role delegation.`}
+              Jukumu lako la "{userRole}" haliruhusiwi kufikia sehemu ya /admin/{activeSectionId}. Wasiliana na Msimamizi Mkuu (Super Admin) kupatiwa idhini.
             </p>
             <button
               onClick={() => navigateTo('/admin')}
               className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-sm"
             >
-              {language === 'sw' ? 'Rudi Dashibodi Kuu' : 'Return to Dashboard'}
+              Rudi Dashibodi Kuu
             </button>
           </div>
         </div>

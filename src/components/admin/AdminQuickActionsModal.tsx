@@ -1,7 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { useTranslation } from '../../context/LanguageContext';
 import { canAccessSection } from '../../utils/adminPermissions';
 import {
   Zap,
@@ -27,10 +26,8 @@ interface AdminQuickActionsModalProps {
 
 interface QuickActionConfig {
   id: string;
-  titleSw: string;
-  titleEn: string;
-  descSw: string;
-  descEn: string;
+  title: string;
+  desc: string;
   targetPath: string;
   requiredSection: any;
   icon: React.ComponentType<{ className?: string }>;
@@ -43,15 +40,12 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
 }) => {
   const { navigateTo } = useApp();
   const { userRole } = useAuth();
-  const { language } = useTranslation();
 
   const actions: QuickActionConfig[] = [
     {
       id: 'view_orders',
-      titleSw: 'Fuatilia Oda za Wateja',
-      titleEn: 'Review Customer Orders',
-      descSw: 'Angalia oda mpya zilizowasilishwa na rekodi ya uwasilishaji.',
-      descEn: 'Inspect recently submitted customer orders and dispatch statuses.',
+      title: 'Fuatilia Oda za Wateja',
+      desc: 'Angalia oda mpya zilizowasilishwa na rekodi ya uwasilishaji.',
       targetPath: '/admin/orders',
       requiredSection: 'orders',
       icon: ShoppingBag,
@@ -59,10 +53,8 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
     },
     {
       id: 'verify_payments',
-      titleSw: 'Uhakiki wa Malipo (Manual Payments)',
-      titleEn: 'Verify Pending Payments',
-      descSw: 'Thibitisha malipo ya M-Pesa/Tigo Pesa yaliyowasilishwa.',
-      descEn: 'Confirm mobile money and bank transfer receipts from customers.',
+      title: 'Uhakiki wa Malipo (Manual Payments)',
+      desc: 'Thibitisha malipo ya M-Pesa na Tigo Pesa yaliyowasilishwa na wateja.',
       targetPath: '/admin/payments',
       requiredSection: 'payments',
       icon: CreditCard,
@@ -70,10 +62,8 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
     },
     {
       id: 'add_product',
-      titleSw: 'Ongeza Bidhaa Mpya Katalogi',
-      titleEn: 'Add Catalog Product',
-      descSw: 'Weka bidhaa mpya ya ofisi au shule na bei yake.',
-      descEn: 'List a new office or school supply product with inventory count.',
+      title: 'Ongeza Bidhaa Mpya',
+      desc: 'Weka bidhaa mpya ya ofisi au shule na bei yake kwenye katalogi.',
       targetPath: '/admin/products',
       requiredSection: 'products',
       icon: PackagePlus,
@@ -81,10 +71,8 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
     },
     {
       id: 'check_inventory',
-      titleSw: 'Kagua Hesabu za Stoo (Inventory)',
-      titleEn: 'Review Low Stock Inventory',
-      descSw: 'Tazama bidhaa zinazoelekea kuisha na rekebisha idadi.',
-      descEn: 'Monitor depleted items and adjust on-shelf inventory levels.',
+      title: 'Kagua Hesabu za Stoo (Inventory)',
+      desc: 'Tazama bidhaa zinazoelekea kuisha na rekebisha idadi ya stoo.',
       targetPath: '/admin/inventory',
       requiredSection: 'inventory',
       icon: Boxes,
@@ -92,10 +80,8 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
     },
     {
       id: 'review_tickets',
-      titleSw: 'Tiketi za Huduma (Print/Gov)',
-      titleEn: 'Service Tickets Queue',
-      descSw: 'Shughulikia kazi za chapisho haraka au fomu za serikali.',
-      descEn: 'Process print wizard jobs or public portal document filings.',
+      title: 'Tiketi za Huduma (Print/Gov)',
+      desc: 'Shughulikia kazi za uchapishaji wa haraka au fomu za serikali.',
       targetPath: '/admin/service-requests',
       requiredSection: 'service-requests',
       icon: FileCheck,
@@ -103,10 +89,8 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
     },
     {
       id: 'review_quotes',
-      titleSw: 'Nukuu za Mifumo & Software',
-      titleEn: 'Tech Quotes & Leads',
-      descSw: 'Kagua maombi ya nukuu ya mifumo na mawasiliano ya mteja.',
-      descEn: 'Review tech quote requests and customer requirement specifications.',
+      title: 'Nukuu za Mifumo & Software',
+      desc: 'Kagua maombi ya nukuu ya mifumo na mawasiliano ya mteja.',
       targetPath: '/admin/quotes',
       requiredSection: 'quotes',
       icon: Globe,
@@ -114,10 +98,8 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
     },
     {
       id: 'create_ad',
-      titleSw: 'Tengeneza Bango la Tangazo',
-      titleEn: 'Create Promo Announcement',
-      descSw: 'Weka ofa maalum au bango la punguzo la bei ukurasa wa mwanzo.',
-      descEn: 'Publish a hero banner offer or seasonal discount highlight.',
+      title: 'Tengeneza Bango la Tangazo',
+      desc: 'Weka ofa maalum au bango la punguzo la bei ukurasa wa mwanzo.',
       targetPath: '/admin/advertisements',
       requiredSection: 'advertisements',
       icon: Megaphone,
@@ -125,10 +107,8 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
     },
     {
       id: 'customer_directory',
-      titleSw: 'Orodha ya Wateja',
-      titleEn: 'Customer Profiles Directory',
-      descSw: 'Tazama akaunti za wateja, simu, barua pepe na rekodi zao.',
-      descEn: 'Browse registered buyer accounts and activity profiles.',
+      title: 'Orodha ya Wateja',
+      desc: 'Tazama akaunti za wateja, namba za simu, barua pepe na rekodi zao.',
       targetPath: '/admin/customers',
       requiredSection: 'customers',
       icon: Users,
@@ -136,10 +116,8 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
     },
     {
       id: 'store_settings',
-      titleSw: 'Mipangilio ya Duka & Namba za Malipo',
-      titleEn: 'Store & Payment Settings',
-      descSw: 'Sasisha namba za WhatsApp, M-Pesa, Tigo Pesa na maelekezo.',
-      descEn: 'Configure store contact phone, bank details and WhatsApp dispatch.',
+      title: 'Mipangilio ya Duka & Namba za Malipo',
+      desc: 'Sasisha namba za WhatsApp, M-Pesa, Tigo Pesa na maelekezo ya duka.',
       targetPath: '/admin/settings',
       requiredSection: 'settings',
       icon: Settings,
@@ -147,10 +125,8 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
     },
     {
       id: 'staff_rbac',
-      titleSw: 'Wafanyakazi & Majukumu (RBAC)',
-      titleEn: 'Staff & Team Permissions',
-      descSw: 'Gawa majukumu ya Staff, Admin au Super Admin kwa watumiaji.',
-      descEn: 'Delegate operational, managerial and security privileges.',
+      title: 'Wafanyakazi & Majukumu (RBAC)',
+      desc: 'Gawa majukumu ya Staff, Admin au Super Admin kwa watumiaji.',
       targetPath: '/admin/staff',
       requiredSection: 'staff',
       icon: ShieldCheck,
@@ -158,10 +134,8 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
     },
     {
       id: 'audit_logs',
-      titleSw: 'Kumbukumbu za Usalama (Audit Logs)',
-      titleEn: 'Security & Action Audit Logs',
-      descSw: 'Kagua kumbukumbu rasmi za mabadiliko yaliyofanywa kwenye mfumo.',
-      descEn: 'Inspect append-only audit trail of system and financial operations.',
+      title: 'Kumbukumbu za Usalama (Audit Logs)',
+      desc: 'Kagua kumbukumbu rasmi za mabadiliko yaliyofanywa kwenye mfumo.',
       targetPath: '/admin/audit-logs',
       requiredSection: 'audit-logs',
       icon: History,
@@ -189,12 +163,10 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                {language === 'sw' ? 'Vitendo vya Haraka vya Usimamizi' : 'Admin Quick Actions'}
+                Vitendo vya Haraka vya Usimamizi
               </h3>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                {language === 'sw'
-                  ? 'Njia za mkato kulingana na idhini yako ya kiutendaji'
-                  : 'Fast operational shortcuts tailored to your authorized role'}
+                Njia za mkato kulingana na idhini yako ya kiutendaji
               </p>
             </div>
           </div>
@@ -222,12 +194,12 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate">
-                      {language === 'sw' ? action.titleSw : action.titleEn}
+                      {action.title}
                     </p>
                     <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-500 group-hover:translate-x-1 transition-all flex-shrink-0" />
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                    {language === 'sw' ? action.descSw : action.descEn}
+                    {action.desc}
                   </p>
                 </div>
               </div>
@@ -237,12 +209,12 @@ export const AdminQuickActionsModal: React.FC<AdminQuickActionsModalProps> = ({
 
         {/* Footer */}
         <div className="p-3 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-400">
-          <span>{allowedActions.length} shortcuts available</span>
+          <span>Njia {allowedActions.length} za mkato zinapatikana</span>
           <button
             onClick={onClose}
             className="px-3 py-1 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 text-xs font-semibold transition-colors"
           >
-            Close
+            Funga
           </button>
         </div>
       </div>

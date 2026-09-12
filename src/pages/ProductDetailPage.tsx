@@ -41,8 +41,8 @@ export const ProductDetailPage: React.FC = () => {
     setIsAdded(true);
     showToast({
       type: 'success',
-      title: 'Added to Cart',
-      message: `${quantity}x ${product.name} has been added.`
+      title: 'Kimeongezwa Kwenye Kikapu!',
+      message: `${quantity}x ${product.name} kimeongezwa kikapuni.`
     });
     setTimeout(() => setIsAdded(false), 1500);
   };
@@ -57,7 +57,7 @@ export const ProductDetailPage: React.FC = () => {
         {/* Breadcrumb */}
         <Breadcrumbs
           items={[
-            { label: 'Shop', path: '/shop' },
+            { label: 'Duka la Vifaa', path: '/shop' },
             { label: product.category, path: `/shop?category=${product.category}` },
             { label: product.name }
           ]}
@@ -76,12 +76,12 @@ export const ProductDetailPage: React.FC = () => {
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 {product.isBestSeller && (
                   <Badge variant="brand" size="md">
-                    Best Seller
+                    Inauzwa Sana
                   </Badge>
                 )}
                 {product.originalPrice && (
                   <span className="px-2.5 py-1 rounded-full text-xs font-black bg-rose-600 text-white shadow-xs">
-                    Save {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                    Punguzo {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
                   </span>
                 )}
               </div>
@@ -95,7 +95,7 @@ export const ProductDetailPage: React.FC = () => {
                 <span className="font-bold uppercase tracking-wider text-amber-600">
                   {product.category}
                 </span>
-                <span className="font-mono text-slate-400">SKU: {product.sku}</span>
+                <span className="font-mono text-slate-400">Namba ya Kifaa (SKU): {product.sku}</span>
               </div>
 
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
@@ -107,7 +107,7 @@ export const ProductDetailPage: React.FC = () => {
                 <div className="flex items-center gap-1 text-amber-400 text-xs font-bold">
                   <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                   <span className="text-slate-800">{product.rating || 4.9}</span>
-                  <span className="text-slate-400 font-normal">({product.reviewCount || 28} verified reviews)</span>
+                  <span className="text-slate-400 font-normal">({product.reviewCount || 28} maoni ya wateja)</span>
                 </div>
 
                 <div className="h-3 w-px bg-slate-200" />
@@ -115,11 +115,11 @@ export const ProductDetailPage: React.FC = () => {
                 <div>
                   {product.inStock ? (
                     <Badge variant="success" size="sm">
-                      In Stock ({product.stockCount} Available)
+                      Ipo Stoo ({product.stockCount} Vipo)
                     </Badge>
                   ) : (
                     <Badge variant="danger" size="sm">
-                      Out of Stock
+                      Imeisha kwa Sasa
                     </Badge>
                   )}
                 </div>
@@ -129,7 +129,7 @@ export const ProductDetailPage: React.FC = () => {
             {/* Price block */}
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-baseline justify-between">
               <div>
-                <span className="text-xs font-bold text-slate-500 uppercase block">Unit Price</span>
+                <span className="text-xs font-bold text-slate-500 uppercase block">Bei ya Kifaa</span>
                 <div className="flex items-baseline gap-2 mt-0.5">
                   <span className="text-3xl font-black text-slate-950">
                     {formatTSh(product.price)}
@@ -143,7 +143,7 @@ export const ProductDetailPage: React.FC = () => {
               </div>
 
               <span className="text-xs text-slate-500 font-medium">
-                Sold per {product.unit || 'unit'}
+                Inauzwa kwa {product.unit || 'kimoja'}
               </span>
             </div>
 
@@ -160,7 +160,7 @@ export const ProductDetailPage: React.FC = () => {
                     type="button"
                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
                     className="w-9 h-9 flex items-center justify-center text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                    aria-label="Decrease quantity"
+                    aria-label="Punguza idadi"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
@@ -171,7 +171,7 @@ export const ProductDetailPage: React.FC = () => {
                     type="button"
                     onClick={() => setQuantity(q => q + 1)}
                     className="w-9 h-9 flex items-center justify-center text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                    aria-label="Increase quantity"
+                    aria-label="Ongeza idadi"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
@@ -186,7 +186,7 @@ export const ProductDetailPage: React.FC = () => {
                   disabled={!product.inStock}
                   icon={isAdded ? <Check className="w-5 h-5" /> : <ShoppingCart className="w-5 h-5" />}
                 >
-                  {isAdded ? 'Added to Cart!' : `Add to Cart (${formatTSh(product.price * quantity)})`}
+                  {isAdded ? 'Kimeongezwa Kikapuni!' : `Weka Kwenye Kikapu (${formatTSh(product.price * quantity)})`}
                 </Button>
               </div>
 
@@ -198,7 +198,7 @@ export const ProductDetailPage: React.FC = () => {
                 onClick={handleDirectWhatsApp}
                 icon={<MessageSquare className="w-5 h-5" />}
               >
-                Order This Item on WhatsApp ({formatTSh(product.price * quantity)})
+                Agiza Kifaa Hiki Moja kwa Moja WhatsApp ({formatTSh(product.price * quantity)})
               </Button>
             </div>
 
@@ -207,16 +207,16 @@ export const ProductDetailPage: React.FC = () => {
               <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                 <Store className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div className="text-xs">
-                  <span className="font-bold text-slate-900 block">Instant Store Collection</span>
-                  <span className="text-slate-500">Pick up ready at TK Stationery Center within 30 minutes.</span>
+                  <span className="font-bold text-slate-900 block">Chukua Dukani Papo Hapo</span>
+                  <span className="text-slate-500">Kipokee dukani TK Stationery ndani ya dakika 30.</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                 <Truck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                 <div className="text-xs">
-                  <span className="font-bold text-slate-900 block">Dar es Salaam Dispatch</span>
-                  <span className="text-slate-500">Doorstep delivery via trusted courier or bodaboda.</span>
+                  <span className="font-bold text-slate-900 block">Usafirishaji Dar es Salaam</span>
+                  <span className="text-slate-500">Tunaleta mpaka mlangoni kwako kwa bodaboda au gari.</span>
                 </div>
               </div>
             </div>
@@ -225,7 +225,7 @@ export const ProductDetailPage: React.FC = () => {
             {product.specifications && (
               <div className="pt-4 border-t border-slate-200 space-y-2">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                  Product Technical Specifications
+                  Sifa za Kina za Kifaa
                 </h3>
                 <div className="rounded-xl border border-slate-200 overflow-hidden divide-y divide-slate-100 text-xs">
                   {Object.entries(product.specifications).map(([key, val]) => (
@@ -244,7 +244,7 @@ export const ProductDetailPage: React.FC = () => {
         {relatedProducts.length > 0 && (
           <div className="pt-12 border-t border-slate-200 space-y-6">
             <h2 className="text-xl font-bold text-slate-900">
-              Related Items in {product.category}
+              Vifaa Vingine Vinavyohusiana katika {product.category}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {relatedProducts.map(rel => (

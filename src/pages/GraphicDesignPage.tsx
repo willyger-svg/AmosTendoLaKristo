@@ -27,18 +27,18 @@ export const GraphicDesignPage: React.FC = () => {
 
   const samplePortfolio = [
     {
-      title: 'Safari Lodge Corporate Brand Identity',
-      category: 'Branding & Stationery',
+      title: 'Utambulisho wa Nembo ya Hoteli ya Safari Lodge',
+      category: 'Utambulisho wa Kampuni',
       image: 'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?w=600&auto=format&fit=crop&q=80'
     },
     {
-      title: 'Modern Coffee Shop Packaging & Menu',
-      category: 'Print & Packaging',
+      title: 'Vifungashio na Menyu ya Kahawa ya Kisasa',
+      category: 'Uchapishaji na Vifungashio',
       image: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=600&auto=format&fit=crop&q=80'
     },
     {
-      title: 'Law Chambers Letterhead & Business Cards',
-      category: 'Corporate Stationery',
+      title: 'Barua Rasmi na Kadi za Ofisi ya Mawakili',
+      category: 'Vifaa vya Kiofisi',
       image: 'https://images.unsplash.com/photo-1542435503-956c469947f6?w=600&auto=format&fit=crop&q=80'
     }
   ];
@@ -47,22 +47,22 @@ export const GraphicDesignPage: React.FC = () => {
     <div className="py-8 space-y-16">
       <Container>
         {/* Breadcrumb */}
-        <Breadcrumbs items={[{ label: 'Graphic Design Studio' }]} />
+        <Breadcrumbs items={[{ label: 'Studio ya Ubunifu wa Picha & Nembo' }]} />
 
         {/* Hero Section */}
         <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 border border-slate-800 relative overflow-hidden mt-4">
           <div className="max-w-3xl space-y-4 relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-950 border border-purple-800 text-purple-300 text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Creative Design & Corporate Branding</span>
+              <span>Ubunifu wa Kisasa & Utambulisho wa Kibiashara</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-              Graphic Design & Visual Brand Identity
+              Ubunifu wa Picha & Utambulisho wa Chapa (Branding)
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              We turn concepts into striking visual identities. From company logos and high-impact marketing flyers to complete corporate stationery packs and product labels ready for precision printing.
+              Tunageuza maono yako kuwa muonekano halisi unaovutia. Kuanzia nembo (logo) za kampuni, vipeperushi vya masoko, kadi za biashara (business cards), vifungashio vya bidhaa hadi stika zilizo tayari kuchapwa kwa ubora wa juu.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-2">
@@ -72,16 +72,16 @@ export const GraphicDesignPage: React.FC = () => {
                 onClick={() => openModal({ type: 'print-wizard' })}
                 icon={<Palette className="w-4 h-4" />}
               >
-                Request Custom Design Quote
+                Omba Makadirio ya Ubunifu
               </Button>
 
               <Button
                 variant="whatsapp"
                 size="md"
-                onClick={() => window.open(createWhatsAppUrl('Hello TK Stationery! I need a graphic designer for a project.'), '_blank')}
+                onClick={() => window.open(createWhatsAppUrl('Habari TK Stationery! Nahitaji mbunifu wa picha na nembo kwa ajili ya mradi wangu.'), '_blank')}
                 icon={<MessageSquare className="w-4 h-4" />}
               >
-                Chat with Design Lead
+                Wasiliana na Mbunifu Wetu WhatsApp
               </Button>
             </div>
           </div>
@@ -90,9 +90,9 @@ export const GraphicDesignPage: React.FC = () => {
         {/* 1. Services Grid */}
         <div>
           <SectionHeader
-            eyebrow="Creative Packages"
-            title="Design Solutions Tailored to Your Business"
-            subtitle="Choose from individual visual assets or end-to-end company branding packages."
+            eyebrow="Vifurushi vya Ubunifu"
+            title="Huduma za Ubunifu Zinazolingana na Biashara Yako"
+            subtitle="Chagua nembo moja au kifurushi kamili cha utambulisho wa kampuni yako."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -135,13 +135,13 @@ export const GraphicDesignPage: React.FC = () => {
                     fullWidth
                     onClick={() => handleRequestDesign(service.title)}
                   >
-                    Start Project
+                    Anza Mradi
                   </Button>
 
                   <Button
                     variant="whatsapp"
                     size="sm"
-                    onClick={() => window.open(createWhatsAppUrl(`Hello TK Stationery! I am interested in ${service.title}.`), '_blank')}
+                    onClick={() => window.open(createWhatsAppUrl(`Habari TK Stationery! Nahitaji huduma ya ubunifu wa ${service.title}.`), '_blank')}
                   >
                     WhatsApp
                   </Button>
@@ -154,9 +154,9 @@ export const GraphicDesignPage: React.FC = () => {
         {/* 2. Sample Design Portfolio Showcase */}
         <div>
           <SectionHeader
-            eyebrow="Recent Work"
-            title="Design & Print Portfolio"
-            subtitle="A glimpse into custom brand assets, logos, and printed packaging produced for Tanzanian enterprises."
+            eyebrow="Kazi Zetu za Hivi Karibuni"
+            title="Sampuli za Ubunifu na Uchapishaji Wetu"
+            subtitle="Tazama mifano ya kazi za nembo, vifungashio na nyaraka tulizotengeneza kwa ajili ya wateja wetu nchini Tanzania."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

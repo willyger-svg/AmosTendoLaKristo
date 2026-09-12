@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { useTranslation } from '../../context/LanguageContext';
 import { notificationService } from '../../services/notifications/notificationService';
 import { NotificationItem } from '../../types';
 import {
@@ -31,7 +30,6 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
 }) => {
   const { userProfile, userRole } = useAuth();
   const { orders, serviceTickets, quoteRequests } = useApp();
-  const { t, language } = useTranslation();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -81,8 +79,8 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
               orderId: pendingOrders[0].id,
               type: 'system_alert',
               channel: 'in_app',
-              title: `${pendingOrders.length} Pending Order(s) Awaiting Review`,
-              message: `Latest: Order #${pendingOrders[0].id} from ${pendingOrders[0].customerName}`,
+              title: `Oda ${pendingOrders.length} Zinazosubiri Ukaguzi`,
+              message: `Hivi karibuni: Oda #${pendingOrders[0].id} kutoka kwa ${pendingOrders[0].customerName}`,
               status: 'sent',
               createdAt: pendingOrders[0].createdAt || now,
               actionUrl: '/admin/orders'
@@ -97,8 +95,8 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
               userId: 'admin',
               type: 'ticket_created',
               channel: 'in_app',
-              title: `${pendingTickets.length} New Service Ticket(s)`,
-              message: `Ticket #${pendingTickets[0].id} (${pendingTickets[0].serviceType}) requires staff attention`,
+              title: `Tiketi ${pendingTickets.length} Mpya za Huduma`,
+              message: `Tiketi #${pendingTickets[0].id} (${pendingTickets[0].serviceType}) inahitaji kushughulikiwa`,
               status: 'sent',
               createdAt: pendingTickets[0].createdAt || now,
               actionUrl: '/admin/service-requests'
@@ -113,8 +111,8 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
               userId: 'admin',
               type: 'quote_received',
               channel: 'in_app',
-              title: `${pendingQuotes.length} Tech Quote Lead(s)`,
-              message: `Project quote for ${pendingQuotes[0].serviceCategory} from ${pendingQuotes[0].name}`,
+              title: `Maombi ${pendingQuotes.length} Mapya ya Makadirio`,
+              message: `Makadirio ya ${pendingQuotes[0].serviceCategory} kutoka kwa ${pendingQuotes[0].name}`,
               status: 'sent',
               createdAt: pendingQuotes[0].createdAt || now,
               actionUrl: '/admin/quotes'
@@ -185,7 +183,7 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
         <div className="flex items-center gap-2">
           <Bell className="w-4 h-4 text-amber-500" />
           <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-            {t('admin.notifications.title')}
+            Arifa za Mfumo
           </h4>
         </div>
         <div className="flex items-center gap-2">
@@ -194,7 +192,7 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
               onClick={handleMarkAllRead}
               className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 hover:underline"
             >
-              {t('admin.notifications.mark_all_read')}
+              Weka zote zimesomwa
             </button>
           )}
           <button
@@ -211,12 +209,12 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
         {loading ? (
           <div className="py-8 text-center text-xs text-slate-400">
             <span className="inline-block w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mr-2" />
-            Loading operational alerts...
+            Inapakia arifa za mfumo...
           </div>
         ) : notifications.length === 0 ? (
           <div className="py-10 text-center text-slate-400">
             <CheckCircle2 className="w-7 h-7 mx-auto mb-2 text-emerald-500" />
-            <p className="text-xs font-medium">{t('admin.notifications.empty')}</p>
+            <p className="text-xs font-medium">Hakuna arifa mpya kwa sasa</p>
           </div>
         ) : (
           notifications.map(n => {
@@ -268,9 +266,9 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
                       <button
                         onClick={e => handleMarkAsRead(n.id, e)}
                         className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-500 hover:text-amber-500 flex items-center gap-1"
-                        title="Mark as read"
+                        title="Weka imesomwa"
                       >
-                        <Check className="w-3 h-3" /> Mark read
+                        <Check className="w-3 h-3" /> Weka imesomwa
                       </button>
                     )}
                   </div>
@@ -290,7 +288,7 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
           }}
           className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1.5"
         >
-          <span>View All System Notifications</span>
+          <span>Tazama Arifa Zote za Mfumo</span>
           <ExternalLink className="w-3 h-3" />
         </button>
       </div>

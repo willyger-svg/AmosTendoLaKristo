@@ -65,10 +65,10 @@ export const PrintPriceEstimator: React.FC<PrintPriceEstimatorProps> = ({
       <div className="p-6 bg-slate-900 text-white flex items-center justify-between">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
-            Self-Service Calculator
+            Kikokotoo cha Haraka
           </span>
           <h3 className="text-lg font-bold text-white mt-0.5">
-            Document Print & Copy Cost Estimator
+            Kadiria Gharama ya Kuchapa na Kutoa Nakala za Nyaraka
           </h3>
         </div>
         <div className="p-2.5 bg-slate-800 rounded-xl text-amber-400">
@@ -80,7 +80,7 @@ export const PrintPriceEstimator: React.FC<PrintPriceEstimatorProps> = ({
         {/* Print Type: B&W vs Color */}
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-            1. Print Color Mode
+            1. Aina ya Rangi ya Chapa
           </label>
           <div className="grid grid-cols-2 gap-3">
             <button
@@ -94,9 +94,9 @@ export const PrintPriceEstimator: React.FC<PrintPriceEstimatorProps> = ({
             >
               <div>
                 <span className="font-bold text-xs text-slate-900 block">
-                  Black & White (Monochrome)
+                  Nyeusi na Nyeupe (B&W)
                 </span>
-                <span className="text-[11px] text-slate-500">From TSh 100 / page</span>
+                <span className="text-[11px] text-slate-500">Kuanzia TSh 100 / ukurasa</span>
               </div>
               {config.printType === 'bw' && <Check className="w-4 h-4 text-amber-600" />}
             </button>
@@ -112,9 +112,9 @@ export const PrintPriceEstimator: React.FC<PrintPriceEstimatorProps> = ({
             >
               <div>
                 <span className="font-bold text-xs text-slate-900 block">
-                  Full High-Gloss Color
+                  Rangi Kamili (Color Print)
                 </span>
-                <span className="text-[11px] text-slate-500">From TSh 500 / page</span>
+                <span className="text-[11px] text-slate-500">Kuanzia TSh 500 / ukurasa</span>
               </div>
               {config.printType === 'color' && <Check className="w-4 h-4 text-amber-600" />}
             </button>
@@ -125,32 +125,32 @@ export const PrintPriceEstimator: React.FC<PrintPriceEstimatorProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Paper Size
+              Ukubwa wa Karatasi
             </label>
             <select
               value={config.paperSize}
               onChange={e => setConfig({ ...config, paperSize: e.target.value as any })}
               className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:border-amber-500"
             >
-              <option value="A4">A4 (Standard Document - 210 x 297 mm)</option>
-              <option value="A3">A3 (Large Ledger / Posters - 297 x 420 mm)</option>
-              <option value="A5">A5 (Booklet / Small Flyer - 148 x 210 mm)</option>
+              <option value="A4">A4 (Kawaida ya Nyaraka - 210 x 297 mm)</option>
+              <option value="A3">A3 (Karatasi Kubwa / Mabango - 297 x 420 mm)</option>
+              <option value="A5">A5 (Kijitabu / Vipeperushi - 148 x 210 mm)</option>
             </select>
           </div>
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Paper Type / Thickness
+              Aina ya Karatasi / Unene
             </label>
             <select
               value={config.paperWeight}
               onChange={e => setConfig({ ...config, paperWeight: e.target.value as any })}
               className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:border-amber-500"
             >
-              <option value="80gsm Standard">80 GSM Standard Double A Paper</option>
-              <option value="100gsm Smooth">100 GSM Smooth Presentation Paper (+TSh 50/pg)</option>
-              <option value="120gsm Heavy">120 GSM Heavy Cardstock (+TSh 100/pg)</option>
-              <option value="Glossy Photo Paper">Glossy Photographic Paper</option>
+              <option value="80gsm Standard">Karatasi ya Kawaida ya Double A (80 GSM)</option>
+              <option value="100gsm Smooth">Karatasi Nyepesi ya Ripoti (100 GSM, +TSh 50/uk)</option>
+              <option value="120gsm Heavy">Karatasi Nene ya Jalada (120 GSM, +TSh 100/uk)</option>
+              <option value="Glossy Photo Paper">Karatasi ya Picha Inayong'aa (Glossy Photo Paper)</option>
             </select>
           </div>
         </div>
@@ -159,7 +159,7 @@ export const PrintPriceEstimator: React.FC<PrintPriceEstimatorProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Total Document Pages
+              Idadi ya Kurasa za Faili
             </label>
             <input
               type="number"
@@ -173,7 +173,7 @@ export const PrintPriceEstimator: React.FC<PrintPriceEstimatorProps> = ({
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Number of Sets / Copies
+              Idadi ya Nakala (Seti)
             </label>
             <input
               type="number"
@@ -190,33 +190,33 @@ export const PrintPriceEstimator: React.FC<PrintPriceEstimatorProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Binding Option
+              Aina ya Kufunga / Jalada
             </label>
             <select
               value={config.binding}
               onChange={e => setConfig({ ...config, binding: e.target.value as any })}
               className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:border-amber-500"
             >
-              <option value="none">No Binding (Loose Collated Sheets)</option>
-              <option value="staple">Corner / Side Stapling (+TSh 200)</option>
-              <option value="spiral">Spiral Ring Binding with Clear Cover (+TSh 3,000)</option>
-              <option value="tape">Thermal Cloth Tape Binding (+TSh 2,500)</option>
-              <option value="hardcover">Gold-Lettered Thesis Hardcover (+TSh 25,000)</option>
+              <option value="none">Bila Kufunga (Karatasi Zilizopangwa Tu)</option>
+              <option value="staple">Kupiga Pini (Stapler ya Pembeni, +TSh 200)</option>
+              <option value="spiral">Kufunga kwa Spiral (Ring Binding na Jalada la Plastiki, +TSh 3,000)</option>
+              <option value="tape">Kufunga kwa Tape ya Vitabu (Tape Binding, +TSh 2,500)</option>
+              <option value="hardcover">Hardcover ya Thesis yenye Maandishi ya Dhahabu (+TSh 25,000)</option>
             </select>
           </div>
 
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Protective Lamination
+              Kuweka Lamination ya Kinga
             </label>
             <select
               value={config.lamination}
               onChange={e => setConfig({ ...config, lamination: e.target.value as any })}
               className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:border-amber-500"
             >
-              <option value="none">No Lamination</option>
-              <option value="gloss">Gloss Thermal Pouch Lamination (+TSh 1,000/sheet)</option>
-              <option value="matte">Matte Anti-Glare Lamination (+TSh 1,200/sheet)</option>
+              <option value="none">Bila Lamination</option>
+              <option value="gloss">Lamination Inayong'aa (Gloss Pouch, +TSh 1,000/karatasi)</option>
+              <option value="matte">Lamination Isiyong'aa (Matte, +TSh 1,200/karatasi)</option>
             </select>
           </div>
         </div>
@@ -225,14 +225,14 @@ export const PrintPriceEstimator: React.FC<PrintPriceEstimatorProps> = ({
         <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <span className="text-[11px] font-bold uppercase text-slate-500 block">
-              Estimated Price (Subject to file check)
+              Makadirio ya Bei (Inathibitishwa na faili)
             </span>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black text-slate-950">
                 {formatTSh(estimatedTotal)}
               </span>
               <span className="text-xs text-slate-500 font-medium">
-                ({config.pageCount} pages × {config.copies} {config.copies === 1 ? 'copy' : 'copies'})
+                ({config.pageCount} kurasa × nakala {config.copies})
               </span>
             </div>
           </div>
@@ -243,7 +243,7 @@ export const PrintPriceEstimator: React.FC<PrintPriceEstimatorProps> = ({
             onClick={handleLaunchOrder}
             icon={<Printer className="w-4 h-4" />}
           >
-            Upload File & Submit Print Job
+            Pakia Faili & Tuma Kazi ya Chapa
           </Button>
         </div>
       </div>

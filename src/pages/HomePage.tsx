@@ -11,6 +11,7 @@ import { mockProducts } from '../data/products';
 import { publicServicesData } from '../data/publicServices';
 import { mockTestimonials } from '../data/orders';
 import { createWhatsAppUrl } from '../utils/whatsapp';
+import { TKLogo } from '../components/common/TKLogo';
 import {
   ShoppingBag,
   Printer,
@@ -66,106 +67,90 @@ export const HomePage: React.FC = () => {
   const coreServices = [
     {
       id: 'stationery',
-      title: language === 'sw' ? 'Duka la Vifaa vya Ofisi na Shule' : 'Stationery & Office Store',
-      description: language === 'sw'
-        ? 'Daftari za counter, kalamu bora, ream za karatasi A4/A3, mafaili ya box na vifaa vyote vya ofisi.'
-        : 'Quality counter books, premium pens, A4/A3 paper reams, box files, and everyday office supplies.',
+      title: 'Duka la Vifaa vya Ofisi na Shule',
+      description: 'Daftari za counter, kalamu bora, ream za karatasi A4 na A3, mafaili ya box na vifaa vyote vya ofisi na shule.',
       icon: ShoppingBag,
-      tag: '1,500+ Bidhaa',
+      tag: '1,500+ Vifaa',
       iconBg: 'bg-amber-500 text-slate-950',
       borderHover: 'hover:border-amber-400 hover:shadow-amber-500/10',
-      actionText: language === 'sw' ? 'Fungua Duka la Vifaa' : 'Shop Supplies',
+      actionText: 'Fungua Duka la Vifaa',
       path: '/shop'
     },
     {
       id: 'printing',
-      title: language === 'sw' ? 'Uchapaji wa Haraka (Laser Printing)' : 'High-Speed Document Printing',
-      description: language === 'sw'
-        ? 'Uchapaji wa nyaraka nyeusi na nyeupe (B&W) na rangi kamili kwa ubora wa laser 1200 DPI bila kupoteza muda.'
-        : 'Rapid crisp B&W and vivid full-color laser printing for reports, booklets, agreements, and forms.',
+      title: 'Uchapaji wa Haraka (Laser Printing)',
+      description: 'Uchapaji wa nyaraka nyeusi na nyeupe (B&W) na rangi kamili kwa ubora wa laser 1200 DPI bila kupoteza muda.',
       icon: Printer,
       tag: 'Dakika 5 - 15',
       iconBg: 'bg-sky-600 text-white',
       borderHover: 'hover:border-sky-400 hover:shadow-sky-500/10',
-      actionText: language === 'sw' ? 'Chapisha / Kokotoa Bei' : 'Print & Estimate',
+      actionText: 'Chapisha / Kokotoa Bei',
       path: '/printing'
     },
     {
       id: 'binding',
-      title: language === 'sw' ? 'Binding na Jalada Gumu (Hardcover)' : 'Binding & Hardcover Finishing',
-      description: language === 'sw'
-        ? 'Spiral binding ya plastiki, wire binding, lamination na jalada gumu lenye herufi za dhahabu kwa ripoti na thesis.'
-        : 'Plastic comb spiral, wire binding, thermal binding, and gold-embossed hardcover university thesis books.',
+      title: 'Kufunga Vitabu na Jalada Gumu (Hardcover)',
+      description: 'Spiral binding ya plastiki na waya, lamination na jalada gumu lenye herufi za dhahabu kwa ripoti na thesis za chuo.',
       icon: BookOpen,
       tag: 'Ubora wa Juu',
       iconBg: 'bg-indigo-600 text-white',
       borderHover: 'hover:border-indigo-400 hover:shadow-indigo-500/10',
-      actionText: language === 'sw' ? 'Tazama Vigezo vya Binding' : 'View Binding Options',
+      actionText: 'Tazama Vigezo vya Binding',
       path: '/printing'
     },
     {
       id: 'passport-photos',
-      title: language === 'sw' ? 'Picha za Pasipoti za Papo Hapo' : 'Studio Passport-Size Photos',
-      description: language === 'sw'
-        ? 'Picha za viwango vya kimataifa kwa ajili ya NIDA, pasipoti ya kusafiria, visa, vyeti na usajili wa shule.'
-        : 'Instant compliant passport photos with white, blue, or red studio backgrounds plus digital softcopy.',
+      title: 'Picha za Pasipoti za Papo Hapo',
+      description: 'Picha za viwango rasmi kwa ajili ya NIDA, pasipoti ya kusafiria, visa, vyeti vya shule na leseni.',
       icon: Camera,
       tag: 'Papo kwa Papo',
       iconBg: 'bg-emerald-600 text-white',
       borderHover: 'hover:border-emerald-400 hover:shadow-emerald-500/10',
-      actionText: language === 'sw' ? 'Vigezo vya Picha' : 'Photo Details',
+      actionText: 'Vigezo vya Picha',
       path: '/printing'
     },
     {
       id: 'nida-services',
-      title: language === 'sw' ? 'Msaada wa NIDA (Namba & NIN)' : 'NIDA NIN & Identity Services',
-      description: language === 'sw'
-        ? 'Kutafuta namba ya NIDA mtandaoni, kupakua kopi ya kitambulisho, na maelekezo ya usajili mpya.'
-        : 'Instant national ID number (NIN) retrieval, downloadable verification cards, and filing assistance.',
+      title: 'Msaada wa Vitambulisho vya NIDA',
+      description: 'Kutafuta namba ya NIN mtandaoni, kupakua nakala ya kitambulisho, na ushauri wa usajili mpya.',
       icon: ShieldCheck,
       tag: 'Huduma ya Serikali',
       iconBg: 'bg-emerald-700 text-white',
       borderHover: 'hover:border-emerald-500 hover:shadow-emerald-500/10',
-      actionText: language === 'sw' ? 'Pata Msaada wa NIDA' : 'Get NIDA Support',
+      actionText: 'Pata Msaada wa NIDA',
       path: '/online-services?focus=NIDA'
     },
     {
       id: 'tra-services',
-      title: language === 'sw' ? 'Msaada wa TRA (TIN & Tax Returns)' : 'TRA TIN & Tax Returns Support',
-      description: language === 'sw'
-        ? 'Msaada wa maombi ya TIN mpya ya biashara au binafsi, marejesho ya kodi (tax filing) na ankara za kodi.'
-        : 'Individual and corporate TIN application guidance, Nil returns assistance, and tax clearance support.',
+      title: 'Msaada wa TRA (TIN na Kodi)',
+      description: 'Msaada wa maombi ya TIN mpya ya biashara au binafsi, marejesho ya kodi (tax returns) na ankara za malipo.',
       icon: FileText,
       tag: 'Ushuru & Kodi',
       iconBg: 'bg-amber-600 text-white',
       borderHover: 'hover:border-amber-400 hover:shadow-amber-500/10',
-      actionText: language === 'sw' ? 'Pata Msaada wa TRA' : 'TRA Assistance',
+      actionText: 'Pata Msaada wa TRA',
       path: '/online-services?focus=TRA'
     },
     {
       id: 'police-loss-report',
-      title: language === 'sw' ? 'Ripoti ya Polisi ya Upotevu' : 'Police Loss Report (Upotevu)',
-      description: language === 'sw'
-        ? 'Kujaza fomu ya mtandaoni ya kuripoti simu, cheti, au nyaraka zilizopotea na kupata stakabadhi rasmi.'
-        : 'Assisted electronic police loss report filing with genuine reference number printing within minutes.',
+      title: 'Ripoti ya Polisi ya Upotevu wa Nyaraka',
+      description: 'Kujaza fomu rasmi ya mtandaoni ya upotevu wa simu, cheti, au nyaraka na kupata stakabadhi papo hapo.',
       icon: ShieldCheck,
       tag: 'Haraka & Rahisi',
       iconBg: 'bg-slate-800 text-amber-400',
       borderHover: 'hover:border-slate-400 hover:shadow-slate-500/10',
-      actionText: language === 'sw' ? 'Jaza Ripoti ya Polisi' : 'Fill Loss Report',
+      actionText: 'Jaza Ripoti ya Upotevu',
       path: '/online-services?focus=POLICE'
     },
     {
       id: 'graphic-design',
-      title: language === 'sw' ? 'Ubunifu wa Graphics & Vipeperushi' : 'Graphic & Certificate Design',
-      description: language === 'sw'
-        ? 'Ubunifu wa vipeperushi vya matangazo (flyers), kadi za biashara (business cards), vyeti na mabango.'
-        : 'Clean flyers, corporate business cards, letterheads, certificates, and vibrant promotional graphics.',
+      title: 'Ubunifu wa Vipeperushi na Kadi',
+      description: 'Ubunifu wa vipeperushi vya matangazo (flyers), kadi za biashara, vyeti, kalenda na mabango safi.',
       icon: Sparkles,
       tag: 'Ubunifu Maalum',
       iconBg: 'bg-purple-600 text-white',
       borderHover: 'hover:border-purple-400 hover:shadow-purple-500/10',
-      actionText: language === 'sw' ? 'Tazama Sampuli' : 'View Samples',
+      actionText: 'Tazama Ubunifu Wetu',
       path: '/graphic-design'
     }
   ];
@@ -234,7 +219,7 @@ export const HomePage: React.FC = () => {
                   icon={<ShoppingBag className="w-4 h-4 text-slate-950" />}
                   className="w-full sm:w-auto shadow-lg shadow-amber-500/20"
                 >
-                  {language === 'sw' ? 'Nunua Vifaa Dukani' : 'Shop Stationery'}
+                  Nunua Vifaa Dukani
                 </Button>
 
                 <Button
@@ -244,7 +229,7 @@ export const HomePage: React.FC = () => {
                   icon={<Printer className="w-4 h-4 text-sky-400" />}
                   className="w-full sm:w-auto border-slate-700 text-white hover:bg-slate-900"
                 >
-                  {language === 'sw' ? 'Kikokotoo cha Printing' : 'Instant Print Calculator'}
+                  Kikokotoo cha Printing
                 </Button>
 
                 <Button
@@ -254,7 +239,7 @@ export const HomePage: React.FC = () => {
                   icon={<ShieldCheck className="w-4 h-4 text-emerald-400" />}
                   className="w-full sm:w-auto text-slate-300 hover:text-white hover:bg-slate-800/60"
                 >
-                  {language === 'sw' ? 'NIDA / TRA / Polisi' : 'Government Portals'}
+                  NIDA / TRA / Polisi
                 </Button>
               </div>
 
@@ -263,19 +248,19 @@ export const HomePage: React.FC = () => {
                 <div className="p-2 rounded-xl bg-slate-900/40 border border-slate-800/60">
                   <span className="text-xl sm:text-2xl font-black text-amber-400 block">1,500+</span>
                   <span className="text-[11px] text-slate-300 block font-medium">
-                    {language === 'sw' ? 'Vifaa vya Shule & Ofisi' : 'Stationery Items'}
+                    Vifaa vya Shule & Ofisi
                   </span>
                 </div>
                 <div className="p-2 rounded-xl bg-slate-900/40 border border-slate-800/60">
                   <span className="text-xl sm:text-2xl font-black text-amber-400 block">Dakika 5-15</span>
                   <span className="text-[11px] text-slate-300 block font-medium">
-                    {language === 'sw' ? 'Uchapaji & Passport' : 'Fast Document Print'}
+                    Uchapaji & Passport
                   </span>
                 </div>
                 <div className="p-2 rounded-xl bg-slate-900/40 border border-slate-800/60">
                   <span className="text-xl sm:text-2xl font-black text-amber-400 block">M-Pesa / Tigo</span>
                   <span className="text-[11px] text-slate-300 block font-medium">
-                    {language === 'sw' ? 'Malipo Salama ya Simu' : 'Mobile Payments'}
+                    Malipo Salama ya Simu
                   </span>
                 </div>
               </div>
@@ -285,16 +270,14 @@ export const HomePage: React.FC = () => {
             <div className="lg:col-span-5 relative">
               <div className="bg-slate-900/95 rounded-3xl border border-slate-800 p-6 sm:p-7 shadow-2xl backdrop-blur-md space-y-5">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
-                      <Zap className="w-5 h-5" />
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <TKLogo size="md" className="shadow-lg shadow-amber-500/10" />
                     <div>
                       <span className="font-bold text-sm text-white block">
-                        {language === 'sw' ? 'Mawasiliano & Malipo ya Haraka' : 'Fast Order & Payment Desk'}
+                        Mawasiliano & Malipo ya Haraka
                       </span>
-                      <span className="text-[11px] text-slate-400 block">
-                        M-Pesa • Tigo Pesa • Airtel Money • Cash
+                      <span className="text-[11px] text-amber-400 font-semibold block">
+                        Tendo La Kristo (Amos) • Manzese
                       </span>
                     </div>
                   </div>
@@ -307,7 +290,7 @@ export const HomePage: React.FC = () => {
                 <div className="p-4 bg-slate-950/90 rounded-2xl border border-slate-800 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-                      {language === 'sw' ? 'Namba ya Malipo & WhatsApp:' : 'Payment / WhatsApp Line:'}
+                      Namba ya Malipo & WhatsApp:
                     </span>
                     <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded">
                       Inapatikana Sasa
@@ -324,13 +307,11 @@ export const HomePage: React.FC = () => {
                       className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-emerald-900/30"
                     >
                       <MessageSquare className="w-3.5 h-3.5" />
-                      <span>Chat WhatsApp</span>
+                      <span>Ongea Nasi WhatsApp</span>
                     </a>
                   </div>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
-                    {language === 'sw'
-                      ? 'Tuma orodha ya vifaa unavyohitaji au faili ya PDF ya kuchapishwa kupitia WhatsApp kwa huduma ya haraka.'
-                      : 'Send your shopping list or PDF documents directly to our WhatsApp desk for prompt processing.'}
+                    Tuma orodha ya vifaa unavyohitaji au faili ya PDF ya kuchapishwa kupitia WhatsApp kwa huduma ya haraka.
                   </p>
                 </div>
 
@@ -342,7 +323,7 @@ export const HomePage: React.FC = () => {
                   >
                     <span className="font-semibold text-slate-200 flex items-center gap-2.5">
                       <ShoppingBag className="w-4 h-4 text-amber-400" />
-                      {language === 'sw' ? 'Agiza Vifaa vya Ofisi na Shule' : 'Order Stationery Items'}
+                      Agiza Vifaa vya Ofisi na Shule
                     </span>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </div>
@@ -353,7 +334,7 @@ export const HomePage: React.FC = () => {
                   >
                     <span className="font-semibold text-slate-200 flex items-center gap-2.5">
                       <Printer className="w-4 h-4 text-sky-400" />
-                      {language === 'sw' ? 'Kikokotoo cha Bei ya Uchapaji' : 'Instant Print Calculator'}
+                      Kikokotoo cha Bei ya Uchapaji
                     </span>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </div>
@@ -364,7 +345,7 @@ export const HomePage: React.FC = () => {
                   >
                     <span className="font-semibold text-slate-200 flex items-center gap-2.5">
                       <Truck className="w-4 h-4 text-emerald-400" />
-                      {language === 'sw' ? 'Fuatilia Hali ya Oda Yako' : 'Track Existing Order Status'}
+                      Fuatilia Hali ya Oda Yako
                     </span>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </div>
@@ -380,15 +361,13 @@ export const HomePage: React.FC = () => {
         <Container>
           <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
             <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-200 inline-block">
-              {language === 'sw' ? 'Huduma Zetu Kuu' : 'Core Offerings'}
+              Huduma Zetu Kuu
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              {language === 'sw' ? 'Huduma Zote Mahali Pamoja' : 'Everything Under One Roof'}
+              Huduma Zote za Ofisi Mahali Pamoja
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              {language === 'sw'
-                ? 'Tumezingatia huduma muhimu zinazosaidia wanafunzi, wafanyakazi, wajasiriamali na taasisi kufanya shughuli zao kwa wepesi na uhakika.'
-                : 'Focused on high-demand everyday essentials: dependable stationery, precision printing, fast binding, and essential government portal filing.'}
+              Tumezingatia huduma muhimu zinazosaidia wanafunzi, wafanyakazi, wajasiriamali na taasisi kufanya shughuli zao kwa wepesi na uhakika.
             </p>
           </div>
 
@@ -438,21 +417,19 @@ export const HomePage: React.FC = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
               <SectionHeader
-                title={language === 'sw' ? 'Vifaa Vinavyoongoza Mauzo Dukani' : 'Best Selling Stationery'}
-                subtitle={language === 'sw'
-                  ? 'Ream za karatasi zenye ubora, kalamu, madaftari ya counter na vifaa vya ofisi kwa bei nafuu.'
-                  : 'Top-rated paper reams, writing instruments, notebooks, and office accessories.'}
+                title="Vifaa Vinavyoongoza Mauzo Dukani"
+                subtitle="Ream za karatasi zenye ubora, kalamu, madaftari ya counter na vifaa vya ofisi kwa bei nafuu."
               />
             </div>
 
             {/* Category Filter Tabs */}
             <div className="flex flex-wrap gap-2">
               {[
-                { id: 'all', label: language === 'sw' ? 'Maarufu Zote' : 'All Popular' },
-                { id: 'paper', label: language === 'sw' ? 'Karatasi & Ream' : 'Paper & Printing' },
-                { id: 'school', label: language === 'sw' ? 'Vifaa vya Shule' : 'School' },
-                { id: 'office', label: language === 'sw' ? 'Vifaa vya Ofisi' : 'Office' },
-                { id: 'accessories', label: language === 'sw' ? 'Vikorokoro / PC' : 'Accessories' }
+                { id: 'all', label: 'Maarufu Zote' },
+                { id: 'paper', label: 'Karatasi & Ream' },
+                { id: 'school', label: 'Vifaa vya Shule' },
+                { id: 'office', label: 'Vifaa vya Ofisi' },
+                { id: 'accessories', label: 'Vikorokoro / PC' }
               ].map(tab => (
                 <button
                   key={tab.id}
@@ -483,7 +460,7 @@ export const HomePage: React.FC = () => {
               icon={<ArrowRight className="w-4 h-4" />}
               className="bg-white border-slate-300 text-slate-900 hover:bg-slate-100 font-bold px-8 shadow-xs"
             >
-              {language === 'sw' ? 'Tazama Duka Lote (Bidhaa 1,500+) →' : 'Browse Full Catalog (1,500+ Items) →'}
+              Tazama Duka Lote (Vifaa 1,500+) →
             </Button>
           </div>
         </Container>
@@ -495,35 +472,31 @@ export const HomePage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-5 space-y-4">
               <span className="text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-200 inline-block">
-                {language === 'sw' ? 'Kikokotoo cha Haraka cha Chapisho' : 'Instant Print Calculator'}
+                Kikokotoo cha Haraka cha Chapisho
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
-                {language === 'sw'
-                  ? 'Pata Makadirio ya Bei ya Printing Kabla ya Kuagiza'
-                  : 'Calculate Your Print Job Cost Instantly'}
+                Pata Makadirio ya Bei ya Printing Kabla ya Kuagiza
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                {language === 'sw'
-                  ? 'Chagua idadi ya kurasa, aina ya uchapaji (Nyeusi & Nyeupe au Rangi Kamili), ukubwa wa karatasi (A4 au A3), na aina ya binding unayotaka upate gharama sahihi papo hapo.'
-                  : 'Specify page count, color options (B&W or Full Color), paper format (A4/A3), and binding preference to calculate your exact cost.'}
+                Chagua idadi ya kurasa, aina ya uchapaji (Nyeusi & Nyeupe au Rangi Kamili), ukubwa wa karatasi (A4 au A3), na aina ya binding unayotaka upate gharama sahihi papo hapo.
               </p>
 
               <div className="space-y-2.5 pt-2">
                 <div className="flex items-center gap-2.5 text-xs text-slate-700 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>{language === 'sw' ? 'Laser printing ya ubora wa 1200 DPI (maneno na picha nyororo)' : 'High-density 1200 DPI laser printing'}</span>
+                  <span>Laser printing ya ubora wa 1200 DPI (maneno na picha nyororo)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-xs text-slate-700 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>{language === 'sw' ? 'Spiral binding na plastiki safi ya mbele na nyuma' : 'Fast spiral binding with clear protective covers'}</span>
+                  <span>Spiral binding na plastiki safi ya mbele na nyuma</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-xs text-slate-700 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>{language === 'sw' ? 'Hardcover thesis binding kwa wanavyuo (herufi za dhahabu)' : 'Hardcover golden-embossed thesis binding'}</span>
+                  <span>Hardcover thesis binding kwa wanavyuo (herufi za dhahabu)</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-xs text-slate-700 font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>{language === 'sw' ? 'Tuma kazi mtandaoni na chukua bila kukaa foleni' : 'Upload online and pick up without queuing'}</span>
+                  <span>Tuma kazi mtandaoni na chukua bila kukaa foleni</span>
                 </div>
               </div>
 
@@ -534,7 +507,7 @@ export const HomePage: React.FC = () => {
                   onClick={() => navigateTo('/printing/order-service')}
                   icon={<Printer className="w-3.5 h-3.5 text-sky-600" />}
                 >
-                  {language === 'sw' ? 'Tuma Nyaraka Yako Mtandaoni' : 'Upload Document Directly'}
+                  Tuma Nyaraka Yako Mtandaoni
                 </Button>
               </div>
             </div>
@@ -559,15 +532,13 @@ export const HomePage: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-800 inline-block">
-                {language === 'sw' ? 'Msaada wa Huduma za Serikali' : 'Government Services Assistance'}
+                Msaada wa Huduma za Serikali
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-white mt-3">
-                {language === 'sw' ? 'Usipate Tabu na Mifumo ya Mtandaoni' : 'Hassle-Free Public Portal Support'}
+                Usipate Tabu na Mifumo ya Mtandaoni
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl leading-relaxed">
-                {language === 'sw'
-                  ? 'Wataalamu wetu wapo tayari kukusaidia kujaza, kufuatilia na kuchapisha nyaraka za NIDA, TRA, Polisi, RITA na maombi ya Ajira bila makosa wala usumbufu.'
-                  : 'Our experienced staff assists you in filing, checking, and printing documentation for NIDA, TRA, Police, RITA, and Ajira portals.'}
+                Wataalamu wetu wapo tayari kukusaidia kujaza, kufuatilia na kuchapisha nyaraka za NIDA, TRA, Polisi, RITA na maombi ya Ajira bila makosa wala usumbufu.
               </p>
             </div>
 
@@ -577,7 +548,7 @@ export const HomePage: React.FC = () => {
               onClick={() => navigateTo('/online-services')}
               className="bg-emerald-600 text-white hover:bg-emerald-500 font-bold self-start lg:self-end"
             >
-              {language === 'sw' ? 'Huduma Zote za Serikali →' : 'View All Portals →'}
+              Huduma Zote za Serikali →
             </Button>
           </div>
 
@@ -600,7 +571,7 @@ export const HomePage: React.FC = () => {
                     onClick={() => navigateTo('/online-services')}
                     className="text-emerald-400 font-bold hover:underline"
                   >
-                    {language === 'sw' ? 'Omba Msaada' : 'Apply'}
+                    Omba Msaada
                   </button>
                 </div>
               </div>
@@ -618,15 +589,13 @@ export const HomePage: React.FC = () => {
         <Container>
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
-              {language === 'sw' ? 'Hatua Rahisi' : 'Simple Steps'}
+              Hatua Rahisi
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              {language === 'sw' ? 'Jinsi ya Kupata Huduma TK Stationery' : 'How Ordering Works'}
+              Jinsi ya Kupata Huduma TK Stationery
             </h2>
             <p className="text-xs sm:text-sm text-slate-600">
-              {language === 'sw'
-                ? 'Agiza ukiwa nyumbani au ofisini kwako kwa hatua 3 tu rahisi.'
-                : 'Order from anywhere in Dar es Salaam in 3 effortless steps.'}
+              Agiza ukiwa nyumbani au ofisini kwako kwa hatua 3 tu rahisi.
             </p>
           </div>
 
@@ -636,12 +605,10 @@ export const HomePage: React.FC = () => {
                 1
               </div>
               <h3 className="font-bold text-base text-slate-900">
-                {language === 'sw' ? 'Chagua Bidhaa au Tuma Faili' : 'Select Items or Upload'}
+                Chagua Bidhaa au Tuma Faili
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                {language === 'sw'
-                  ? 'Weka vifaa kwenye kikapu au tuma faili zako za PDF/Word za kuchapishwa moja kwa moja kupitia tovuti au WhatsApp.'
-                  : 'Add stationery products to cart or send your documents via our website or direct WhatsApp line.'}
+                Weka vifaa kwenye kikapu au tuma faili zako za PDF/Word za kuchapishwa moja kwa moja kupitia tovuti au WhatsApp.
               </p>
             </div>
 
@@ -650,12 +617,10 @@ export const HomePage: React.FC = () => {
                 2
               </div>
               <h3 className="font-bold text-base text-slate-900">
-                {language === 'sw' ? 'Lipa kwa Simu ya Mkononi' : 'Pay via Mobile Money'}
+                Lipa kwa Simu ya Mkononi
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                {language === 'sw'
-                  ? 'Fanya malipo salama kwa M-Pesa, Tigo Pesa, Airtel Money au Lipa Namba. Tuma uthibitisho kwa sekunde chache.'
-                  : 'Complete payment conveniently via M-Pesa, Tigo Pesa, or Airtel Money with quick automated verification.'}
+                Fanya malipo salama kwa M-Pesa, Tigo Pesa, Airtel Money au Lipa Namba. Tuma uthibitisho kwa sekunde chache.
               </p>
             </div>
 
@@ -664,12 +629,10 @@ export const HomePage: React.FC = () => {
                 3
               </div>
               <h3 className="font-bold text-base text-slate-900">
-                {language === 'sw' ? 'Chukua Dukani au Letewa Ofisini' : 'Pick Up or Delivery'}
+                Chukua Dukani au Letewa Ofisini
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                {language === 'sw'
-                  ? 'Kazi yako ikikamilika unaweza kuja kuichukua dukani au kuletewa moja kwa moja na msafirishaji wetu jijini Dar es Salaam.'
-                  : 'Pick up your completed order at our store or enjoy prompt motorcycle delivery straight to your door.'}
+                Kazi yako ikikamilika unaweza kuja kuichukua dukani Manzese au kuletewa moja kwa moja na msafirishaji wetu jijini Dar es Salaam.
               </p>
             </div>
           </div>
@@ -680,10 +643,8 @@ export const HomePage: React.FC = () => {
       <section className="bg-slate-50 py-16 border-y border-slate-200">
         <Container>
           <SectionHeader
-            title={language === 'sw' ? 'Wateja Wetu Wanasema Nini' : 'What Our Customers Say'}
-            subtitle={language === 'sw'
-              ? 'Wanafunzi, walimu, makampuni na wataalamu wanatuamini kwa kazi safi na ya haraka.'
-              : 'Trusted by students, teachers, businesses, and professionals in Dar es Salaam.'}
+            title="Wateja Wetu Wanasema Nini"
+            subtitle="Wanafunzi, walimu, makampuni na wataalamu wanatuamini kwa kazi safi na ya haraka."
             align="center"
           />
 
@@ -730,15 +691,11 @@ export const HomePage: React.FC = () => {
             </span>
 
             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
-              {language === 'sw'
-                ? 'Unahitaji Vifaa vya Ofisi na Uchapaji kwa Wingi?'
-                : 'Looking for Bulk Stationery & Printing Supplies?'}
+              Unahitaji Vifaa vya Ofisi na Uchapaji kwa Wingi?
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl">
-              {language === 'sw'
-                ? 'TK Stationery inatoa punguzo maalum la bei kwa taasisi, makampuni, mashule na vituo vya mafunzo kote Tanzania. Tunatoa ankara rasmi za kodi (Proforma & EFD Tax Invoice) na usafirishaji wa haraka.'
-                : 'TK Stationery offers tailored wholesale discounts for institutions, corporate offices, schools, and organizations across Tanzania with official tax invoicing.'}
+              TK Stationery inatoa punguzo maalum la bei kwa taasisi, makampuni, mashule na vituo vya mafunzo kote Tanzania. Tunatoa ankara rasmi za kodi (Proforma na EFD Tax Invoice) na usafirishaji wa haraka.
             </p>
 
             <div className="pt-3 flex flex-wrap items-center gap-3">

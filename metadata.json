@@ -1,6 +1,6 @@
 {
   "name": "TK Stationery",
-  "description": "Stationery, Office Supplies, Public & Online Services, Printing, IT Support & Digital Solutions platform.",
+  "description": "TK Stationery - Tendo La Kristo (Amos Stationery): Vifaa vya ofisi na shule, uchapaji, na huduma za serikali mtandaoni Manzese, Dar es Salaam.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useAuth } from '../../../context/AuthContext';
-import { useTranslation } from '../../../context/LanguageContext';
 import { adService } from '../../../services/ads/adService';
 import { auditLogService } from '../../../services/audit/auditLogService';
 import { Advertisement, AdPlacement } from '../../../types';
@@ -20,7 +19,6 @@ import {
 export const AdminAdvertisementsView: React.FC = () => {
   const { advertisements, refreshAds, showToast } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
-  const { language } = useTranslation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAd, setEditingAd] = useState<Advertisement | null>(null);
@@ -104,8 +102,8 @@ export const AdminAdvertisementsView: React.FC = () => {
         }
         showToast({
           type: 'success',
-          title: language === 'sw' ? 'Tangazo Limesasishwa' : 'Ad Updated',
-          message: `${title} saved.`
+          title: 'Tangazo Limesasishwa',
+          message: `${title} limehifadhiwa kwa mafanikio.`
         });
       } else {
         const created = await adService.createAd(payload);
@@ -124,15 +122,15 @@ export const AdminAdvertisementsView: React.FC = () => {
         }
         showToast({
           type: 'success',
-          title: language === 'sw' ? 'Tangazo Mpya Limeundwa' : 'Ad Banner Created',
-          message: `${title} published.`
+          title: 'Tangazo Jipya Limeundwa',
+          message: `${title} limechapishwa kwenye tovuti.`
         });
       }
 
       await refreshAds();
       setIsModalOpen(false);
     } catch {
-      showToast({ type: 'error', title: 'Error', message: 'Could not save advertisement.' });
+      showToast({ type: 'error', title: 'Hitilafu', message: 'Imeshindwa kuhifadhi tangazo.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -191,9 +189,9 @@ export const AdminAdvertisementsView: React.FC = () => {
         <div>
           <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
             <Megaphone className="w-5 h-5 text-amber-500" />
-            <span>Storefront Banners & Promos</span>
+            <span>Mabango na Matangazo ya Duka</span>
           </h3>
-          <p className="text-xs text-slate-400">Manage hero slider carousels, popup modals, and highlight banners</p>
+          <p className="text-xs text-slate-400">Simamia mabango ya kuteleza, matangazo ya pop-up na ofa maalum za dukani</p>
         </div>
 
         <button
@@ -201,7 +199,7 @@ export const AdminAdvertisementsView: React.FC = () => {
           className="w-full sm:w-auto px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
         >
           <Plus className="w-4 h-4" />
-          <span>New Ad Banner</span>
+          <span>Bango Jipya la Tangazo</span>
         </button>
       </div>
 
@@ -223,7 +221,7 @@ export const AdminAdvertisementsView: React.FC = () => {
 
               <div className="absolute top-3 left-3 flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950 shadow-sm">
-                  {ad.badgeText || 'PROMO'}
+                  {ad.badgeText || 'OFFA'}
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-900/80 text-white backdrop-blur-sm">
                   {ad.placement}
@@ -240,9 +238,9 @@ export const AdminAdvertisementsView: React.FC = () => {
             <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
               <div className="space-y-1 text-xs">
                 <p className="text-slate-600 dark:text-slate-400 line-clamp-2">
-                  {ad.description || 'No description specified.'}
+                  {ad.description || 'Hakuna maelezo yaliyowekwa.'}
                 </p>
-                <p className="text-[11px] text-slate-400 font-mono">Target: {ad.targetUrl}</p>
+                <p className="text-[11px] text-slate-400 font-mono">Uelekeo: {ad.targetUrl}</p>
               </div>
 
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
@@ -254,21 +252,21 @@ export const AdminAdvertisementsView: React.FC = () => {
                       : 'bg-slate-100 text-slate-500 dark:bg-slate-800'
                   }`}
                 >
-                  {ad.isActive ? 'Active & Published' : 'Hidden / Disabled'}
+                  {ad.isActive ? 'Lipo Hewani' : 'Limefichwa'}
                 </button>
 
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleOpenEdit(ad)}
                     className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                    title="Edit Banner"
+                    title="Hariri Bango"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(ad)}
                     className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
-                    title="Delete Banner"
+                    title="Futa Bango"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -284,20 +282,20 @@ export const AdminAdvertisementsView: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 max-h-[90vh] overflow-y-auto">
             <h3 className="text-base font-black text-slate-900 dark:text-white mb-4">
-              {editingAd ? 'Edit Ad Banner' : 'Create Promotional Banner'}
+              {editingAd ? 'Hariri Bango la Tangazo' : 'Unda Bango Jipya la Tangazo'}
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Main Headline *
+                  Kichwa Kikuu cha Habari *
                 </label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  placeholder="e.g. Karibu Muhula Mpya — Punguzo la 20%"
+                  placeholder="mf. Karibu Muhula Mpya — Punguzo la 20%"
                   className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:border-amber-500 text-slate-900 dark:text-white"
                 />
               </div>
@@ -305,25 +303,25 @@ export const AdminAdvertisementsView: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Subtitle
+                    Kichwa Kidogo
                   </label>
                   <input
                     type="text"
                     value={subtitle}
                     onChange={e => setSubtitle(e.target.value)}
-                    placeholder="e.g. Vifaa vyote vya ofisi na shule"
+                    placeholder="mf. Vifaa vyote vya ofisi na shule"
                     className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Badge Pill Text
+                    Maandishi ya Beji (Lebo)
                   </label>
                   <input
                     type="text"
                     value={badgeText}
                     onChange={e => setBadgeText(e.target.value)}
-                    placeholder="e.g. OFFA MAALUM"
+                    placeholder="mf. OFFA MAALUM"
                     className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
                   />
                 </div>
@@ -332,7 +330,7 @@ export const AdminAdvertisementsView: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Button CTA Text
+                    Maandishi ya Kitufe (CTA)
                   </label>
                   <input
                     type="text"
@@ -344,7 +342,7 @@ export const AdminAdvertisementsView: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Target Route / URL
+                    Ukurasa wa Kuelekea / URL
                   </label>
                   <input
                     type="text"
@@ -359,22 +357,22 @@ export const AdminAdvertisementsView: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Placement Spot
+                    Eneo la Kuweka Tangazo
                   </label>
                   <select
                     value={placement}
                     onChange={e => setPlacement(e.target.value as AdPlacement)}
                     className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none"
                   >
-                    <option value="hero_banner">Hero Banner Slider</option>
-                    <option value="home_highlight">Home Highlight Bar</option>
-                    <option value="popup_modal">Popup Announcement</option>
-                    <option value="sidebar">Sidebar Spotlight</option>
+                    <option value="hero_banner">Bango Kuu la Juu (Hero Slider)</option>
+                    <option value="home_highlight">Bango la Vivutio vya Nyumbani</option>
+                    <option value="popup_modal">Tangazo Linalojitokeza (Popup)</option>
+                    <option value="sidebar">Bango la Pembeni (Sidebar)</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Display Priority
+                    Kipaumbele cha Kuonyesha
                   </label>
                   <input
                     type="number"
@@ -389,7 +387,7 @@ export const AdminAdvertisementsView: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  High-Resolution Image URL *
+                  Picha ya Tangazo (URL) *
                 </label>
                 <input
                   type="url"
@@ -402,7 +400,7 @@ export const AdminAdvertisementsView: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Description / Body Text
+                  Maelezo ya Tangazo
                 </label>
                 <textarea
                   value={description}
@@ -421,7 +419,7 @@ export const AdminAdvertisementsView: React.FC = () => {
                   className="rounded text-amber-500"
                 />
                 <label htmlFor="ad_is_active" className="text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
-                  Publish immediately (Active)
+                  Liruhusu lionekane mara moja (Lipo Hewani)
                 </label>
               </div>
 
@@ -431,14 +429,14 @@ export const AdminAdvertisementsView: React.FC = () => {
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold"
                 >
-                  Cancel
+                  Ghairi
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition-all shadow-md"
                 >
-                  {isSubmitting ? 'Saving...' : editingAd ? 'Update Ad' : 'Publish Ad'}
+                  {isSubmitting ? 'Inahifadhi...' : editingAd ? 'Sasisha Tangazo' : 'Chapisha Tangazo'}
                 </button>
               </div>
             </form>

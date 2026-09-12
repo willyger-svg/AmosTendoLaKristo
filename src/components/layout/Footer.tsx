@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TK_PHONE_DISPLAY, createWhatsAppUrl } from '../../utils/whatsapp';
+import { TKLogo } from '../common/TKLogo';
 
 export const Footer: React.FC = () => {
   const { navigateTo, storeSettings } = useApp();
@@ -26,15 +27,18 @@ export const Footer: React.FC = () => {
           {/* Col 1: Brand & Purpose */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xl shadow-xs">
-                TK
-              </div>
+              <TKLogo size="lg" className="shadow-lg shadow-amber-500/10" />
               <div>
-                <span className="text-xl font-black text-white tracking-tight leading-none block">
-                  TK STATIONERY
-                </span>
-                <span className="text-xs font-semibold text-amber-400 tracking-wider uppercase">
-                  Stationery • Printing • Digital Solutions
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-black text-white tracking-tight leading-none block">
+                    TK STATIONERY
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300">
+                    Tendo La Kristo
+                  </span>
+                </div>
+                <span className="text-xs font-bold text-amber-400 tracking-wider uppercase mt-1 block">
+                  Amos Stationery • Manzese, Dar es Salaam
                 </span>
               </div>
             </div>
@@ -46,13 +50,13 @@ export const Footer: React.FC = () => {
             {/* Direct WhatsApp CTA */}
             <div className="pt-2">
               <a
-                href={createWhatsAppUrl('Hello TK Stationery! I need assistance.', rawWhatsApp)}
+                href={createWhatsAppUrl('Habari TK Stationery! Nahitaji huduma.', rawWhatsApp)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>Chat on WhatsApp: {phoneDisplay}</span>
+                <span>Wasiliana Nasi WhatsApp: {phoneDisplay}</span>
               </a>
             </div>
           </div>
@@ -60,17 +64,17 @@ export const Footer: React.FC = () => {
           {/* Col 2: Shop Departments */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4 border-b border-slate-800 pb-2">
-              Shop Stationery
+              Duka la Vifaa
             </h4>
             <ul className="space-y-2 text-xs">
               {[
-                { label: 'School Supplies', path: '/shop?category=School Supplies' },
-                { label: 'Office Supplies', path: '/shop?category=Office Supplies' },
-                { label: 'Writing & Pens', path: '/shop?category=Writing Materials' },
-                { label: 'Paper Reams & Rolls', path: '/shop?category=Paper & Printing' },
-                { label: 'Files & Folders', path: '/shop?category=Files & Folders' },
-                { label: 'Computer Accessories', path: '/shop?category=Computer Accessories' },
-                { label: 'Track My Order', path: '/track-order' }
+                { label: 'Vifaa vya Shule & Wanafunzi', path: '/shop?category=School Supplies' },
+                { label: 'Vifaa vya Ofisi & Biashara', path: '/shop?category=Office Supplies' },
+                { label: 'Kalamu na Vifaa vya Kuandikia', path: '/shop?category=Writing Materials' },
+                { label: 'Ream za Karatasi (A4 na A3)', path: '/shop?category=Paper & Printing' },
+                { label: 'Mafaili na Majalada ya Nyaraka', path: '/shop?category=Files & Folders' },
+                { label: 'Vifaa vya Kompyuta na Flash', path: '/shop?category=Computer Accessories' },
+                { label: 'Fuatilia Maendeleo ya Oda', path: '/track-order' }
               ].map(link => (
                 <li key={link.label}>
                   <button
@@ -88,15 +92,15 @@ export const Footer: React.FC = () => {
           {/* Col 3: Services & Assistance */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4 border-b border-slate-800 pb-2">
-              Huduma Kuu
+              Huduma Kuu za Ofisi
             </h4>
             <ul className="space-y-2 text-xs">
               {[
-                { label: 'Huduma za Serikali (NIDA/TRA)', path: '/online-services' },
-                { label: 'Uchapaji wa Nyaraka (Printing)', path: '/printing' },
-                { label: 'Binding na Hardcover Thesis', path: '/printing' },
-                { label: 'Picha za Pasipoti (Passport)', path: '/printing' },
-                { label: 'Uchapaji wa Risiti & Ankara', path: '/printing' },
+                { label: 'Msaada wa NIDA, TRA na RITA', path: '/online-services' },
+                { label: 'Uchapaji wa Nyaraka na Printing', path: '/printing' },
+                { label: 'Kufunga Vitabu na Hardcover', path: '/printing' },
+                { label: 'Picha za Pasipoti na Leseni', path: '/printing' },
+                { label: 'Kupiga Chapa Risiti na Ankara', path: '/printing' },
                 { label: 'Kikokotoo cha Bei ya Printing', path: '/printing' },
                 { label: 'Ripoti ya Polisi ya Upotevu', path: '/online-services?focus=POLICE' }
               ].map(link => (
@@ -116,7 +120,7 @@ export const Footer: React.FC = () => {
           {/* Col 4: Location & Operating Hours */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4 border-b border-slate-800 pb-2">
-              Store & Operations
+              Duka & Saa za Kazi
             </h4>
 
             <div className="flex items-start gap-2 text-xs text-slate-400">
@@ -127,8 +131,8 @@ export const Footer: React.FC = () => {
             <div className="flex items-start gap-2 text-xs text-slate-400">
               <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <div>
-                <p>Mon - Sat: 8:00 AM - 7:30 PM</p>
-                <p className="text-slate-500">Sun & Holidays: 10:00 AM - 4:00 PM</p>
+                <p>Jumatatu - Jumamosi: Saa 2:00 Asubuhi - Saa 1:30 Usiku</p>
+                <p className="text-slate-500">Jumapili & Sikukuu: Saa 4:00 Asubuhi - Saa 10:00 Jioni</p>
               </div>
             </div>
 
@@ -144,28 +148,28 @@ export const Footer: React.FC = () => {
           <div className="rounded-xl bg-slate-900 border border-slate-800 p-4 text-xs text-slate-400 flex items-start gap-3">
             <ShieldCheck className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
             <div className="leading-relaxed">
-              <strong className="text-slate-200">Legal Compliance & Public Service Notice:</strong>{' '}
-              TK Stationery is an independent private stationery, document processing, and technology bureau.
-              TK Stationery is <strong>NOT</strong> an official government institution, department, or agent of NIDA, TRA, Police Force, RITA, NAPA, or any government ministry.
-              Official government statutory fees are paid directly to government accounts via <strong>GePG Control Numbers</strong>. TK Stationery only charges independent fees for document typing, scanning, printing, and digital portal navigation.
+              <strong className="text-slate-200">Uzingatiaji wa Sheria & Ilani ya Huduma za Umma:</strong>{' '}
+              TK Stationery ni ofisi binafsi ya kutoa huduma za vifaa vya ofisi na shule, uchapaji wa nyaraka na kusaidia matumizi ya mifumo ya kidijitali.
+              TK Stationery <strong>SIYO</strong> idara au taasisi ya serikali wala wakala wa NIDA, TRA, Jeshi la Polisi, RITA, au Ajira Portal.
+              Tozo rasmi za kiserikali hulipwa moja kwa moja serikalini kupitia namba za malipo za <strong>GePG Control Numbers</strong>. TK Stationery hutoza ada yake binafsi ya huduma tu ya uchapaji, upigaji picha, uchapishaji na usaidizi wa kiufundi mtandaoni.
             </div>
           </div>
         </div>
 
         {/* Bottom Bar: Copyright & Payment Mock preview */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} TK Stationery. All Rights Reserved.</p>
+          <p>© {new Date().getFullYear()} TK Stationery (Tendo La Kristo). Haki Zote Zimehifadhiwa.</p>
 
           <div className="flex items-center gap-3">
-            <span className="text-[10px] uppercase font-bold text-slate-400">Supported Methods:</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400">Njia za Malipo:</span>
             <span className="px-2 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400 text-[10px] font-semibold">
-              M-Pesa / Tigo Pesa
+              M-Pesa / Tigo Pesa / Airtel Money
             </span>
             <span className="px-2 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400 text-[10px] font-semibold">
-              Cash on Delivery
+              Pesa Taslimu (Cash)
             </span>
             <span className="px-2 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400 text-[10px] font-semibold">
-              Bank Transfer
+              Benki (NMB / CRDB)
             </span>
           </div>
         </div>

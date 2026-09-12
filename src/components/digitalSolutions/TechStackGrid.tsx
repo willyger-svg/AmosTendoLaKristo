@@ -13,40 +13,40 @@ import {
 export const TechStackGrid: React.FC = () => {
   const stackItems = [
     {
-      category: 'Web & User Interfaces',
+      category: 'Tovuti & Miundo ya Watumiaji',
       icon: Code2,
       techs: ['React', 'TypeScript', 'Tailwind CSS', 'Next.js', 'Vite'],
-      description: 'Ultra-fast, mobile-first responsive interfaces optimized for Tanzanian cellular networks.'
+      description: 'Miundo yenye kasi ya juu, inayofaa simu na iliyoboreshwa kwa mitandao ya intaneti ya Tanzania.'
     },
     {
-      category: 'Mobile Applications',
+      category: 'Programu za Simu (Mobile Apps)',
       icon: Smartphone,
       techs: ['Flutter', 'React Native', 'Android Native', 'iOS Native'],
-      description: 'Cross-platform mobile apps with native hardware access, offline sync, and push notifications.'
+      description: 'Programu za simu za Android na iOS zenye kufanya kazi bila intaneti na kutuma taarifa papo hapo.'
     },
     {
-      category: 'Backend & High-Speed APIs',
+      category: 'Mifumo ya Nyuma & API za Kasi Kubwa',
       icon: Server,
       techs: ['Node.js', 'Express', 'Python FastAPI', 'Go'],
-      description: 'Robust REST and GraphQL endpoints designed for low-latency transaction processing.'
+      description: 'Seva na API imara za REST na GraphQL zilizoundwa kwa uchakataji wa haraka wa miamala.'
     },
     {
-      category: 'Databases & Resilience',
+      category: 'Hifadhidata & Usalama wa Kumbukumbu',
       icon: Database,
       techs: ['PostgreSQL', 'Cloud SQL', 'Firebase Firestore', 'Redis Cache'],
-      description: 'ACID-compliant relational architectures with automated automated cloud backups.'
+      description: 'Muundo imara wa hifadhidata wenye nakala za kiotomatiki za wingu (cloud backup).'
     },
     {
-      category: 'Payments & Telecom Gateways',
+      category: 'Mifumo ya Malipo ya Mitandao ya Simu',
       icon: Zap,
-      techs: ['M-Pesa Daraja API', 'Tigo Pesa', 'Airtel Money', 'GePG Gov API', 'Card Processing'],
-      description: 'Seamless integration with local mobile network operators and electronic billing systems.'
+      techs: ['M-Pesa Daraja API', 'Tigo Pesa', 'Airtel Money', 'GePG Gov API', 'Kadi za Benki'],
+      description: 'Muunganisho wa moja kwa moja na mitandao ya M-Pesa, Tigo Pesa, Airtel Money na GePG.'
     },
     {
-      category: 'Security & Infrastructure',
+      category: 'Ulinzi wa Kimtandao & Miundombinu',
       icon: Shield,
-      techs: ['Google Cloud Platform', 'Docker', 'SSL / TLS Encryption', 'Role-Based Access'],
-      description: 'Enterprise-grade access isolation, automated threat protection, and disaster recovery.'
+      techs: ['Google Cloud Platform', 'Docker', 'SSL / TLS Encryption', 'Ruksa za Ngazi'],
+      description: 'Ulinzi thabiti wa kiwango cha makampuni, usimbaji fiche (encryption), na mifumo thabiti ya kiusalama.'
     }
   ];
 

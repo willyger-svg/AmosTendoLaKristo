@@ -86,7 +86,7 @@ export const ShopPage: React.FC = () => {
         {/* Breadcrumb */}
         <Breadcrumbs
           items={[
-            { label: 'Stationery Store', path: '/shop' },
+            { label: 'Duka la Vifaa', path: '/shop' },
             ...(filters.category !== 'All Categories'
               ? [{ label: filters.category }]
               : [])
@@ -97,10 +97,10 @@ export const ShopPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4 border-b border-slate-200">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Stationery & Office Supplies Store
+              Duka la Vifaa vya Ofisi na Shule
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Genuine pens, notebooks, reams of paper, files, school supplies, and computer accessories in Dar es Salaam.
+              Kalamu asilia, madaftari, ream za karatasi, mafaili, vifaa vya shule na vifaa vya kompyuta Dar es Salaam.
             </p>
           </div>
 
@@ -112,7 +112,7 @@ export const ShopPage: React.FC = () => {
               onClick={() => setIsMobileFilterOpen(true)}
               icon={<SlidersHorizontal className="w-4 h-4" />}
             >
-              Filters ({filteredProducts.length})
+              Vichujio ({filteredProducts.length})
             </Button>
           </div>
         </div>
@@ -159,12 +159,12 @@ export const ShopPage: React.FC = () => {
             {/* Active Category Chips */}
             <div className="flex items-center justify-between flex-wrap gap-2 pb-2">
               <span className="text-xs font-bold text-slate-600">
-                Showing {filteredProducts.length} of {mockProducts.length} stationery items
+                Inaonyesha vifaa {filteredProducts.length} kati ya {mockProducts.length}
               </span>
 
               {searchQuery && (
                 <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full text-xs text-amber-900">
-                  <span>Search: "{searchQuery}"</span>
+                  <span>Utafutaji: "{searchQuery}"</span>
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
@@ -189,13 +189,13 @@ export const ShopPage: React.FC = () => {
                   <Package className="w-8 h-8" />
                 </div>
                 <h3 className="text-base font-bold text-slate-800">
-                  No products matched your criteria
+                  Hakuna kifaa kilichopatikana kwa vigezo hivi
                 </h3>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Try adjusting your search terms or resetting category filters to see all stationery items.
+                  Jaribu kubadili maneno ya utafutaji au weka upya vichujio ili kuona vifaa vyote vya duka.
                 </p>
                 <Button variant="primary" size="sm" onClick={resetFilters}>
-                  Clear All Filters
+                  Weka Upya Vichujio Vyote
                 </Button>
               </div>
             )}
