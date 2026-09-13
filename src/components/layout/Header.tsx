@@ -136,8 +136,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
     setSearchQuery('');
     if ('agencyName' in item) {
       navigateTo(`/online-services`);
-    } else if ('categoryTag' in item) {
-      navigateTo(`/digital-solutions`);
     } else {
       navigateTo(`/printing`);
     }
@@ -349,7 +347,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
             )}
 
             {/* Notifications Dropdown Bell */}
-            {currentUser && (
+            {(currentUser || userProfile) && (
               <div ref={notifRef} className="relative">
                 <Tooltip content="View notifications">
                   <button

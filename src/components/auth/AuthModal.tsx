@@ -39,7 +39,7 @@ export const AuthModal: React.FC = () => {
     setSuccessMessage(null);
 
     if (!email || !password) {
-      setErrorMessage('Please provide both email and password.');
+      setErrorMessage('Tafadhali jaza barua pepe au namba ya simu pamoja na nenosiri.');
       return;
     }
 
@@ -64,17 +64,20 @@ export const AuthModal: React.FC = () => {
       showToast({
         type: 'success',
         title: 'Karibu Tena!',
-        message: 'Umeingia kikamilifu kwenye akaunti yako.'
+        message: 'Umeingia kikamilifu kwenye akaunti yako ya TK Stationery.'
       });
       closeModal();
+      navigateTo('/account');
     } catch (err: any) {
       console.warn('Login error:', err);
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
-        setErrorMessage('Invalid email or password. Please verify your credentials.');
+      if (err.message) {
+        setErrorMessage(err.message);
+      } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        setErrorMessage('Barua pepe / namba ya simu au nenosiri si sahihi.');
       } else if (err.code === 'auth/too-many-requests') {
-        setErrorMessage('Too many unsuccessful attempts. Please try again in a few minutes.');
+        setErrorMessage('Majaribio yamezidi. Tafadhali subiri dakika chache kabla ya kujaribu tena.');
       } else {
-        setErrorMessage('Unable to sign in. Please verify your internet connection and try again.');
+        setErrorMessage('Hitilafu ya kuingia. Tafadhali hakiki taarifa zako na ujaribu tena.');
       }
     }
   };
@@ -84,13 +87,13 @@ export const AuthModal: React.FC = () => {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    if (!fullName.trim() || !email.trim() || !password || !phone.trim()) {
-      setErrorMessage('Please fill in all required fields.');
+    if (!fullName.trim() || !phone.trim() || !password) {
+      setErrorMessage('Tafadhali jaza jina kamili, namba ya simu na nenosiri.');
       return;
     }
 
     if (password.length < 6) {
-      setErrorMessage('Password must be at least 6 characters.');
+      setErrorMessage('Nenosiri lazima liwe na herufi au tarakimu 6 au zaidi.');
       return;
     }
 
@@ -98,20 +101,23 @@ export const AuthModal: React.FC = () => {
       await signUp(fullName.trim(), email.trim(), password, phone.trim(), 'customer');
       showToast({
         type: 'success',
-        title: 'Account Created',
-        message: `Welcome to TK Stationery, ${fullName.trim()}!`
+        title: 'Akaunti Imefunguliwa!',
+        message: `Karibu TK Stationery, ${fullName.trim()}!`
       });
       closeModal();
+      navigateTo('/account');
     } catch (err: any) {
       console.warn('Registration error:', err);
-      if (err.code === 'auth/email-already-in-use') {
-        setErrorMessage('An account with this email already exists. Please log in.');
+      if (err.message) {
+        setErrorMessage(err.message);
+      } else if (err.code === 'auth/email-already-in-use') {
+        setErrorMessage('Akaunti yenye barua pepe hii au namba ya simu tayari ipo. Tafadhali ingia.');
       } else if (err.code === 'auth/invalid-email') {
-        setErrorMessage('Please enter a valid email address.');
+        setErrorMessage('Tafadhali weka barua pepe sahihi au uiache wazi.');
       } else if (err.code === 'auth/weak-password') {
-        setErrorMessage('Password is too weak. Please choose a stronger password.');
+        setErrorMessage('Nenosiri ni dhaifu. Tafadhali tumia herufi au tarakimu 6 au zaidi.');
       } else {
-        setErrorMessage('Could not create account. Please try again.');
+        setErrorMessage('Imeshindikana kufungua akaunti. Tafadhali jaribu tena.');
       }
     }
   };

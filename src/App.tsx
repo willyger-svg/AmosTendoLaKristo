@@ -23,9 +23,6 @@ import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { PrintingPage } from './pages/PrintingPage';
 import { OnlineServicesPage } from './pages/OnlineServicesPage';
-import { GraphicDesignPage } from './pages/GraphicDesignPage';
-import { ITSupportPage } from './pages/ITSupportPage';
-import { DigitalSolutionsPage } from './pages/DigitalSolutionsPage';
 import { TrackOrderPage } from './pages/TrackOrderPage';
 import { CustomerAccountPage } from './pages/CustomerAccountPage';
 import { CustomerLoginPage } from './pages/CustomerLoginPage';
@@ -79,15 +76,11 @@ const AppContent: React.FC = () => {
     }
 
     if (currentPath === '/graphic-design') {
-      return <GraphicDesignPage />;
+      return <PrintingPage />;
     }
 
-    if (currentPath === '/it-support') {
-      return <ITSupportPage />;
-    }
-
-    if (currentPath === '/digital-solutions') {
-      return <DigitalSolutionsPage />;
+    if (currentPath === '/it-support' || currentPath === '/digital-solutions') {
+      return <OnlineServicesPage />;
     }
 
     if (currentPath === '/track-order') {

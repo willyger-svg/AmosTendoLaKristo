@@ -35,43 +35,43 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
+    try {
+      const raw =
+        localStorage.getItem('tk_active_admin_session') ||
+        localStorage.getItem('tk_active_customer_session') ||
+        localStorage.getItem('tk_active_session');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.id) return parsed;
+      }
+    } catch {}
+    return null;
+  });
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Check if there is an active admin session cached in localStorage
-    try {
-      const cached = localStorage.getItem('tk_active_admin_session');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed && (parsed.role === 'super_admin' || parsed.role === 'admin')) {
-          setUserProfile(parsed);
-        }
-      }
-    } catch {
-      // ignore
-    }
-
     const unsubscribe = authService.onAuthState((user, profile) => {
       setCurrentUser(user);
       if (profile) {
         setUserProfile(profile);
       } else {
-        const cached = localStorage.getItem('tk_active_admin_session');
-        if (cached) {
-          try {
-            const parsed = JSON.parse(cached);
-            if (parsed && (parsed.role === 'super_admin' || parsed.role === 'admin')) {
+        // Double check localStorage before resetting
+        try {
+          const raw =
+            localStorage.getItem('tk_active_admin_session') ||
+            localStorage.getItem('tk_active_customer_session') ||
+            localStorage.getItem('tk_active_session');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.id) {
               setUserProfile(parsed);
-            } else {
-              setUserProfile(null);
+              setLoading(false);
+              return;
             }
-          } catch {
-            setUserProfile(null);
           }
-        } else {
-          setUserProfile(null);
-        }
+        } catch {}
+        setUserProfile(null);
       }
       setLoading(false);
     });
@@ -124,6 +124,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       try {
         localStorage.removeItem('tk_active_admin_session');
+        localStorage.removeItem('tk_active_customer_session');
+        localStorage.removeItem('tk_active_session');
       } catch {
         // ignore
       }
@@ -140,8 +142,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const updateProfile = async (data: Partial<UserProfile>): Promise<void> => {
-    if (!currentUser) throw new Error('Not authenticated');
-    await authService.updateProfile(currentUser.uid, data);
+    const effectiveUserId = currentUser?.uid || userProfile?.id;
+    if (!effectiveUserId) throw new Error('Akaunti haijathibitishwa.');
+    await authService.updateProfile(effectiveUserId, data);
     setUserProfile(prev => (prev ? { ...prev, ...data } : null));
   };
 
@@ -149,15 +152,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     file: File,
     onProgress?: (progress: number) => void
   ): Promise<string> => {
-    if (!currentUser) throw new Error('Not authenticated');
-    const photoUrl = await authService.uploadProfilePhoto(currentUser.uid, file, onProgress);
+    const effectiveUserId = currentUser?.uid || userProfile?.id;
+    if (!effectiveUserId) throw new Error('Akaunti haijathibitishwa.');
+    const photoUrl = await authService.uploadProfilePhoto(effectiveUserId, file, onProgress);
     setUserProfile(prev => (prev ? { ...prev, avatarUrl: photoUrl } : null));
     return photoUrl;
   };
 
   const removeProfilePhoto = async (): Promise<void> => {
-    if (!currentUser) throw new Error('Not authenticated');
-    await authService.removeProfilePhoto(currentUser.uid, userProfile?.avatarUrl);
+    const effectiveUserId = currentUser?.uid || userProfile?.id;
+    if (!effectiveUserId) throw new Error('Akaunti haijathibitishwa.');
+    await authService.removeProfilePhoto(effectiveUserId, userProfile?.avatarUrl);
     setUserProfile(prev => (prev ? { ...prev, avatarUrl: '' } : null));
   };
 
@@ -173,23 +178,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const refreshUserProfile = async (): Promise<void> => {
-    if (currentUser) {
-      const p = await authService.getUserProfile(currentUser.uid);
+    const effectiveUserId = currentUser?.uid || userProfile?.id;
+    if (effectiveUserId) {
+      const p = await authService.getUserProfile(effectiveUserId);
       if (p) {
         setUserProfile(p);
-      }
-    } else {
-      try {
-        const cached = localStorage.getItem('tk_active_admin_session');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed?.id) {
-            const p = await authService.getUserProfile(parsed.id);
-            if (p) setUserProfile(p);
-          }
-        }
-      } catch {
-        // ignore
       }
     }
   };
@@ -200,6 +193,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const computedRole: UserRole = (() => {
     if (userProfile?.role === 'super_admin') return 'super_admin';
+    if (userProfile?.id === 'admin_1010_master') return 'super_admin';
     if (isSuperAdminEmail(currentUser?.email)) return 'super_admin';
     if (isSuperAdminEmail(userProfile?.email)) return 'super_admin';
     return userProfile?.role || 'customer';

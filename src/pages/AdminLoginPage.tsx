@@ -31,10 +31,10 @@ export const AdminLoginPage: React.FC = () => {
 
   // If already authenticated with staff/admin role, offer immediate redirect
   useEffect(() => {
-    if (currentUser && isStaff) {
-      // User is already authenticated as staff/admin
+    if ((currentUser || userProfile) && (isStaff || isSuperAdmin)) {
+      navigateTo('/admin');
     }
-  }, [currentUser, isStaff]);
+  }, [currentUser, userProfile, isStaff, isSuperAdmin, navigateTo]);
 
   const handleAdminSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

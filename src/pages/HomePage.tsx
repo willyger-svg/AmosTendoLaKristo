@@ -150,8 +150,8 @@ export const HomePage: React.FC = () => {
       tag: 'Ubunifu Maalum',
       iconBg: 'bg-purple-600 text-white',
       borderHover: 'hover:border-purple-400 hover:shadow-purple-500/10',
-      actionText: 'Tazama Ubunifu Wetu',
-      path: '/graphic-design'
+      actionText: 'Agiza Ubunifu & Uchapaji',
+      path: '/printing'
     }
   ];
 

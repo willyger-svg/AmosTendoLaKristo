@@ -15,7 +15,8 @@ import {
   Cpu,
   Palette,
   Clock,
-  UserCheck
+  UserCheck,
+  ShoppingBag
 } from 'lucide-react';
 
 interface AccountServicesSectionProps {
@@ -138,11 +139,11 @@ export const AccountServicesSection: React.FC<AccountServicesSectionProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => onNavigatePath('/it-support')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-100 transition-colors min-h-[36px]"
+            onClick={() => onNavigatePath('/shop')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-xs font-bold whitespace-nowrap hover:bg-amber-100 transition-colors min-h-[36px]"
           >
-            <Cpu className="w-3.5 h-3.5" />
-            <span>{language === 'sw' ? 'Msaada wa IT' : 'IT Support'}</span>
+            <ShoppingBag className="w-3.5 h-3.5" />
+            <span>{language === 'sw' ? 'Vifaa vya Ofisi' : 'Stationery'}</span>
           </button>
         </div>
       </div>

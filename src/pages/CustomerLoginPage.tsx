@@ -37,7 +37,7 @@ export const CustomerLoginPage: React.FC = () => {
     if (currentUser || userProfile) {
       if (userProfile?.role === 'super_admin' || userProfile?.role === 'admin' || userProfile?.role === 'staff') {
         navigateTo('/admin');
-      } else if (currentUser) {
+      } else {
         navigateTo('/account');
       }
     }
@@ -80,7 +80,9 @@ export const CustomerLoginPage: React.FC = () => {
       }
     } catch (err: any) {
       console.warn('Customer Login Error:', err);
-      if (
+      if (err.message) {
+        setErrorMessage(err.message);
+      } else if (
         err.code === 'auth/invalid-credential' ||
         err.code === 'auth/user-not-found' ||
         err.code === 'auth/wrong-password'

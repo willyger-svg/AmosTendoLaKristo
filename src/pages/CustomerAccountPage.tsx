@@ -112,28 +112,32 @@ export const CustomerAccountPage: React.FC = () => {
   const [selectedPhotoFile, setSelectedPhotoFile] = useState<File | null>(null);
   const [isDraggingPhoto, setIsDraggingPhoto] = useState(false);
 
+  const effectiveUserId = currentUser?.uid || userProfile?.id;
+  const effectiveEmail = currentUser?.email || userProfile?.email;
+  const effectivePhone = userProfile?.phone || '';
+
   // Filter items specifically for the authenticated user
-  const userOrders = currentUser
-    ? orders.filter(o => !o.customerId || o.customerId === currentUser.uid || o.customerEmail === currentUser.email)
+  const userOrders = effectiveUserId
+    ? orders.filter(o => !o.customerId || o.customerId === effectiveUserId || (effectiveEmail && o.customerEmail === effectiveEmail) || (effectivePhone && o.customerPhone && (o.customerPhone.includes(effectivePhone) || effectivePhone.includes(o.customerPhone))))
     : [];
 
-  const userTickets = currentUser
-    ? serviceTickets.filter(t => !t.customerId || t.customerId === currentUser.uid || t.customerEmail === currentUser.email)
+  const userTickets = effectiveUserId
+    ? serviceTickets.filter(t => !t.customerId || t.customerId === effectiveUserId || (effectiveEmail && t.customerEmail === effectiveEmail) || (effectivePhone && t.customerPhone && (t.customerPhone.includes(effectivePhone) || effectivePhone.includes(t.customerPhone))))
     : [];
 
-  const userQuotes = currentUser
-    ? quoteRequests.filter(q => !q.customerId || q.customerId === currentUser.uid || q.customerEmail === currentUser.email)
+  const userQuotes = effectiveUserId
+    ? quoteRequests.filter(q => !q.customerId || q.customerId === effectiveUserId || (effectiveEmail && q.customerEmail === effectiveEmail) || (effectivePhone && q.customerPhone && (q.customerPhone.includes(effectivePhone) || effectivePhone.includes(q.customerPhone))))
     : [];
 
   // Fetch subcollections when user is logged in
   const loadCustomerData = async () => {
-    if (!currentUser?.uid) return;
+    if (!effectiveUserId) return;
     setIsLoadingCustomerData(true);
     try {
       const [docsRes, savedRes, payRes] = await Promise.all([
-        documentService.getCustomerDocuments(currentUser.uid),
-        savedProductsService.getSavedProducts(currentUser.uid),
-        paymentService.getCustomerPayments(currentUser.uid)
+        documentService.getCustomerDocuments(effectiveUserId),
+        savedProductsService.getSavedProducts(effectiveUserId),
+        paymentService.getCustomerPayments(effectiveUserId)
       ]);
       setDocuments(docsRes);
       setSavedProducts(savedRes);
@@ -146,24 +150,24 @@ export const CustomerAccountPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (currentUser?.uid) {
+    if (effectiveUserId) {
       loadCustomerData();
 
       // Listen to customer notifications in real time
       const unsubNotifications = notificationService.listenToUserNotifications(
-        currentUser.uid,
+        effectiveUserId,
         items => setNotifications(items)
       );
 
       // Listen to customer documents in real time
       const unsubDocuments = documentService.listenToCustomerDocuments(
-        currentUser.uid,
+        effectiveUserId,
         docs => setDocuments(docs)
       );
 
       // Listen to saved products in real time
       const unsubSaved = savedProductsService.listenToSavedProducts(
-        currentUser.uid,
+        effectiveUserId,
         items => setSavedProducts(items)
       );
 
@@ -173,7 +177,7 @@ export const CustomerAccountPage: React.FC = () => {
         unsubSaved();
       };
     }
-  }, [currentUser?.uid]);
+  }, [effectiveUserId]);
 
   // Handle Photo Selection
   const processSelectedPhoto = (file: File) => {
@@ -270,7 +274,7 @@ export const CustomerAccountPage: React.FC = () => {
   };
 
   // If user is not signed in, show clean customer portal authentication gate
-  if (!currentUser) {
+  if (!effectiveUserId && !userProfile) {
     return (
       <div className="py-12 space-y-8 bg-slate-50 dark:bg-slate-950 min-h-[75vh] flex items-center">
         <Container>
@@ -294,7 +298,7 @@ export const CustomerAccountPage: React.FC = () => {
                 <Button
                   variant="primary"
                   size="lg"
-                  onClick={() => openModal({ type: 'auth', initialTab: 'login' })}
+                  onClick={() => navigateTo('/login')}
                   className="w-full justify-center min-h-[48px]"
                 >
                   Ingia Kwenye Akaunti
@@ -302,7 +306,7 @@ export const CustomerAccountPage: React.FC = () => {
                 <Button
                   variant="outline"
                   size="lg"
-                  onClick={() => openModal({ type: 'auth', initialTab: 'register' })}
+                  onClick={() => navigateTo('/register')}
                   className="w-full justify-center min-h-[48px]"
                 >
                   Fungua Akaunti Mpya

@@ -99,7 +99,7 @@ export const AccountQuotesSection: React.FC<AccountQuotesSectionProps> = ({
 
             <button
               type="button"
-              onClick={() => onNavigatePath('/digital-solutions')}
+              onClick={() => onNavigatePath('/online-services')}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black whitespace-nowrap shadow-xs transition-colors min-h-[36px]"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -131,11 +131,11 @@ export const AccountQuotesSection: React.FC<AccountQuotesSectionProps> = ({
           </div>
           <button
             type="button"
-            onClick={() => onNavigatePath('/digital-solutions')}
+            onClick={() => onNavigatePath('/online-services')}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-amber-500 text-white hover:text-slate-950 text-xs font-bold transition-all min-h-[44px]"
           >
             <Sparkles className="w-4 h-4" />
-            <span>{language === 'sw' ? 'Omba Nukuu ya Software Sasa' : 'Explore Software Solutions'}</span>
+            <span>{language === 'sw' ? 'Omba Nukuu ya Huduma Sasa' : 'Explore Online Services'}</span>
           </button>
         </div>
       ) : (

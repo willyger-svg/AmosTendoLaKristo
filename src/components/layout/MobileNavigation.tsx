@@ -43,7 +43,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
         navigateTo('/admin');
         return;
       }
-      if (!currentUser) {
+      if (!currentUser && !userProfile) {
         navigateTo('/login');
         return;
       }
