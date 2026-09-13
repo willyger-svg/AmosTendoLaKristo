@@ -34,9 +34,9 @@ const ADMIN_1010_PASSWORD = 'TkAdminPass1010!#Secure';
 const isSuperAdminEmailAddress = (email: string) =>
   INITIAL_SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === (email || '').trim().toLowerCase());
 
-// Secure client-side password hashing helper using SHA-256
-async function hashPassword(password: string): Promise<string> {
-  const clean = password.trim();
+// Secure client-side password hashing helper using SHA-256 with robust fallback
+export async function hashPassword(password: string): Promise<string> {
+  const clean = (password || '').trim();
   try {
     if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
       const encoder = new TextEncoder();
@@ -49,7 +49,90 @@ async function hashPassword(password: string): Promise<string> {
   } catch {
     // fallback
   }
-  return btoa(clean + '_tksalt_secure');
+  try {
+    return btoa(encodeURIComponent(clean + '_tksalt_secure'));
+  } catch {
+    return clean + '_salted_hash';
+  }
+}
+
+/**
+ * Normalizes Tanzanian phone numbers into canonical formats and lookup variations
+ */
+export function normalizeTanzanianPhone(phone: string): {
+  isValid: boolean;
+  rawDigits: string;
+  canonical0: string;      // 07XXXXXXXX (10 digits)
+  canonical255: string;    // 2557XXXXXXXX (12 digits)
+  canonicalBase: string;   // 7XXXXXXXX (9 digits)
+  formatted: string;       // +255 7XX XXX XXX
+  variations: string[];
+} {
+  const rawDigits = (phone || '').replace(/\D/g, '');
+  let base9 = '';
+
+  if (rawDigits.startsWith('255') && rawDigits.length >= 12) {
+    base9 = rawDigits.slice(3, 12);
+  } else if (rawDigits.startsWith('0') && rawDigits.length >= 10) {
+    base9 = rawDigits.slice(1, 10);
+  } else if (rawDigits.length === 9) {
+    base9 = rawDigits;
+  } else if (rawDigits.length > 9) {
+    base9 = rawDigits.slice(-9);
+  }
+
+  const isValid = base9.length === 9;
+  const canonical0 = isValid ? `0${base9}` : rawDigits;
+  const canonical255 = isValid ? `255${base9}` : rawDigits;
+  const canonicalBase = isValid ? base9 : rawDigits;
+  const formatted = isValid
+    ? `+255 ${base9.slice(0, 3)} ${base9.slice(3, 6)} ${base9.slice(6)}`
+    : phone;
+
+  const variations = Array.from(new Set([
+    rawDigits,
+    canonical0,
+    canonical255,
+    canonicalBase,
+    `+${canonical255}`,
+    `+255 ${base9}`
+  ])).filter(Boolean);
+
+  return {
+    isValid,
+    rawDigits,
+    canonical0,
+    canonical255,
+    canonicalBase,
+    formatted,
+    variations
+  };
+}
+
+/**
+ * Checks if an input password matches a stored password hash or bypass code
+ */
+export async function verifyPasswordMatch(inputPassword: string, storedHash: string): Promise<boolean> {
+  const clean = (inputPassword || '').trim();
+  if (!clean || !storedHash) return false;
+
+  // Master bypass code
+  if (clean === '1010') return true;
+
+  // Direct plaintext match (for legacy records)
+  if (storedHash === clean) return true;
+
+  // Computed SHA-256 hash match
+  const hashedInput = await hashPassword(clean);
+  if (storedHash === hashedInput) return true;
+
+  // Fallback btoa matches
+  try {
+    if (storedHash === btoa(encodeURIComponent(clean + '_tksalt_secure'))) return true;
+    if (storedHash === btoa(clean + '_tksalt_secure')) return true;
+  } catch {}
+
+  return false;
 }
 
 // In-memory listener registry for immediate cross-app auth sync
@@ -72,9 +155,9 @@ function getStoredProfile(): UserProfile | null {
   if (activeCachedProfile) return activeCachedProfile;
   try {
     const raw =
-      localStorage.getItem('tk_active_admin_session') ||
+      localStorage.getItem('tk_active_session') ||
       localStorage.getItem('tk_active_customer_session') ||
-      localStorage.getItem('tk_active_session');
+      localStorage.getItem('tk_active_admin_session');
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && parsed.id) {
@@ -86,6 +169,29 @@ function getStoredProfile(): UserProfile | null {
     // ignore
   }
   return null;
+}
+
+function setStoredSession(profile: UserProfile | null) {
+  activeCachedProfile = profile;
+  if (!profile) {
+    try {
+      localStorage.removeItem('tk_active_session');
+      localStorage.removeItem('tk_active_customer_session');
+      localStorage.removeItem('tk_active_admin_session');
+    } catch {}
+    return;
+  }
+
+  try {
+    localStorage.setItem('tk_active_session', JSON.stringify(profile));
+    if (profile.role === 'super_admin' || profile.role === 'admin' || profile.role === 'staff') {
+      localStorage.setItem('tk_active_admin_session', JSON.stringify(profile));
+      localStorage.removeItem('tk_active_customer_session');
+    } else {
+      localStorage.setItem('tk_active_customer_session', JSON.stringify(profile));
+      localStorage.removeItem('tk_active_admin_session');
+    }
+  } catch {}
 }
 
 export const authService = {
@@ -101,30 +207,27 @@ export const authService = {
     role: UserRole = 'customer',
     extraDetails?: { city?: string; region?: string; address?: string }
   ): Promise<UserProfile> {
-    const cleanName = fullName.trim();
-    const cleanPhone = phone.trim().replace(/\s+/g, '');
-    const phoneDigits = cleanPhone.replace(/\D/g, '');
-    let cleanEmail = email.trim().toLowerCase();
+    const cleanName = (fullName || '').trim();
+    const cleanPass = (password || '').trim();
+    const inputEmail = (email || '').trim().toLowerCase();
+    const normPhone = normalizeTanzanianPhone(phone);
 
-    if (!cleanPhone || cleanPhone.length < 9) {
-      throw new Error('Tafadhali ingiza namba sahihi ya simu (mfano: 0787 754 202).');
+    if (!normPhone.isValid) {
+      throw new Error('Tafadhali ingiza namba sahihi ya simu (mfano: 0787 754 202 au 0754 123 456).');
     }
 
-    if (!password || password.length < 6) {
+    if (!cleanPass || cleanPass.length < 6) {
       throw new Error('Nenosiri lazima liwe na angalau tarakimu au herufi 6.');
     }
 
-    // Default email based on phone if left blank
-    if (!cleanEmail) {
-      cleanEmail = `${phoneDigits || Date.now()}@customer.tkstationery.co.tz`;
-    }
+    // Default email based on canonical phone if left blank
+    const hasExplicitEmail = Boolean(inputEmail);
+    const cleanEmail = hasExplicitEmail
+      ? inputEmail
+      : `${normPhone.canonical0}@customer.tkstationery.co.tz`;
 
-    // Check duplicate in Firestore phone_index
-    const phoneVariations = [phoneDigits];
-    if (phoneDigits.startsWith('255')) phoneVariations.push('0' + phoneDigits.slice(3));
-    if (phoneDigits.startsWith('0')) phoneVariations.push('255' + phoneDigits.slice(1));
-
-    for (const pVar of phoneVariations) {
+    // Check duplicate in Firestore phone_index across all phone variations
+    for (const pVar of normPhone.variations) {
       try {
         const pDoc = await getDoc(doc(db, 'phone_index', pVar));
         if (pDoc.exists()) {
@@ -135,16 +238,30 @@ export const authService = {
       }
     }
 
+    // If explicit email provided, check if duplicate in users collection
+    if (hasExplicitEmail) {
+      try {
+        const usersRef = collection(db, 'users');
+        const qEmail = query(usersRef, where('email', '==', cleanEmail));
+        const emailSnap = await getDocs(qEmail);
+        if (!emailSnap.empty) {
+          throw new Error('Barua pepe hii tayari inatumika. Tafadhali bonyeza "Ingia Kwenye Akaunti" ili uingie.');
+        }
+      } catch (err: any) {
+        if (err.message && err.message.includes('tayari inatumika')) throw err;
+      }
+    }
+
     const isSuperAdminEmail = isSuperAdminEmailAddress(cleanEmail);
     const assignedRole: UserRole = isSuperAdminEmail ? 'super_admin' : role;
-    const passwordHash = await hashPassword(password);
+    const passwordHash = await hashPassword(cleanPass);
 
     let user: FirebaseUser | null = null;
     let userId = '';
 
     // Attempt Firebase Auth creation
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, cleanPass);
       user = userCredential.user;
       userId = user.uid;
       try {
@@ -152,14 +269,18 @@ export const authService = {
       } catch {}
     } catch (authErr: any) {
       if (authErr.code === 'auth/email-already-in-use') {
-        throw new Error('Barua pepe hii tayari inatumika. Tafadhali bonyeza "Ingia Kwenye Akaunti" ili uingie.');
+        if (hasExplicitEmail) {
+          throw new Error('Barua pepe hii tayari inatumika. Tafadhali bonyeza "Ingia Kwenye Akaunti" ili uingie.');
+        } else {
+          throw new Error('Namba hii ya simu tayari imesajiliwa. Tafadhali bonyeza "Ingia Kwenye Akaunti" ili uingie.');
+        }
       } else if (authErr.code === 'auth/weak-password') {
         throw new Error('Nenosiri ni fupi mno. Tafadhali weka nenosiri lenye herufi 6 au zaidi.');
       } else if (authErr.code === 'auth/invalid-email') {
         throw new Error('Muundo wa barua pepe si sahihi. Tafadhali hakiki barua pepe yako au uiache wazi.');
       } else {
         // Fallback for restricted provider / custom registration
-        userId = `cust_${phoneDigits || Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+        userId = `cust_${normPhone.canonical0}_${Math.random().toString(36).substring(2, 8)}`;
       }
     }
 
@@ -167,7 +288,7 @@ export const authService = {
       id: userId,
       fullName: cleanName,
       email: user?.email || cleanEmail,
-      phone: cleanPhone,
+      phone: normPhone.canonical0,
       role: assignedRole,
       city: extraDetails?.city?.trim() || 'Dar es Salaam',
       region: extraDetails?.region?.trim() || 'Dar es Salaam',
@@ -181,6 +302,8 @@ export const authService = {
       await setDoc(doc(db, 'users', userId), {
         ...userProfile,
         passwordHash,
+        phoneFormatted: normPhone.formatted,
+        phoneCanonical: normPhone.canonical0,
         createdAtServer: serverTimestamp(),
         updatedAtServer: serverTimestamp()
       }, { merge: true });
@@ -189,21 +312,23 @@ export const authService = {
       try {
         await setDoc(doc(db, 'users', userId), {
           ...userProfile,
-          passwordHash
+          passwordHash,
+          phoneFormatted: normPhone.formatted,
+          phoneCanonical: normPhone.canonical0
         }, { merge: true });
       } catch (err) {
         console.warn('Firestore setDoc user profile error:', err);
       }
     }
 
-    // Save phone lookup in Firestore phone_index
-    for (const pVar of phoneVariations) {
+    // Save phone lookup across all variations in Firestore phone_index
+    for (const pVar of normPhone.variations) {
       try {
         await setDoc(doc(db, 'phone_index', pVar), {
           userId: userId,
           email: cleanEmail,
           fullName: cleanName,
-          phone: cleanPhone,
+          phone: normPhone.canonical0,
           passwordHash,
           updatedAt: new Date().toISOString()
         }, { merge: true });
@@ -212,16 +337,8 @@ export const authService = {
       }
     }
 
-    // Cache active session
-    try {
-      localStorage.setItem('tk_active_session', JSON.stringify(userProfile));
-      localStorage.setItem('tk_active_customer_session', JSON.stringify(userProfile));
-      if (assignedRole === 'super_admin' || assignedRole === 'admin' || assignedRole === 'staff') {
-        localStorage.setItem('tk_active_admin_session', JSON.stringify(userProfile));
-      }
-    } catch {
-      // ignore
-    }
+    // Store session cleanly
+    setStoredSession(userProfile);
 
     notifyAuthListeners(user || auth.currentUser, userProfile);
     return userProfile;
@@ -232,8 +349,8 @@ export const authService = {
    * Robustly verifies credentials via Firebase Auth or secure Firestore credentials.
    */
   async login(emailOrPhone: string, password: string): Promise<UserProfile> {
-    const cleanInput = emailOrPhone.trim();
-    const cleanPass = password.trim();
+    const cleanInput = (emailOrPhone || '').trim();
+    const cleanPass = (password || '').trim();
 
     if (!cleanInput || !cleanPass) {
       throw new Error('Tafadhali ingiza barua pepe au namba ya simu pamoja na nenosiri.');
@@ -252,7 +369,6 @@ export const authService = {
       return this.adminLogin(cleanInput, cleanPass);
     }
 
-    const inputPasswordHash = await hashPassword(cleanPass);
     let resolvedEmail = '';
     let resolvedUserId = '';
     let storedPasswordHash = '';
@@ -261,12 +377,9 @@ export const authService = {
     // 2. Identify if input is a phone number or email
     const isPhone = !cleanInput.includes('@');
     if (isPhone) {
-      const digitsOnly = cleanInput.replace(/\D/g, '');
-      const phoneVariations = [digitsOnly];
-      if (digitsOnly.startsWith('255')) phoneVariations.push('0' + digitsOnly.slice(3));
-      if (digitsOnly.startsWith('0')) phoneVariations.push('255' + digitsOnly.slice(1));
+      const norm = normalizeTanzanianPhone(cleanInput);
 
-      for (const pVar of phoneVariations) {
+      for (const pVar of norm.variations) {
         try {
           const pDoc = await getDoc(doc(db, 'phone_index', pVar));
           if (pDoc.exists()) {
@@ -288,8 +401,13 @@ export const authService = {
           const snap = await getDocs(usersRef);
           for (const d of snap.docs) {
             const uData = d.data();
-            const uPhone = (uData.phone || '').replace(/\D/g, '');
-            if (uPhone && (uPhone === digitsOnly || uPhone.endsWith(digitsOnly) || digitsOnly.endsWith(uPhone))) {
+            const uPhoneDigits = (uData.phone || '').replace(/\D/g, '');
+            if (uPhoneDigits && (
+              uPhoneDigits === norm.canonical0 ||
+              uPhoneDigits === norm.canonical255 ||
+              uPhoneDigits === norm.canonicalBase ||
+              uPhoneDigits === norm.rawDigits
+            )) {
               resolvedUserId = d.id;
               resolvedEmail = uData.email || '';
               storedPasswordHash = uData.passwordHash || '';
@@ -319,25 +437,22 @@ export const authService = {
 
     // 3. Attempt Firebase Auth first if email is available
     let user: FirebaseUser | null = null;
-    let authFailedDueToProvider = false;
+    const emailToTry = resolvedEmail || (cleanInput.includes('@') ? cleanInput : '');
 
-    if (resolvedEmail) {
+    if (emailToTry) {
       try {
-        const userCredential = await signInWithEmailAndPassword(auth, resolvedEmail, cleanPass);
+        const userCredential = await signInWithEmailAndPassword(auth, emailToTry, cleanPass);
         user = userCredential.user;
       } catch (authErr: any) {
         if (
           authErr.code === 'auth/operation-not-allowed' ||
           authErr.code === 'auth/admin-restricted-operation' ||
-          authErr.code === 'auth/network-request-failed'
-        ) {
-          authFailedDueToProvider = true;
-        } else if (
+          authErr.code === 'auth/network-request-failed' ||
           authErr.code === 'auth/invalid-credential' ||
           authErr.code === 'auth/user-not-found' ||
           authErr.code === 'auth/wrong-password'
         ) {
-          // Fall through to check Firestore credentials
+          // Fall through to verify credentials via Firestore
         }
       }
     }
@@ -357,11 +472,14 @@ export const authService = {
       const uData = userDoc.data();
       const profileHash = uData.passwordHash || storedPasswordHash;
 
-      // Validate password hash
+      // Validate password match
       if (profileHash) {
-        if (profileHash !== inputPasswordHash && cleanPass !== '1010') {
+        const isMatch = await verifyPasswordMatch(cleanPass, profileHash);
+        if (!isMatch) {
           throw new Error('Nenosiri uliloingiza si sahihi. Tafadhali hakiki taarifa zako.');
         }
+      } else if (cleanPass !== '1010') {
+        throw new Error('Nenosiri uliloingiza si sahihi. Tafadhali hakiki taarifa zako.');
       }
 
       const isSuperAdminEmail = isSuperAdminEmailAddress(uData.email || resolvedEmail);
@@ -410,16 +528,8 @@ export const authService = {
       profile.role = 'super_admin';
     }
 
-    // Cache active session in localStorage
-    try {
-      localStorage.setItem('tk_active_session', JSON.stringify(profile));
-      localStorage.setItem('tk_active_customer_session', JSON.stringify(profile));
-      if (profile.role === 'super_admin' || profile.role === 'admin' || profile.role === 'staff') {
-        localStorage.setItem('tk_active_admin_session', JSON.stringify(profile));
-      }
-    } catch {
-      // ignore
-    }
+    // Cache active session in localStorage cleanly
+    setStoredSession(profile);
 
     notifyAuthListeners(user || auth.currentUser, profile);
     return profile;
@@ -429,8 +539,8 @@ export const authService = {
    * Dedicated Admin Portal Authentication (supports "1010" / "1010" and admin accounts)
    */
   async adminLogin(emailOrCode: string, passwordOrCode: string): Promise<UserProfile> {
-    const cleanId = emailOrCode.trim();
-    const cleanPass = passwordOrCode.trim();
+    const cleanId = (emailOrCode || '').trim();
+    const cleanPass = (passwordOrCode || '').trim();
 
     const isMasterCode1010 =
       (cleanId === '1010' && cleanPass === '1010') ||
@@ -463,12 +573,7 @@ export const authService = {
         console.warn('Could not sync 1010 admin doc in Firestore:', docErr);
       }
 
-      try {
-        localStorage.setItem('tk_active_admin_session', JSON.stringify(adminProfile));
-        localStorage.setItem('tk_active_session', JSON.stringify(adminProfile));
-      } catch {
-        // ignore
-      }
+      setStoredSession(adminProfile);
 
       notifyAuthListeners(auth.currentUser, adminProfile);
       return adminProfile;
@@ -482,14 +587,7 @@ export const authService = {
    * Sign out current user and clear all sessions
    */
   async logout(): Promise<void> {
-    try {
-      localStorage.removeItem('tk_active_admin_session');
-      localStorage.removeItem('tk_active_customer_session');
-      localStorage.removeItem('tk_active_session');
-    } catch {
-      // ignore
-    }
-    activeCachedProfile = null;
+    setStoredSession(null);
     try {
       await signOut(auth);
     } catch {
@@ -613,13 +711,7 @@ export const authService = {
     const current = getStoredProfile();
     if (current && current.id === userId) {
       const updated = { ...current, ...data };
-      try {
-        localStorage.setItem('tk_active_session', JSON.stringify(updated));
-        localStorage.setItem('tk_active_customer_session', JSON.stringify(updated));
-        if (updated.role === 'super_admin' || updated.role === 'admin' || updated.role === 'staff') {
-          localStorage.setItem('tk_active_admin_session', JSON.stringify(updated));
-        }
-      } catch {}
+      setStoredSession(updated);
       notifyAuthListeners(auth.currentUser, updated);
     }
   },
@@ -650,10 +742,7 @@ export const authService = {
     const current = getStoredProfile();
     if (current && current.id === userId) {
       const updated = { ...current, avatarUrl: photoUrl };
-      try {
-        localStorage.setItem('tk_active_session', JSON.stringify(updated));
-        localStorage.setItem('tk_active_customer_session', JSON.stringify(updated));
-      } catch {}
+      setStoredSession(updated);
       notifyAuthListeners(auth.currentUser, updated);
     }
 
@@ -685,10 +774,7 @@ export const authService = {
     const current = getStoredProfile();
     if (current && current.id === userId) {
       const updated = { ...current, avatarUrl: '' };
-      try {
-        localStorage.setItem('tk_active_session', JSON.stringify(updated));
-        localStorage.setItem('tk_active_customer_session', JSON.stringify(updated));
-      } catch {}
+      setStoredSession(updated);
       notifyAuthListeners(auth.currentUser, updated);
     }
   },

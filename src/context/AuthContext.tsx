@@ -38,9 +38,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
     try {
       const raw =
-        localStorage.getItem('tk_active_admin_session') ||
+        localStorage.getItem('tk_active_session') ||
         localStorage.getItem('tk_active_customer_session') ||
-        localStorage.getItem('tk_active_session');
+        localStorage.getItem('tk_active_admin_session');
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed && parsed.id) return parsed;
@@ -59,9 +59,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Double check localStorage before resetting
         try {
           const raw =
-            localStorage.getItem('tk_active_admin_session') ||
+            localStorage.getItem('tk_active_session') ||
             localStorage.getItem('tk_active_customer_session') ||
-            localStorage.getItem('tk_active_session');
+            localStorage.getItem('tk_active_admin_session');
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed && parsed.id) {
