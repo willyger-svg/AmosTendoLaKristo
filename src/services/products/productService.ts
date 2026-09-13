@@ -9,11 +9,13 @@ import {
   query,
   where,
   orderBy,
-  limit
+  limit,
+  onSnapshot,
+  Unsubscribe
 } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { Product, ProductCategory } from '../../types';
-import { mockProducts } from '../../data/products';
+import { initialProducts } from '../seed/initialSeedData';
 
 const PRODUCTS_COLLECTION = 'products';
 
@@ -42,7 +44,7 @@ export const productService = {
       if (snapshot.empty) {
         // If collection is empty, trigger initial seed in background
         await this.seedProductsIfEmpty();
-        return this.filterLocally(mockProducts.map(p => ({ ...p, isActive: p.isActive ?? true })), options);
+        return this.filterLocally(initialProducts.map(p => ({ ...p, isActive: p.isActive ?? true })), options);
       }
 
       const products: Product[] = [];
@@ -88,7 +90,7 @@ export const productService = {
       return this.filterLocally(products, options);
     } catch (err) {
       console.warn('Error fetching products from Firestore, using baseline catalog fallback:', err);
-      return this.filterLocally(mockProducts.map(p => ({ ...p, isActive: true })), options);
+      return this.filterLocally(initialProducts.map(p => ({ ...p, isActive: true })), options);
     }
   },
 
@@ -183,11 +185,11 @@ export const productService = {
       }
 
       // Fallback to baseline catalog
-      const fallback = mockProducts.find(p => p.id === idOrSlug || p.slug === idOrSlug);
+      const fallback = initialProducts.find(p => p.id === idOrSlug || p.slug === idOrSlug);
       return fallback ? { ...fallback, isActive: true } : null;
     } catch (err) {
       console.warn('Error fetching product detail, using fallback:', err);
-      const fallback = mockProducts.find(p => p.id === idOrSlug || p.slug === idOrSlug);
+      const fallback = initialProducts.find(p => p.id === idOrSlug || p.slug === idOrSlug);
       return fallback ? { ...fallback, isActive: true } : null;
     }
   },
@@ -283,13 +285,74 @@ export const productService = {
   },
 
   /**
+   * Realtime listener for live products from Firestore collection
+   */
+  listenToProducts(callback: (products: Product[]) => void): Unsubscribe {
+    const colRef = collection(db, PRODUCTS_COLLECTION);
+    return onSnapshot(
+      colRef,
+      snapshot => {
+        if (snapshot.empty) {
+          this.seedProductsIfEmpty();
+          callback(initialProducts.map(p => ({ ...p, isActive: p.isActive ?? true })));
+          return;
+        }
+
+        const items: Product[] = [];
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          items.push({
+            id: docSnap.id,
+            slug: data.slug || docSnap.id,
+            name: data.name || data.title || 'Bidhaa',
+            title: data.title || data.name || 'Bidhaa',
+            category: data.category || 'Other Stationery',
+            categoryId: data.categoryId || '',
+            price: Number(data.price) || 0,
+            originalPrice: data.originalPrice ? Number(data.originalPrice) : undefined,
+            compareAtPrice: data.compareAtPrice ? Number(data.compareAtPrice) : data.originalPrice,
+            inStock: data.inStock ?? (Number(data.stockCount ?? data.stockQuantity) > 0),
+            stockCount: Number(data.stockCount ?? data.stockQuantity ?? 0),
+            stockQuantity: Number(data.stockQuantity ?? data.stockCount ?? 0),
+            lowStockThreshold: data.lowStockThreshold ?? 5,
+            sku: data.sku || '',
+            brand: data.brand || '',
+            rating: Number(data.rating) || 5,
+            reviewCount: Number(data.reviewCount) || 0,
+            featured: data.featured ?? data.isFeatured ?? false,
+            isFeatured: data.isFeatured ?? data.featured ?? false,
+            isActive: data.isActive ?? true,
+            isBestSeller: data.isBestSeller ?? false,
+            isNew: data.isNew ?? false,
+            shortDescription: data.shortDescription || '',
+            description: data.description || '',
+            specifications: data.specifications || {},
+            image: data.image || '',
+            images: data.images || (data.image ? [data.image] : []),
+            galleryImages: data.galleryImages || [],
+            tags: data.tags || [],
+            unit: data.unit || 'Piece',
+            createdAt: data.createdAt || '',
+            updatedAt: data.updatedAt || ''
+          });
+        });
+        callback(items);
+      },
+      error => {
+        console.warn('Realtime listener error on products:', error);
+        callback(initialProducts.map(p => ({ ...p, isActive: true })));
+      }
+    );
+  },
+
+  /**
    * Seed Firestore initial catalogue if empty
    */
   async seedProductsIfEmpty(): Promise<void> {
     try {
       const snap = await getDocs(query(collection(db, PRODUCTS_COLLECTION), limit(1)));
       if (snap.empty) {
-        for (const item of mockProducts) {
+        for (const item of initialProducts) {
           const itemDoc = {
             ...item,
             isActive: true,

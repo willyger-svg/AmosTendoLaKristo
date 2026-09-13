@@ -5,7 +5,6 @@ import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { ProductCard } from '../components/shop/ProductCard';
-import { mockProducts } from '../data/products';
 import { formatTSh } from '../utils/formatters';
 import { getProductWhatsAppUrl } from '../utils/whatsapp';
 import {
@@ -27,10 +26,26 @@ export const ProductDetailPage: React.FC = () => {
 
   // Extract slug or id from route /shop/product/:slug
   const slug = currentPath.replace('/shop/product/', '').replace('/', '');
-  const product = products.find(p => p.slug === slug || p.id === slug) || mockProducts.find(p => p.slug === slug) || products[0] || mockProducts[0];
+  const product = products.find(p => p.slug === slug || p.id === slug) || products[0];
 
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
+
+  if (!product) {
+    return (
+      <div className="py-16 text-center">
+        <Container>
+          <div className="max-w-md mx-auto space-y-4">
+            <Package className="w-12 h-12 text-slate-400 mx-auto animate-pulse" />
+            <h2 className="text-lg font-bold text-slate-800">Inapakia taarifa za bidhaa...</h2>
+            <Button variant="outline" onClick={() => navigateTo('/shop')}>
+              Rudi Dukani
+            </Button>
+          </div>
+        </Container>
+      </div>
+    );
+  }
 
   const relatedProducts = products
     .filter(p => p.category === product.category && p.id !== product.id && p.isActive !== false)

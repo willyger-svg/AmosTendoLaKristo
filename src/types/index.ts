@@ -30,6 +30,19 @@ export type ProductCategory =
   | 'Computer Accessories'
   | 'Other Stationery';
 
+export const PRODUCT_CATEGORIES: ProductCategory[] = [
+  'All',
+  'School Supplies',
+  'Office Supplies',
+  'Writing Materials',
+  'Paper & Printing',
+  'Files & Folders',
+  'Computer Accessories',
+  'Other Stationery'
+];
+
+export const productCategories = PRODUCT_CATEGORIES;
+
 export interface Product {
   id: string;
   slug: string;
@@ -220,6 +233,8 @@ export interface Testimonial {
   rating: number;
   comment: string;
   serviceUsed: string;
+  date?: string;
+  createdAt?: string;
   isDemo?: boolean;
 }
 

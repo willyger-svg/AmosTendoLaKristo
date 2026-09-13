@@ -8,7 +8,6 @@ import {
   ProductFilterSidebar,
   FilterState
 } from '../components/shop/ProductFilterSidebar';
-import { mockProducts } from '../data/products';
 import { ProductCategory } from '../types';
 import { Search, Filter, SlidersHorizontal, Package, AlertCircle } from 'lucide-react';
 import { Button } from '../components/common/Button';
@@ -159,7 +158,7 @@ export const ShopPage: React.FC = () => {
             {/* Active Category Chips */}
             <div className="flex items-center justify-between flex-wrap gap-2 pb-2">
               <span className="text-xs font-bold text-slate-600">
-                Inaonyesha vifaa {filteredProducts.length} kati ya {mockProducts.length}
+                Inaonyesha vifaa {filteredProducts.length} kati ya {products.length}
               </span>
 
               {searchQuery && (

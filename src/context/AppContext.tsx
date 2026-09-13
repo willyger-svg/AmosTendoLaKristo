@@ -1,11 +1,23 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { Product, CartItem, Order, ServiceTicket, QuoteRequest, ActiveModal, ToastMessage, StoreSettings, Advertisement } from '../types';
-import { mockOrders, mockServiceTickets, mockQuoteRequests } from '../data/orders';
-import { mockProducts } from '../data/products';
+import {
+  Product,
+  CartItem,
+  Order,
+  ServiceTicket,
+  QuoteRequest,
+  ActiveModal,
+  ToastMessage,
+  StoreSettings,
+  Advertisement,
+  BaseService,
+  PublicServiceItem,
+  Testimonial
+} from '../types';
 import { orderService } from '../services/orders/orderService';
 import { serviceRequestService } from '../services/services/serviceRequestService';
 import { quoteService } from '../services/quotes/quoteService';
 import { productService } from '../services/products/productService';
+import { servicesCatalogService } from '../services/services/servicesCatalogService';
 import { settingsService, DEFAULT_STORE_SETTINGS } from '../services/settings/settingsService';
 import { adService, mockAdvertisements } from '../services/ads/adService';
 
@@ -41,6 +53,9 @@ interface AppContextType {
   serviceTickets: ServiceTicket[];
   quoteRequests: QuoteRequest[];
   products: Product[];
+  printingServices: BaseService[];
+  publicServices: PublicServiceItem[];
+  testimonials: Testimonial[];
   storeSettings: StoreSettings;
   advertisements: Advertisement[];
   updateStoreSettings: (settings: Partial<StoreSettings>) => Promise<StoreSettings>;
@@ -189,8 +204,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch {
       // ignore
     }
-    return mockProducts;
+    return [];
   });
+
+  const [printingServices, setPrintingServices] = useState<BaseService[]>([]);
+  const [publicServices, setPublicServices] = useState<PublicServiceItem[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   const [storeSettings, setStoreSettings] = useState<StoreSettings>(DEFAULT_STORE_SETTINGS);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>(mockAdvertisements);
@@ -285,6 +304,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setProducts(firestoreProducts);
       }
 
+      // Live Services & Public Portal Services & Testimonials from Firestore
+      const [livePrinting, livePublic, liveTestimonials] = await Promise.all([
+        servicesCatalogService.getPrintingServices(),
+        servicesCatalogService.getPublicServices(),
+        servicesCatalogService.getTestimonials()
+      ]);
+      if (livePrinting.length > 0) setPrintingServices(livePrinting);
+      if (livePublic.length > 0) setPublicServices(livePublic);
+      if (liveTestimonials.length > 0) setTestimonials(liveTestimonials);
+
       // Orders
       const firestoreOrders = await orderService.getAllOrders();
       setOrders(sanitizeOrders(firestoreOrders));
@@ -308,7 +337,42 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const unsubSettings = settingsService.listenToSettings((liveSettings) => {
       setStoreSettings(liveSettings);
     });
-    return () => unsubSettings();
+
+    // Realtime products listener from Firestore
+    const unsubProducts = productService.listenToProducts((liveProducts) => {
+      if (liveProducts && liveProducts.length > 0) {
+        setProducts(liveProducts);
+      }
+    });
+
+    // Realtime printing services listener from Firestore
+    const unsubPrinting = servicesCatalogService.listenToPrintingServices((liveServices) => {
+      if (liveServices && liveServices.length > 0) {
+        setPrintingServices(liveServices);
+      }
+    });
+
+    // Realtime public portal services listener from Firestore
+    const unsubPublic = servicesCatalogService.listenToPublicServices((livePublic) => {
+      if (livePublic && livePublic.length > 0) {
+        setPublicServices(livePublic);
+      }
+    });
+
+    // Realtime testimonials listener from Firestore
+    const unsubTestimonials = servicesCatalogService.listenToTestimonials((liveTestimonials) => {
+      if (liveTestimonials && liveTestimonials.length > 0) {
+        setTestimonials(liveTestimonials);
+      }
+    });
+
+    return () => {
+      unsubSettings();
+      unsubProducts();
+      unsubPrinting();
+      unsubPublic();
+      unsubTestimonials();
+    };
   }, []);
 
 
@@ -547,6 +611,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         serviceTickets,
         quoteRequests,
         products,
+        printingServices,
+        publicServices,
+        testimonials,
         addProduct,
         updateProductInState,
         removeProductFromState,

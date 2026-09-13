@@ -19,10 +19,6 @@ import {
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../common/Button';
-import { mockProducts } from '../../data/products';
-import { printingServices } from '../../data/services';
-import { publicServicesData } from '../../data/publicServices';
-import { digitalSolutionsData } from '../../data/digitalSolutions';
 import { formatTSh } from '../../utils/formatters';
 import { createWhatsAppUrl } from '../../utils/whatsapp';
 import { notificationService } from '../../services/notifications/notificationService';
@@ -44,7 +40,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
     setIsCartDrawerOpen,
     searchQuery,
     setSearchQuery,
-    openModal
+    openModal,
+    products,
+    printingServices,
+    publicServices
   } = useApp();
 
   const { currentUser, userProfile, isStaff } = useAuth();
@@ -97,28 +96,25 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
     }
   };
 
-  // Filter items matching search
+  // Filter items matching search from live collections
   const filteredProducts = searchQuery.trim()
-    ? mockProducts.filter(p =>
+    ? (products || []).filter(p =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
+        (p.tags && p.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())))
       ).slice(0, 4)
     : [];
 
   const filteredServices = searchQuery.trim()
     ? [
-        ...printingServices.filter(s =>
+        ...(printingServices || []).filter(s =>
           s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           s.shortDescription.toLowerCase().includes(searchQuery.toLowerCase())
         ),
-        ...publicServicesData.filter(s =>
+        ...(publicServices || []).filter(s =>
           s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.code.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-        ...digitalSolutionsData.filter(s =>
-          s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.categoryTag.toLowerCase().includes(searchQuery.toLowerCase())
+          s.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          s.agencyName.toLowerCase().includes(searchQuery.toLowerCase())
         )
       ].slice(0, 4)
     : [];

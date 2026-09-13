@@ -2,6 +2,7 @@ export * from './auth/authService';
 export * from './products/productService';
 export * from './orders/orderService';
 export * from './services/serviceRequestService';
+export * from './services/servicesCatalogService';
 export * from './quotes/quoteService';
 export * from './payments/paymentService';
 export * from './payments/paymentProvider';

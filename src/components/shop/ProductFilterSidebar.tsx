@@ -1,6 +1,5 @@
 import React from 'react';
-import { ProductCategory } from '../../types';
-import { productCategories } from '../../data/products';
+import { ProductCategory, productCategories } from '../../types';
 import { Filter, X, Check } from 'lucide-react';
 import { Button } from '../common/Button';
 

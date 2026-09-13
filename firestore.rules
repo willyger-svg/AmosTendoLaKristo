@@ -47,6 +47,21 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // Services Catalog (Printing, Scanning, Copying, Binding, Typing)
+    match /services/{serviceId} {
+      allow read, write: if true;
+    }
+
+    // Public / Government Assistance Services
+    match /publicServices/{serviceId} {
+      allow read, write: if true;
+    }
+
+    // Customer Testimonials & Reviews
+    match /testimonials/{testimonialId} {
+      allow read, write: if true;
+    }
+
     // Categories Collection
     match /categories/{categoryId} {
       allow read, write: if true;

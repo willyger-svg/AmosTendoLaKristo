@@ -7,9 +7,6 @@ import { SectionHeader } from '../components/common/SectionHeader';
 import { ProductCard } from '../components/shop/ProductCard';
 import { PrintPriceEstimator } from '../components/printing/PrintPriceEstimator';
 import { DisclaimerBanner } from '../components/common/DisclaimerBanner';
-import { mockProducts } from '../data/products';
-import { publicServicesData } from '../data/publicServices';
-import { mockTestimonials } from '../data/orders';
 import { createWhatsAppUrl } from '../utils/whatsapp';
 import { TKLogo } from '../components/common/TKLogo';
 import {
@@ -41,7 +38,7 @@ import {
 } from 'lucide-react';
 
 export const HomePage: React.FC = () => {
-  const { navigateTo, storeSettings, advertisements, trackAdClick } = useApp();
+  const { navigateTo, storeSettings, advertisements, trackAdClick, products, publicServices, testimonials } = useApp();
   const { t, language } = useTranslation();
   const [selectedCategoryTab, setSelectedCategoryTab] = useState<'all' | 'paper' | 'school' | 'office' | 'accessories'>('all');
 
@@ -51,9 +48,9 @@ export const HomePage: React.FC = () => {
   const whatsappPaymentNumber = storeSettings?.paymentWhatsAppNumber || '0787754202';
   const displayPhone = storeSettings?.displayPhoneNumber || '+255 787 754 202';
 
-  // Filter products by category for quick browsing
-  const filteredProducts = mockProducts.filter(product => {
-    if (selectedCategoryTab === 'all') return product.featured || product.isBestSeller;
+  // Filter products by category for quick browsing from live collection
+  const filteredProducts = (products || []).filter(product => {
+    if (selectedCategoryTab === 'all') return product.featured || product.isFeatured || product.isBestSeller;
     if (selectedCategoryTab === 'paper') return product.category === 'Paper & Printing';
     if (selectedCategoryTab === 'school') return product.category === 'School Supplies';
     if (selectedCategoryTab === 'office') return product.category === 'Office Supplies';
@@ -61,7 +58,7 @@ export const HomePage: React.FC = () => {
     return true;
   }).slice(0, 8);
 
-  const featuredPublicServices = publicServicesData.slice(0, 4);
+  const featuredPublicServices = (publicServices || []).slice(0, 4);
 
   // Core services — focused purely on stationery, printing, passport photos, and government portal assistance
   const coreServices = [
@@ -649,7 +646,7 @@ export const HomePage: React.FC = () => {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
-            {mockTestimonials.slice(0, 3).map((item, idx) => (
+            {(testimonials && testimonials.length > 0 ? testimonials : []).slice(0, 3).map((item, idx) => (
               <div key={idx} className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4 shadow-xs">
                 <div className="flex items-center gap-1 text-amber-500">
                   {[...Array(5)].map((_, i) => (

@@ -165,6 +165,51 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "userId", "title", "message", "status", "createdAt"]
+    },
+    "Service": {
+      "title": "Service Item",
+      "description": "Printing, scanning, copying, binding, and document typing services",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "shortDescription": { "type": "string" },
+        "description": { "type": "string" },
+        "turnaroundTime": { "type": "string" },
+        "pricingLabel": { "type": "string" },
+        "startingPrice": { "type": "number" },
+        "iconName": { "type": "string" },
+        "features": { "type": "array", "items": { "type": "string" } },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "category", "pricingLabel"]
+    },
+    "PublicService": {
+      "title": "Public / Government Service",
+      "description": "NIDA, TRA, Police, RITA, and portal assistance services",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "code": { "type": "string" },
+        "title": { "type": "string" },
+        "agencyName": { "type": "string" },
+        "officialPortalUrlPlaceholder": { "type": "string" },
+        "shortDescription": { "type": "string" },
+        "fullDescription": { "type": "string" },
+        "typicalRequirements": { "type": "array", "items": { "type": "string" } },
+        "estimatedAssistanceTime": { "type": "string" },
+        "tkAssistanceFeeNote": { "type": "string" },
+        "officialGovFeeNote": { "type": "string" },
+        "importantDisclaimer": { "type": "string" },
+        "features": { "type": "array", "items": { "type": "string" } },
+        "icon": { "type": "string" },
+        "isActive": { "type": "boolean" }
+      },
+      "required": ["id", "title", "agencyName", "code"]
     }
   },
   "firestore": {
@@ -176,6 +221,9 @@
     "/quotes/{quoteId}": { "schema": "Quote", "description": "Tech consultation quote requests" },
     "/payments/{paymentId}": { "schema": "Payment", "description": "Payment transactions" },
     "/notifications/{notificationId}": { "schema": "Notification", "description": "Omnichannel notifications" },
+    "/services/{serviceId}": { "schema": "Service", "description": "Printing and document services" },
+    "/publicServices/{serviceId}": { "schema": "PublicService", "description": "Government assistance portal services" },
+    "/testimonials/{testimonialId}": { "description": "Customer testimonials" },
     "/auditLogs/{logId}": { "description": "Payment audit logs" },
     "/settings/general": { "description": "General store & assistance settings" }
   }

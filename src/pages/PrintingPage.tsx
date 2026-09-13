@@ -6,7 +6,6 @@ import { SectionHeader } from '../components/common/SectionHeader';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { PrintPriceEstimator } from '../components/printing/PrintPriceEstimator';
-import { printingServices, documentServices } from '../data/services';
 import { formatTSh } from '../utils/formatters';
 import { createWhatsAppUrl } from '../utils/whatsapp';
 import {
@@ -26,11 +25,13 @@ import {
 } from 'lucide-react';
 
 export const PrintingPage: React.FC = () => {
-  const { openModal, navigateTo } = useApp();
+  const { openModal, navigateTo, printingServices, isLoadingData } = useApp();
 
   const handleOrderService = (serviceTitle: string) => {
     openModal({ type: 'print-wizard' });
   };
+
+  const documentServices = printingServices.slice(0, 6);
 
   return (
     <div className="py-8 space-y-16">

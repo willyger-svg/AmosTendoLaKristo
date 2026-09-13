@@ -6,7 +6,6 @@ import { SectionHeader } from '../components/common/SectionHeader';
 import { DisclaimerBanner } from '../components/common/DisclaimerBanner';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
-import { publicServicesData } from '../data/publicServices';
 import { PublicServiceItem } from '../types';
 import { createWhatsAppUrl } from '../utils/whatsapp';
 import {
@@ -25,7 +24,7 @@ import {
 } from 'lucide-react';
 
 export const OnlineServicesPage: React.FC = () => {
-  const { openModal } = useApp();
+  const { openModal, publicServices, isLoadingData } = useApp();
 
   const [selectedAgency, setSelectedAgency] = useState<string>('ALL');
 
@@ -49,8 +48,8 @@ export const OnlineServicesPage: React.FC = () => {
   ];
 
   const filteredServices = selectedAgency === 'ALL'
-    ? publicServicesData
-    : publicServicesData.filter(s => {
+    ? publicServices
+    : publicServices.filter(s => {
         if (selectedAgency === 'OTHER') {
           return s.code === 'OTHER';
         }
