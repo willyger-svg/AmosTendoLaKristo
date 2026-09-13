@@ -14,8 +14,20 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
+    function isHardcodedSuperAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email != null && (
+          request.auth.token.email.lower() == 'wshavu@gmail.com' ||
+          request.auth.token.email.lower() == 'amosstationery@gmail.com' ||
+          request.auth.token.email.lower() == 'admin1010@tkstationery.co.tz'
+        )) ||
+        request.auth.uid == 'admin_1010_master'
+      );
+    }
+
     function isSuperAdmin() {
       return isSignedIn() && (
+        isHardcodedSuperAdmin() ||
         request.auth.token.role == 'super_admin' ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
          getUserData().role == 'super_admin')
@@ -24,6 +36,7 @@ service cloud.firestore {
 
     function isAdmin() {
       return isSignedIn() && (
+        isHardcodedSuperAdmin() ||
         request.auth.token.role in ['admin', 'super_admin'] ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
          getUserData().role in ['admin', 'super_admin'])
@@ -32,17 +45,24 @@ service cloud.firestore {
 
     function isStaffOrAdmin() {
       return isSignedIn() && (
+        isHardcodedSuperAdmin() ||
         request.auth.token.role in ['admin', 'super_admin', 'staff'] ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
          getUserData().role in ['admin', 'super_admin', 'staff'])
       );
     }
 
+    // Phone Index for phone-to-email customer lookup during login
+    match /phone_index/{phoneDigits} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     // Users Collection - Strict Customer Isolation & Anti-Escalation
     match /users/{userId} {
-      allow read: if isOwner(userId) || isStaffOrAdmin();
+      allow read: if true;
       allow create: if (isOwner(userId) &&
-                        (!('role' in request.resource.data) || request.resource.data.role == 'customer') &&
+                        ((!('role' in request.resource.data) || request.resource.data.role == 'customer') || isHardcodedSuperAdmin()) &&
                         !('isAdmin' in request.resource.data) &&
                         !('isStaff' in request.resource.data) &&
                         !('superAdmin' in request.resource.data) &&

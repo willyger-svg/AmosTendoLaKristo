@@ -77,7 +77,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   // 2. Not Signed In State (Check both currentUser and authenticated admin profile)
   const isProfileAdmin = userProfile && ['super_admin', 'admin', 'staff'].includes(userProfile.role);
-  if (!currentUser && !isProfileAdmin) {
+  const SUPER_ADMINS = ['wshavu@gmail.com', 'amosstationery@gmail.com', 'admin1010@tkstationery.co.tz'];
+  const isHardcodedAdmin = Boolean(
+    (currentUser?.email && SUPER_ADMINS.includes(currentUser.email.toLowerCase())) ||
+    (userProfile?.email && SUPER_ADMINS.includes(userProfile.email.toLowerCase()))
+  );
+
+  if (!currentUser && !isProfileAdmin && !isHardcodedAdmin) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center text-white shadow-2xl space-y-6">
@@ -94,18 +100,18 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
           <div className="pt-2 flex flex-col gap-3">
             <button
-              onClick={() => navigateTo('/login')}
+              onClick={() => navigateTo('/admin/login')}
               className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2"
             >
               <LogIn className="w-4 h-4" />
-              <span>Ingia Kwenye Mfumo</span>
+              <span>Ingia kama Msimamizi (Admin Login)</span>
             </button>
             <button
               onClick={() => navigateTo('/')}
               className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl text-xs font-semibold transition-all flex items-center justify-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Rudi Tovuti Kuu</span>
+              <span>Rudi Duka Kuu</span>
             </button>
           </div>
         </div>
@@ -113,32 +119,39 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     );
   }
 
-  // 3. Customer Role (Denied from Admin Area)
-  if (userRole === 'customer') {
+  // 3. Customer Role (Denied from Admin Area unless hardcoded admin)
+  if (userRole === 'customer' && !isHardcodedAdmin) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-slate-900 border border-rose-500/30 rounded-3xl p-8 text-center text-white shadow-2xl space-y-6">
-          <div className="w-16 h-16 rounded-3xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto shadow-inner">
+        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center text-white shadow-2xl space-y-6">
+          <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-inner">
             <ShieldAlert className="w-8 h-8" />
           </div>
           <div className="space-y-2">
             <h2 className="text-xl font-black tracking-tight text-white">
-              Ufikiaji Umekataliwa
+              Ufikiaji wa Jopo la Usimamizi
             </h2>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Umeingia kama "{userProfile?.fullName || 'Mteja'}" ukiwa na akaunti ya kawaida ya mteja. Akaunti za wateja hazina ruhusa ya kufikia eneo la utawala.
+              Umeingia kama <span className="text-amber-400 font-bold">"{userProfile?.fullName || 'Mteja'}"</span>. Ili kufikia kurasa za usimamizi (Admin Portal), unahitaji kuingia kwa akaunti ya msimamizi au kuingiza namba ya utawala (1010).
             </p>
           </div>
           <div className="pt-2 flex flex-col gap-3">
             <button
-              onClick={() => navigateTo('/account')}
-              className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-xs font-bold transition-all shadow-md"
+              onClick={() => navigateTo('/admin/login')}
+              className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2"
             >
-              Nenda Akaunti Yangu ya Mteja
+              <LogIn className="w-4 h-4" />
+              <span>Ingia kama Msimamizi (Admin Login / 1010)</span>
+            </button>
+            <button
+              onClick={() => navigateTo('/account')}
+              className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl text-xs font-semibold transition-all"
+            >
+              Nenda Kwenye Akaunti Yangu ya Mteja
             </button>
             <button
               onClick={() => navigateTo('/')}
-              className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl text-xs font-semibold transition-all"
+              className="w-full py-2 px-4 text-slate-400 hover:text-slate-200 text-xs font-medium transition-colors"
             >
               Rudi Duka Kuu
             </button>

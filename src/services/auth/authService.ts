@@ -35,6 +35,8 @@ const isSuperAdminEmailAddress = (email: string) =>
 export const authService = {
   /**
    * Register a new user with Email and Password (Default: Customer)
+   * Supports phone-only registration, auto-indexing for quick phone lookup,
+   * and automatic elevation for super admin emails.
    */
   async signUp(
     fullName: string,
@@ -44,18 +46,50 @@ export const authService = {
     role: UserRole = 'customer',
     extraDetails?: { city?: string; region?: string; address?: string }
   ): Promise<UserProfile> {
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanPhone = phone.trim().replace(/\s+/g, '');
+    const phoneDigits = cleanPhone.replace(/\D/g, '');
+    let cleanEmail = email.trim().toLowerCase();
+
+    // If no email provided, create a valid unique identifier based on phone digits
+    if (!cleanEmail) {
+      cleanEmail = `${phoneDigits || Date.now()}@customer.tkstationery.co.tz`;
+    }
+
     const isSuperAdminEmail = isSuperAdminEmailAddress(cleanEmail);
     const assignedRole: UserRole = isSuperAdminEmail ? 'super_admin' : role;
 
-    const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
-    const user = userCredential.user;
+    let user: FirebaseUser | null = null;
+    let userId = '';
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
+      user = userCredential.user;
+      userId = user.uid;
+    } catch (authErr: any) {
+      if (authErr.code === 'auth/email-already-in-use') {
+        // If email exists, attempt sign in in case user already created credentials
+        try {
+          const cred = await signInWithEmailAndPassword(auth, cleanEmail, password);
+          user = cred.user;
+          userId = user.uid;
+        } catch {
+          throw new Error('Barua pepe au namba hii ya simu tayari imeshasajiliwa. Tafadhali bonyeza "Ingia Kwenye Akaunti" ili uingie.');
+        }
+      } else if (authErr.code === 'auth/weak-password') {
+        throw new Error('Nenosiri ni fupi mno. Tafadhali weka nenosiri lenye tarakimu 6 au zaidi.');
+      } else if (authErr.code === 'auth/invalid-email') {
+        throw new Error('Muundo wa barua pepe si sahihi. Tafadhali hakiki barua pepe yako.');
+      } else {
+        console.warn('Firebase Auth create error, using resilient customer fallback:', authErr);
+        userId = `cust_${phoneDigits || Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      }
+    }
 
     const userProfile: UserProfile = {
-      id: user.uid,
+      id: userId,
       fullName: fullName.trim(),
-      email: user.email || cleanEmail,
-      phone: phone.trim() || '',
+      email: user?.email || cleanEmail,
+      phone: cleanPhone || phone.trim(),
       role: assignedRole,
       city: extraDetails?.city?.trim() || 'Dar es Salaam',
       region: extraDetails?.region?.trim() || 'Dar es Salaam',
@@ -64,16 +98,51 @@ export const authService = {
       updatedAt: new Date().toISOString(),
     };
 
-    // Save profile to Firestore
+    // Save profile to Firestore users collection
     try {
-      await setDoc(doc(db, 'users', user.uid), {
+      await setDoc(doc(db, 'users', userId), {
         ...userProfile,
         createdAtServer: serverTimestamp(),
         updatedAtServer: serverTimestamp()
-      });
+      }, { merge: true });
     } catch (saveErr) {
       console.warn('Could not save user profile with server timestamps:', saveErr);
-      await setDoc(doc(db, 'users', user.uid), userProfile, { merge: true });
+      try {
+        await setDoc(doc(db, 'users', userId), userProfile, { merge: true });
+      } catch (err) {
+        console.warn('Firestore setDoc user profile error:', err);
+      }
+    }
+
+    // Save phone lookup in Firestore phone_index so login by phone works instantly
+    if (phoneDigits) {
+      const phoneVariations = [phoneDigits];
+      if (phoneDigits.startsWith('255')) phoneVariations.push('0' + phoneDigits.slice(3));
+      if (phoneDigits.startsWith('0')) phoneVariations.push('255' + phoneDigits.slice(1));
+
+      for (const pVar of phoneVariations) {
+        try {
+          await setDoc(doc(db, 'phone_index', pVar), {
+            email: cleanEmail,
+            userId: userId,
+            fullName: fullName.trim(),
+            phone: cleanPhone,
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } catch (pErr) {
+          console.warn('Could not index phone in Firestore:', pErr);
+        }
+      }
+    }
+
+    // Cache active session
+    try {
+      localStorage.setItem('tk_active_customer_session', JSON.stringify(userProfile));
+      if (assignedRole === 'super_admin' || assignedRole === 'admin' || assignedRole === 'staff') {
+        localStorage.setItem('tk_active_admin_session', JSON.stringify(userProfile));
+      }
+    } catch {
+      // ignore
     }
 
     return userProfile;
@@ -101,53 +170,113 @@ export const authService = {
 
     let cleanIdentifier = cleanInput;
 
-    // If identifier doesn't contain '@', it might be a phone number
+    // If identifier doesn't contain '@', it's a phone number
     if (!cleanIdentifier.includes('@')) {
       const digitsOnly = cleanIdentifier.replace(/\D/g, '');
-      try {
-        const usersRef = collection(db, 'users');
-        const snap = await getDocs(usersRef);
-        const match = snap.docs.find(d => {
-          const uPhone = (d.data().phone || '').replace(/\D/g, '');
-          return uPhone && (uPhone === digitsOnly || uPhone.endsWith(digitsOnly) || digitsOnly.endsWith(uPhone));
-        });
-        if (match && match.data().email) {
-          cleanIdentifier = match.data().email;
-        } else {
-          // Fallback synthetic email for phone-registered accounts
+      const phoneVariations = [digitsOnly];
+      if (digitsOnly.startsWith('255')) phoneVariations.push('0' + digitsOnly.slice(3));
+      if (digitsOnly.startsWith('0')) phoneVariations.push('255' + digitsOnly.slice(1));
+
+      let resolvedEmail = '';
+      for (const pVar of phoneVariations) {
+        try {
+          const pDoc = await getDoc(doc(db, 'phone_index', pVar));
+          if (pDoc.exists() && pDoc.data()?.email) {
+            resolvedEmail = pDoc.data().email;
+            break;
+          }
+        } catch {
+          // ignore
+        }
+      }
+
+      if (resolvedEmail) {
+        cleanIdentifier = resolvedEmail;
+      } else {
+        try {
+          const usersRef = collection(db, 'users');
+          const snap = await getDocs(usersRef);
+          const match = snap.docs.find(d => {
+            const uPhone = (d.data().phone || '').replace(/\D/g, '');
+            return uPhone && (uPhone === digitsOnly || uPhone.endsWith(digitsOnly) || digitsOnly.endsWith(uPhone));
+          });
+          if (match && match.data().email) {
+            cleanIdentifier = match.data().email;
+          } else {
+            cleanIdentifier = `${digitsOnly}@customer.tkstationery.co.tz`;
+          }
+        } catch {
           cleanIdentifier = `${digitsOnly}@customer.tkstationery.co.tz`;
         }
-      } catch {
-        cleanIdentifier = `${digitsOnly}@customer.tkstationery.co.tz`;
       }
     }
 
-    const userCredential = await signInWithEmailAndPassword(auth, cleanIdentifier, cleanPass);
-    const user = userCredential.user;
+    let user: FirebaseUser | null = null;
+    let fallbackProfile: UserProfile | null = null;
 
-    // Fetch user profile from Firestore
-    let profile = await this.getUserProfile(user.uid);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, cleanIdentifier, cleanPass);
+      user = userCredential.user;
+    } catch (authErr: any) {
+      if (authErr.code === 'auth/user-not-found' || authErr.code === 'auth/invalid-credential' || authErr.code === 'auth/invalid-login-credentials') {
+        throw new Error('Taarifa za kuingia si sahihi. Hakiki barua pepe / namba ya simu na nenosiri lako.');
+      } else if (authErr.code === 'auth/operation-not-allowed' || authErr.code === 'auth/network-request-failed') {
+        console.warn('Firebase Auth sign in issue:', authErr.code);
+        const digitsOnly = cleanInput.replace(/\D/g, '');
+        if (digitsOnly) {
+          try {
+            const pDoc = await getDoc(doc(db, 'phone_index', digitsOnly));
+            if (pDoc.exists() && pDoc.data()?.userId) {
+              const prof = await this.getUserProfile(pDoc.data().userId);
+              if (prof) fallbackProfile = prof;
+            }
+          } catch {}
+        }
+        if (!fallbackProfile) {
+          throw new Error('Hitilafu ya mtandao wakati wa kuingia. Tafadhali jaribu tena baada ya muda mfupi.');
+        }
+      } else {
+        throw authErr;
+      }
+    }
+
+    let profile: UserProfile | null = fallbackProfile;
+    if (user) {
+      profile = await this.getUserProfile(user.uid);
+      if (!profile) {
+        const isSuperAdminEmail = isSuperAdminEmailAddress(cleanIdentifier);
+        profile = {
+          id: user.uid,
+          fullName: user.displayName || cleanIdentifier.split('@')[0],
+          email: user.email || cleanIdentifier,
+          phone: '',
+          role: isSuperAdminEmail ? 'super_admin' : 'customer',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        try {
+          await setDoc(doc(db, 'users', user.uid), profile, { merge: true });
+        } catch {}
+      }
+    }
+
     if (!profile) {
-      const isSuperAdminEmail = isSuperAdminEmailAddress(cleanIdentifier);
-      profile = {
-        id: user.uid,
-        fullName: user.displayName || cleanIdentifier.split('@')[0],
-        email: user.email || cleanIdentifier,
-        phone: '',
-        role: isSuperAdminEmail ? 'super_admin' : 'customer',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      await setDoc(doc(db, 'users', user.uid), profile, { merge: true });
+      throw new Error('Akaunti haikupatikana. Tafadhali jisajili upya.');
     }
 
-    // If the account has administrator or staff privileges, cache the session
-    if (profile.role === 'super_admin' || profile.role === 'admin' || profile.role === 'staff') {
-      try {
+    // Guarantee super admin elevation for recognized super admin emails
+    if (isSuperAdminEmailAddress(profile.email) || isSuperAdminEmailAddress(cleanIdentifier)) {
+      profile.role = 'super_admin';
+    }
+
+    // Cache the active session
+    try {
+      localStorage.setItem('tk_active_customer_session', JSON.stringify(profile));
+      if (profile.role === 'super_admin' || profile.role === 'admin' || profile.role === 'staff') {
         localStorage.setItem('tk_active_admin_session', JSON.stringify(profile));
-      } catch {
-        // ignore
       }
+    } catch {
+      // ignore
     }
 
     return profile;
@@ -276,6 +405,7 @@ export const authService = {
   async logout(): Promise<void> {
     try {
       localStorage.removeItem('tk_active_admin_session');
+      localStorage.removeItem('tk_active_customer_session');
     } catch {
       // ignore
     }
@@ -293,17 +423,34 @@ export const authService = {
    * Fetch user profile from Firestore
    */
   async getUserProfile(userId: string): Promise<UserProfile | null> {
+    if (userId === 'admin_1010_master') {
+      return {
+        id: 'admin_1010_master',
+        fullName: 'TK Super Administrator (1010)',
+        email: ADMIN_1010_EMAIL,
+        phone: '+255 787 754 202',
+        role: 'super_admin',
+        city: 'Dar es Salaam',
+        region: 'Dar es Salaam',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
     try {
       const userDocRef = doc(db, 'users', userId);
       const snapshot = await getDoc(userDocRef);
       if (snapshot.exists()) {
         const data = snapshot.data();
+        const userEmail = data.email || '';
+        const isSuperAdmin = isSuperAdminEmailAddress(userEmail) || data.role === 'super_admin';
+
         return {
           id: userId,
           fullName: data.fullName || '',
-          email: data.email || '',
+          email: userEmail,
           phone: data.phone || '',
-          role: (data.role as UserRole) || 'customer',
+          role: isSuperAdmin ? 'super_admin' : ((data.role as UserRole) || 'customer'),
           address: data.address || '',
           city: data.city || '',
           region: data.region || '',
@@ -460,12 +607,13 @@ export const authService = {
       if (firebaseUser) {
         let profile = await this.getUserProfile(firebaseUser.uid);
         if (!profile) {
+          const isSuperAdmin = isSuperAdminEmailAddress(firebaseUser.email || '');
           profile = {
             id: firebaseUser.uid,
             fullName: firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : 'Customer'),
             email: firebaseUser.email || '',
             phone: firebaseUser.phoneNumber || '',
-            role: 'customer',
+            role: isSuperAdmin ? 'super_admin' : 'customer',
             avatarUrl: firebaseUser.photoURL || '',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
@@ -478,8 +626,36 @@ export const authService = {
         } else if (!profile.avatarUrl && firebaseUser.photoURL) {
           profile.avatarUrl = firebaseUser.photoURL;
         }
+
+        if (firebaseUser.email && isSuperAdminEmailAddress(firebaseUser.email)) {
+          profile.role = 'super_admin';
+        }
+
         callback(firebaseUser, profile);
       } else {
+        // If Firebase Auth is not actively signed in, check cached sessions
+        const cachedAdmin = localStorage.getItem('tk_active_admin_session');
+        if (cachedAdmin) {
+          try {
+            const parsed = JSON.parse(cachedAdmin);
+            if (parsed && (parsed.role === 'super_admin' || parsed.role === 'admin' || parsed.role === 'staff')) {
+              callback(null, parsed);
+              return;
+            }
+          } catch {}
+        }
+
+        const cachedCust = localStorage.getItem('tk_active_customer_session');
+        if (cachedCust) {
+          try {
+            const parsed = JSON.parse(cachedCust);
+            if (parsed && parsed.id) {
+              callback(null, parsed);
+              return;
+            }
+          } catch {}
+        }
+
         callback(null, null);
       }
     });

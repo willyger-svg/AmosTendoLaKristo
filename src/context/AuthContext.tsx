@@ -194,7 +194,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const userRole: UserRole = userProfile?.role || 'customer';
+  const SUPER_ADMIN_EMAILS = ['wshavu@gmail.com', 'amosstationery@gmail.com', 'admin1010@tkstationery.co.tz'];
+  const isSuperAdminEmail = (email?: string | null) =>
+    Boolean(email && SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === email.trim().toLowerCase()));
+
+  const computedRole: UserRole = (() => {
+    if (userProfile?.role === 'super_admin') return 'super_admin';
+    if (isSuperAdminEmail(currentUser?.email)) return 'super_admin';
+    if (isSuperAdminEmail(userProfile?.email)) return 'super_admin';
+    return userProfile?.role || 'customer';
+  })();
+
+  const userRole: UserRole = computedRole;
   const isSuperAdmin = userRole === 'super_admin';
   const isAdmin = userRole === 'admin' || isSuperAdmin;
   const isStaff = userRole === 'staff' || isAdmin;

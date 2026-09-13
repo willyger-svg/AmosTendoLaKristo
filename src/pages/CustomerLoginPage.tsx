@@ -105,8 +105,8 @@ export const CustomerLoginPage: React.FC = () => {
     const cleanEmail = email.trim();
     const cleanPhone = phone.trim();
 
-    if (!cleanName || !cleanEmail || !password || !cleanPhone) {
-      setErrorMessage('Tafadhali jaza sehemu zote zinazohitajika.');
+    if (!cleanName || !cleanPhone || !password) {
+      setErrorMessage('Tafadhali jaza jina kamili, namba ya simu na nenosiri.');
       return;
     }
 
@@ -117,7 +117,7 @@ export const CustomerLoginPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await signUp(cleanName, cleanEmail, password, cleanPhone, 'customer', {
+      const profile = await signUp(cleanName, cleanEmail, password, cleanPhone, 'customer', {
         city: city.trim(),
         region: city.trim()
       });
@@ -126,17 +126,23 @@ export const CustomerLoginPage: React.FC = () => {
         title: 'Akaunti Imefunguliwa!',
         message: `Karibu TK Stationery, ${cleanName}! Taarifa zako zimehifadhiwa.`
       });
-      navigateTo('/account');
+      if (profile.role === 'super_admin' || profile.role === 'admin' || profile.role === 'staff') {
+        navigateTo('/admin');
+      } else {
+        navigateTo('/account');
+      }
     } catch (err: any) {
       console.warn('Customer Registration Error:', err);
-      if (err.code === 'auth/email-already-in-use') {
-        setErrorMessage('Barua pepe hii tayari inatumika. Tafadhali ingia.');
+      if (err.message) {
+        setErrorMessage(err.message);
+      } else if (err.code === 'auth/email-already-in-use') {
+        setErrorMessage('Barua pepe hii au simu tayari inatumika. Tafadhali bonyeza "Ingia Kwenye Akaunti".');
       } else if (err.code === 'auth/invalid-email') {
-        setErrorMessage('Tafadhali weka barua pepe sahihi.');
+        setErrorMessage('Tafadhali weka barua pepe sahihi au uiache wazi.');
       } else if (err.code === 'auth/weak-password') {
-        setErrorMessage('Nenosiri ni dhaifu. Tafadhali tumia herufi 6 au zaidi.');
+        setErrorMessage('Nenosiri ni fupi au dhaifu. Tafadhali tumia tarakimu au herufi 6 au zaidi.');
       } else {
-        setErrorMessage('Imeshindikana kusajili. Tafadhali jaribu tena.');
+        setErrorMessage('Imeshindikana kusajili. Tafadhali hakiki taarifa zako na ujaribu tena.');
       }
     } finally {
       setIsSubmitting(false);
@@ -342,15 +348,16 @@ export const CustomerLoginPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Barua Pepe (Email Address)</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Barua Pepe <span className="text-slate-400 font-normal">(Sio lazima)</span>
+                </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
-                    required
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    placeholder="e.g. juma@gmail.com"
+                    placeholder="e.g. juma@gmail.com (au acha wazi)"
                     className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
                   />
                 </div>
