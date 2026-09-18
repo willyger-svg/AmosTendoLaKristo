@@ -14,7 +14,8 @@ import {
   Layers,
   ShieldCheck,
   Bell,
-  Check
+  Check,
+  Heart
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -43,7 +44,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
     openModal,
     products,
     printingServices,
-    publicServices
+    publicServices,
+    wishlistCount
   } = useApp();
 
   const { currentUser, userProfile, isStaff } = useAuth();
@@ -443,6 +445,23 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
                 <span className="hidden lg:inline text-xs font-medium text-slate-700 max-w-[120px] truncate">
                   {currentUser || userProfile ? (userProfile?.fullName ? userProfile.fullName.split(' ')[0] : (isStaff ? 'Msimamizi' : 'Akaunti')) : 'Ingia'}
                 </span>
+              </button>
+            </Tooltip>
+
+            {/* Wishlist Header Trigger */}
+            <Tooltip content={wishlistCount > 0 ? `Wishlist: vifaa ${wishlistCount} unavyovipenda` : 'Wishlist (Vifaa Unavyopenda)'}>
+              <button
+                type="button"
+                onClick={() => navigateTo(currentUser || userProfile ? '/account?tab=saved' : '/account')}
+                className="relative p-2 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl transition-colors flex items-center gap-1 active:scale-[0.98]"
+                aria-label={`Wishlist: vifaa ${wishlistCount}`}
+              >
+                <Heart className={`w-5 h-5 ${wishlistCount > 0 ? 'text-rose-500 fill-rose-500/20' : 'text-slate-700'}`} />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-2xs">
+                    {wishlistCount}
+                  </span>
+                )}
               </button>
             </Tooltip>
 

@@ -19,11 +19,12 @@ import {
   RotateCcw,
   Star,
   Package,
-  Store
+  Store,
+  Heart
 } from 'lucide-react';
 
 export const ProductDetailPage: React.FC = () => {
-  const { currentPath, addToCart, navigateTo, showToast, products } = useApp();
+  const { currentPath, addToCart, navigateTo, showToast, products, isWishlisted, toggleWishlist } = useApp();
 
   // Extract slug or id from route /shop/product/:slug
   const slug = currentPath.replace('/shop/product/', '').replace('/', '');
@@ -31,6 +32,43 @@ export const ProductDetailPage: React.FC = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+
+  // Combine primary and gallery images
+  const allProductImages = product
+    ? Array.from(
+        new Set(
+          [
+            product.image,
+            ...(product.images || []),
+            ...((product as any).galleryImages || [])
+          ].filter(Boolean)
+        )
+      )
+    : [];
+
+  const [selectedImage, setSelectedImage] = useState<string>(
+    product?.image || allProductImages[0] || ''
+  );
+
+  // Sync selected image if product changes
+  React.useEffect(() => {
+    if (product) {
+      setSelectedImage(product.image || product.images?.[0] || '');
+    }
+  }, [product?.id]);
+
+  const isSaved = product ? isWishlisted(product.id) : false;
+
+  const handleToggleWishlist = async () => {
+    if (!product || isWishlistLoading) return;
+    setIsWishlistLoading(true);
+    try {
+      await toggleWishlist(product);
+    } finally {
+      setIsWishlistLoading(false);
+    }
+  };
 
   if (!product) {
     return (
@@ -77,9 +115,9 @@ export const ProductDetailPage: React.FC = () => {
           <div className="lg:col-span-6 space-y-4">
             <div className="relative aspect-square bg-slate-100 rounded-3xl overflow-hidden border border-slate-200 shadow-xs">
               <img
-                src={product.image}
+                src={selectedImage || product.image}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-all duration-300"
               />
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 {product.isBestSeller && (
@@ -93,7 +131,49 @@ export const ProductDetailPage: React.FC = () => {
                   </span>
                 )}
               </div>
+
+              {/* Floating Wishlist Heart */}
+              <button
+                type="button"
+                onClick={handleToggleWishlist}
+                disabled={isWishlistLoading}
+                title={isSaved ? 'Ondoa kwenye Wishlist' : 'Hifadhi kwenye Wishlist'}
+                className={`absolute top-4 right-4 w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-md active:scale-90 ${
+                  isSaved
+                    ? 'bg-white text-rose-600 border border-rose-200 hover:bg-rose-50'
+                    : 'bg-white/90 hover:bg-white text-slate-600 hover:text-rose-500 border border-slate-200'
+                }`}
+              >
+                <Heart className={`w-5 h-5 ${isSaved ? 'fill-rose-500 text-rose-500' : ''}`} />
+              </button>
             </div>
+
+            {/* Gallery Thumbnails Strip */}
+            {allProductImages.length > 1 && (
+              <div className="flex items-center gap-3 overflow-x-auto pb-2 pt-1 scrollbar-none">
+                {allProductImages.map((imgUrl, index) => {
+                  const isCurrent = (selectedImage || product.image) === imgUrl;
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setSelectedImage(imgUrl)}
+                      className={`relative w-18 h-18 rounded-2xl overflow-hidden shrink-0 border-2 transition-all ${
+                        isCurrent
+                          ? 'border-amber-500 ring-2 ring-amber-400/30 scale-105 shadow-sm'
+                          : 'border-slate-200 hover:border-slate-300 opacity-75 hover:opacity-100'
+                      }`}
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`${product.name} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Right: Pricing, Specs & Buying Actions */}
@@ -208,6 +288,25 @@ export const ProductDetailPage: React.FC = () => {
               >
                 Agiza Kifaa Hiki Moja kwa Moja WhatsApp ({formatTSh(product.price * quantity)})
               </Button>
+
+              {/* Add / Remove from Wishlist CTA */}
+              <button
+                type="button"
+                onClick={handleToggleWishlist}
+                disabled={isWishlistLoading}
+                className={`w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 border transition-all active:scale-[0.99] ${
+                  isSaved
+                    ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100/80 shadow-2xs'
+                    : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300 hover:border-slate-400 shadow-2xs'
+                }`}
+              >
+                <Heart className={`w-4 h-4 ${isSaved ? 'fill-rose-500 text-rose-500' : 'text-slate-500'}`} />
+                <span>
+                  {isSaved
+                    ? 'Kipo Kwenye Wishlist Yako (Bonyeza Kuondoa)'
+                    : 'Hifadhi Kwenye Orodha ya Unayopenda (Wishlist)'}
+                </span>
+              </button>
             </div>
 
             {/* Delivery & Collection Guarantees */}

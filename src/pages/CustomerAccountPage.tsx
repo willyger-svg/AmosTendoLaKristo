@@ -77,14 +77,14 @@ export const CustomerAccountPage: React.FC = () => {
   // Determine active tab from current URL path
   const getTabFromPath = (path: string): AccountTabId => {
     const clean = path.replace(/\/$/, '');
-    if (clean.endsWith('/orders')) return 'orders';
-    if (clean.endsWith('/service-requests')) return 'service-requests';
-    if (clean.endsWith('/quotes')) return 'quotes';
-    if (clean.endsWith('/documents')) return 'documents';
-    if (clean.endsWith('/profile')) return 'profile';
-    if (clean.endsWith('/notifications')) return 'notifications';
-    if (clean.endsWith('/saved')) return 'saved';
-    if (clean.endsWith('/settings')) return 'settings';
+    if (clean.includes('tab=orders') || clean.endsWith('/orders')) return 'orders';
+    if (clean.includes('tab=service-requests') || clean.endsWith('/service-requests')) return 'service-requests';
+    if (clean.includes('tab=quotes') || clean.endsWith('/quotes')) return 'quotes';
+    if (clean.includes('tab=documents') || clean.endsWith('/documents')) return 'documents';
+    if (clean.includes('tab=profile') || clean.endsWith('/profile')) return 'profile';
+    if (clean.includes('tab=notifications') || clean.endsWith('/notifications')) return 'notifications';
+    if (clean.includes('tab=saved') || clean.includes('wishlist') || clean.endsWith('/saved')) return 'saved';
+    if (clean.includes('tab=settings') || clean.endsWith('/settings')) return 'settings';
     return 'overview';
   };
 

@@ -210,10 +210,24 @@
         "isActive": { "type": "boolean" }
       },
       "required": ["id", "title", "agencyName", "code"]
+    },
+    "SavedProduct": {
+      "title": "Saved / Wishlist Product",
+      "description": "Products bookmarked by registered customers in their dedicated wishlist",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "productId": { "type": "string" },
+        "product": { "type": "object" },
+        "savedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "productId", "savedAt"]
     }
   },
   "firestore": {
     "/users/{userId}": { "schema": "UserProfile", "description": "User profile with role" },
+    "/users/{userId}/savedProducts/{productId}": { "schema": "SavedProduct", "description": "Customer wishlist products" },
     "/products/{productId}": { "schema": "Product", "description": "Store products" },
     "/categories/{categoryId}": { "description": "Product categories" },
     "/orders/{orderId}": { "schema": "Order", "description": "Stationery orders" },

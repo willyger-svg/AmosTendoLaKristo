@@ -11,8 +11,11 @@ import {
   Advertisement,
   BaseService,
   PublicServiceItem,
-  Testimonial
+  Testimonial,
+  SavedProduct
 } from '../types';
+import { useAuth } from './AuthContext';
+import { savedProductsService } from '../services/saved/savedProductsService';
 import { orderService } from '../services/orders/orderService';
 import { serviceRequestService } from '../services/services/serviceRequestService';
 import { quoteService } from '../services/quotes/quoteService';
@@ -74,6 +77,16 @@ interface AppContextType {
   // Global Search
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+
+  // Wishlist / Saved Products Management (Firestore Persisted)
+  wishlist: SavedProduct[];
+  wishlistCount: number;
+  isWishlisted: (productId: string) => boolean;
+  toggleWishlist: (product: Product) => Promise<boolean>;
+  removeFromWishlist: (productId: string) => Promise<void>;
+  clearWishlist: () => Promise<void>;
+  addAllWishlistToCart: () => void;
+  isLoadingWishlist: boolean;
 }
 
 
@@ -476,6 +489,135 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const cartSubtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
+  // Wishlist / Saved Products State (Firestore Persisted)
+  const { currentUser, userProfile } = useAuth();
+  const effectiveUserId = currentUser?.uid || userProfile?.id;
+  const [wishlist, setWishlist] = useState<SavedProduct[]>([]);
+  const [isLoadingWishlist, setIsLoadingWishlist] = useState<boolean>(false);
+
+  // Real-time Firestore sync of customer's saved products
+  useEffect(() => {
+    if (!effectiveUserId) {
+      setWishlist([]);
+      return;
+    }
+
+    setIsLoadingWishlist(true);
+    const unsubscribe = savedProductsService.listenToSavedProducts(effectiveUserId, items => {
+      setWishlist(items);
+      setIsLoadingWishlist(false);
+    });
+
+    return () => unsubscribe();
+  }, [effectiveUserId]);
+
+  const isWishlisted = useCallback(
+    (productId: string): boolean => {
+      return wishlist.some(item => item.productId === productId || item.id === productId);
+    },
+    [wishlist]
+  );
+
+  const toggleWishlist = useCallback(
+    async (product: Product): Promise<boolean> => {
+      if (!effectiveUserId) {
+        showToast({
+          type: 'info',
+          title: 'Ingia Kwenye Akaunti Yako',
+          message: 'Tafadhali ingia au fungua akaunti ili kuhifadhi vifaa unavyovipenda kwenye orodha yako ya Wishlist.'
+        });
+        navigateTo('/login');
+        return false;
+      }
+
+      const alreadySaved = wishlist.some(item => item.productId === product.id || item.id === product.id);
+
+      try {
+        if (alreadySaved) {
+          await savedProductsService.removeSavedProduct(effectiveUserId, product.id);
+          showToast({
+            type: 'info',
+            title: 'Imeondolewa Wishlist',
+            message: `${product.name} imeondolewa kwenye orodha ya vifaa unavyovipenda.`
+          });
+          return false;
+        } else {
+          await savedProductsService.saveProduct(effectiveUserId, product);
+          showToast({
+            type: 'success',
+            title: 'Imehifadhiwa Kwenye Wishlist!',
+            message: `${product.name} imehifadhiwa kwa ufanisi kwenye orodha ya unayopenda.`
+          });
+          return true;
+        }
+      } catch (err) {
+        console.error('Wishlist toggle error:', err);
+        showToast({
+          type: 'error',
+          title: 'Hitilafu ya Wishlist',
+          message: 'Kulikuwa na tatizo wakati wa kuhifadhi bidhaa. Tafadhali jaribu tena.'
+        });
+        return alreadySaved;
+      }
+    },
+    [effectiveUserId, wishlist, showToast, navigateTo]
+  );
+
+  const removeFromWishlist = useCallback(
+    async (productId: string): Promise<void> => {
+      if (!effectiveUserId) return;
+      try {
+        await savedProductsService.removeSavedProduct(effectiveUserId, productId);
+        showToast({
+          type: 'info',
+          title: 'Kifaa Kimeondolewa',
+          message: 'Kifaa kimeondolewa kwenye orodha yako ya unayopenda.'
+        });
+      } catch (err) {
+        console.error('Wishlist removal error:', err);
+      }
+    },
+    [effectiveUserId, showToast]
+  );
+
+  const clearWishlist = useCallback(async (): Promise<void> => {
+    if (!effectiveUserId) return;
+    try {
+      await savedProductsService.clearAllSavedProducts(effectiveUserId);
+      showToast({
+        type: 'info',
+        title: 'Orodha Imesafishwa',
+        message: 'Vifaa vyote kwenye orodha ya unayopenda vimeondolewa.'
+      });
+    } catch (err) {
+      console.error('Wishlist clear error:', err);
+    }
+  }, [effectiveUserId, showToast]);
+
+  const addAllWishlistToCart = useCallback(() => {
+    const inStockItems = wishlist.filter(item => item.product?.inStock !== false);
+    if (inStockItems.length === 0) {
+      showToast({
+        type: 'warning',
+        title: 'Hakuna Vifaa Vilivyopo Stoo',
+        message: 'Vifaa vilivyopo kwenye Wishlist yako kwa sasa vimeisha stoo au hakuna vifaa.'
+      });
+      return;
+    }
+
+    inStockItems.forEach(item => {
+      addToCart(item.product, 1);
+    });
+
+    showToast({
+      type: 'success',
+      title: 'Vimeongezwa Kikapuni!',
+      message: `Vifaa ${inStockItems.length} vimeongezwa kikapuni kwa pamoja.`
+    });
+  }, [wishlist, addToCart, showToast]);
+
+  const wishlistCount = wishlist.length;
+
   // Persistent Creators
   const createOrder = async (orderInput: Partial<Order> & { customerName: string; customerPhone: string; items: any[] }): Promise<Order> => {
     try {
@@ -629,7 +771,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         updateOrderStatus,
         updateTicketStatus,
         searchQuery,
-        setSearchQuery
+        setSearchQuery,
+        wishlist,
+        wishlistCount,
+        isWishlisted,
+        toggleWishlist,
+        removeFromWishlist,
+        clearWishlist,
+        addAllWishlistToCart,
+        isLoadingWishlist
       }}
     >
       {children}

@@ -5,16 +5,28 @@ import { Button } from './Button';
 import { Badge } from './Badge';
 import { formatTSh } from '../../utils/formatters';
 import { getProductWhatsAppUrl } from '../../utils/whatsapp';
-import { ShoppingCart, MessageSquare, Check, Plus, Minus, ShieldCheck, Truck } from 'lucide-react';
+import { ShoppingCart, MessageSquare, Check, Plus, Minus, ShieldCheck, Truck, Heart } from 'lucide-react';
 
 export const QuickViewModal: React.FC = () => {
-  const { activeModal, closeModal, addToCart, navigateTo } = useApp();
+  const { activeModal, closeModal, addToCart, navigateTo, isWishlisted, toggleWishlist } = useApp();
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
 
   if (!activeModal || activeModal.type !== 'quick-view') return null;
 
   const { product } = activeModal;
+  const isSaved = isWishlisted(product.id);
+
+  const handleToggleWishlist = async () => {
+    if (isWishlistLoading) return;
+    setIsWishlistLoading(true);
+    try {
+      await toggleWishlist(product);
+    } finally {
+      setIsWishlistLoading(false);
+    }
+  };
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
@@ -51,6 +63,20 @@ export const QuickViewModal: React.FC = () => {
               </Badge>
             )}
           </div>
+
+          <button
+            type="button"
+            onClick={handleToggleWishlist}
+            disabled={isWishlistLoading}
+            title={isSaved ? 'Ondoa kwenye Wishlist' : 'Hifadhi kwenye Wishlist'}
+            className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-xs active:scale-90 ${
+              isSaved
+                ? 'bg-white text-rose-600 border border-rose-200 hover:bg-rose-50'
+                : 'bg-white/90 hover:bg-white text-slate-500 hover:text-rose-500 border border-slate-200'
+            }`}
+          >
+            <Heart className={`w-4 h-4 ${isSaved ? 'fill-rose-500 text-rose-500' : ''}`} />
+          </button>
         </div>
 
         {/* Product Info */}
@@ -157,6 +183,21 @@ export const QuickViewModal: React.FC = () => {
                 Full Details &rarr;
               </Button>
             </div>
+
+            {/* Wishlist Toggle Button */}
+            <button
+              type="button"
+              onClick={handleToggleWishlist}
+              disabled={isWishlistLoading}
+              className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border transition-all ${
+                isSaved
+                  ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100/80'
+                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+              }`}
+            >
+              <Heart className={`w-3.5 h-3.5 ${isSaved ? 'fill-rose-500 text-rose-500' : 'text-slate-500'}`} />
+              <span>{isSaved ? 'Kipo Kwenye Wishlist Yako (Ondoa)' : 'Hifadhi Kwenye Wishlist (Unayopenda)'}</span>
+            </button>
           </div>
         </div>
       </div>

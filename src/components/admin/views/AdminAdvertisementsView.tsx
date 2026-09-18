@@ -15,6 +15,7 @@ import {
   Layers,
   Image as ImageIcon
 } from 'lucide-react';
+import { ImageUploadField } from '../../common/ImageUploadField';
 
 export const AdminAdvertisementsView: React.FC = () => {
   const { advertisements, refreshAds, showToast } = useApp();
@@ -385,18 +386,16 @@ export const AdminAdvertisementsView: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Picha ya Tangazo (URL) *
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={imageUrl}
-                  onChange={e => setImageUrl(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono text-slate-900 dark:text-white"
-                />
-              </div>
+              <ImageUploadField
+                label="Picha ya Tangazo / Bango *"
+                value={imageUrl}
+                onChange={url => setImageUrl(url)}
+                folder="ads"
+                itemId={editingAd?.id || `ad_${Date.now()}`}
+                aspectRatio="banner"
+                helpText="Pakia picha ya bango kutoka simu au kompyuta yako (inapendekezwa ukubwa mpana wa 1200x400 au 800x400)."
+                required
+              />
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">

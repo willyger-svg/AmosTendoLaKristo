@@ -14,7 +14,8 @@ import {
   Info,
   PhoneCall,
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  Heart
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -31,14 +32,14 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
   isOpen,
   onClose
 }) => {
-  const { navigateTo, currentPath, openModal } = useApp();
+  const { navigateTo, currentPath, openModal, wishlistCount } = useApp();
   const { currentUser, userProfile } = useAuth();
 
   if (!isOpen) return null;
 
   const handleNav = (path: string) => {
     onClose();
-    if (path === '/account') {
+    if (path === '/account' || path.startsWith('/account')) {
       if (userProfile?.role === 'super_admin' || userProfile?.role === 'admin' || userProfile?.role === 'staff') {
         navigateTo('/admin');
         return;
@@ -66,6 +67,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
   const navLinks: MobileNavItem[] = [
     { label: 'Nyumbani', path: '/', icon: <Home className="w-5 h-5" /> },
     { label: 'Duka la Vifaa', path: '/shop', icon: <ShoppingBag className="w-5 h-5" />, badge: 'Duka' },
+    { label: 'Wishlist (Vifaa Unavyovipenda)', path: '/account?tab=saved', icon: <Heart className="w-5 h-5 text-rose-500" />, badge: wishlistCount > 0 ? `${wishlistCount}` : undefined },
     { label: 'Huduma za Chapisho', path: '/printing', icon: <Printer className="w-5 h-5" /> },
     { label: 'Huduma za Serikali (NIDA & TRA)', path: '/online-services', icon: <ShieldCheck className="w-5 h-5" />, badge: 'NIDA' },
     { label: 'Fuatilia Oda Yako', path: '/track-order', icon: <Search className="w-5 h-5" /> },

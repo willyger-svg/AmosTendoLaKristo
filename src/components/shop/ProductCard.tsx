@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Eye, MessageSquare, Check, Plus, Minus } from 'lucide-react';
+import { ShoppingCart, Eye, MessageSquare, Check, Plus, Minus, Heart } from 'lucide-react';
 import { Product } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { formatTSh } from '../../utils/formatters';
@@ -11,9 +11,23 @@ export interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addToCart, openModal, navigateTo } = useApp();
+  const { addToCart, openModal, navigateTo, isWishlisted, toggleWishlist } = useApp();
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+
+  const saved = isWishlisted(product.id);
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isWishlistLoading) return;
+    setIsWishlistLoading(true);
+    try {
+      await toggleWishlist(product);
+    } finally {
+      setIsWishlistLoading(false);
+    }
+  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -41,9 +55,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       onClick={handleCardClick}
       className="group relative bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl hover:border-amber-300/80 transition-all duration-300 flex flex-col cursor-pointer"
     >
-      {/* Top Badges */}
-      <div className="absolute top-3 left-3 right-3 z-10 flex items-center justify-between pointer-events-none">
-        <div className="flex flex-col gap-1">
+      {/* Top Badges & Wishlist Action */}
+      <div className="absolute top-3 left-3 right-3 z-10 flex items-start justify-between pointer-events-none">
+        <div className="flex flex-col gap-1 pointer-events-auto">
           {product.isBestSeller && (
             <Badge variant="brand" size="sm">
               Inauzwa Sana
@@ -56,7 +70,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           )}
         </div>
 
-        <div>
+        <div className="flex items-center gap-1.5 pointer-events-auto">
           {product.inStock ? (
             <Badge variant="success" size="sm">
               Ipo Stoo
@@ -66,6 +80,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               Imeisha
             </Badge>
           )}
+
+          {/* Wishlist Heart Button */}
+          <button
+            type="button"
+            onClick={handleToggleWishlist}
+            disabled={isWishlistLoading}
+            title={saved ? 'Ondoa kwenye Wishlist' : 'Hifadhi kwenye Wishlist'}
+            aria-label={saved ? 'Ondoa kwenye Wishlist' : 'Hifadhi kwenye Wishlist'}
+            className={`w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all shadow-2xs active:scale-85 ${
+              saved
+                ? 'bg-white text-rose-600 border border-rose-200 hover:bg-rose-50'
+                : 'bg-white/90 hover:bg-white text-slate-500 hover:text-rose-500 border border-slate-200/80'
+            }`}
+          >
+            <Heart
+              className={`w-4 h-4 transition-transform ${
+                saved ? 'fill-rose-500 text-rose-500 scale-110' : ''
+              }`}
+            />
+          </button>
         </div>
       </div>
 

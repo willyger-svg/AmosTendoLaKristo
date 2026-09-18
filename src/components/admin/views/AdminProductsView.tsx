@@ -16,12 +16,19 @@ import {
   Filter,
   Eye,
   Boxes,
-  Tag
+  Tag,
+  ExternalLink,
+  Globe,
+  UploadCloud,
+  Sparkles,
+  Layers,
+  Check
 } from 'lucide-react';
 import { TableSkeleton } from '../../common/Skeleton';
+import { ImageUploadField, MultiImageUploadField } from '../../common/ImageUploadField';
 
 export const AdminProductsView: React.FC = () => {
-  const { products, refreshData, showToast, addProduct, updateProductInState, removeProductFromState, isLoadingData } = useApp();
+  const { products, refreshData, showToast, addProduct, updateProductInState, removeProductFromState, isLoadingData, navigateTo } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,7 +45,11 @@ export const AdminProductsView: React.FC = () => {
   const [sku, setSku] = useState('TK-GEN-001');
   const [brand, setBrand] = useState('TK Stationery');
   const [shortDescription, setShortDescription] = useState('');
-  const [imageUrl, setImageUrl] = useState('https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80');
+  const [imageUrl, setImageUrl] = useState('');
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [isActive, setIsActive] = useState(true);
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isBestSeller, setIsBestSeller] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const categories: ProductCategory[] = [
@@ -62,6 +73,10 @@ export const AdminProductsView: React.FC = () => {
     setBrand('TK Stationery');
     setShortDescription('');
     setImageUrl('https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80');
+    setGalleryImages([]);
+    setIsActive(true);
+    setIsFeatured(false);
+    setIsBestSeller(false);
     setIsAddModalOpen(true);
   };
 
@@ -74,8 +89,12 @@ export const AdminProductsView: React.FC = () => {
     setStockCount(p.stockCount);
     setSku(p.sku || '');
     setBrand(p.brand || 'TK Stationery');
-    setShortDescription(p.shortDescription || '');
+    setShortDescription(p.shortDescription || p.description || '');
     setImageUrl(p.image || p.images?.[0] || '');
+    setGalleryImages(p.galleryImages || (p.images && p.images.length > 1 ? p.images.slice(1) : []));
+    setIsActive(p.isActive ?? true);
+    setIsFeatured(p.isFeatured ?? p.featured ?? false);
+    setIsBestSeller(p.isBestSeller ?? false);
     setIsAddModalOpen(true);
   };
 
@@ -83,22 +102,40 @@ export const AdminProductsView: React.FC = () => {
     e.preventDefault();
     if (!title.trim()) return;
 
+    if (!imageUrl && galleryImages.length === 0) {
+      showToast({
+        type: 'info',
+        title: 'Picha Inahitajika',
+        message: 'Tafadhali pakia picha ya bidhaa ili ionekane vizuri mtandaoni.'
+      });
+    }
+
     setIsSubmitting(true);
     try {
+      const primaryImage = imageUrl || galleryImages[0] || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80';
+      const allImages = [primaryImage, ...galleryImages.filter(g => g !== primaryImage)];
+
       const productPayload: any = {
         name: title.trim(),
         title: title.trim(),
         category,
         price: Number(price),
-        originalPrice: Number(originalPrice),
+        originalPrice: originalPrice ? Number(originalPrice) : undefined,
+        compareAtPrice: originalPrice ? Number(originalPrice) : undefined,
         stockCount: Number(stockCount),
+        stockQuantity: Number(stockCount),
+        inStock: Number(stockCount) > 0,
         sku,
         brand,
         shortDescription,
         description: shortDescription,
-        image: imageUrl,
-        images: [imageUrl],
-        isActive: true,
+        image: primaryImage,
+        images: allImages,
+        galleryImages: galleryImages,
+        isActive,
+        isFeatured,
+        featured: isFeatured,
+        isBestSeller,
         unit: 'Piece'
       };
 
@@ -114,14 +151,14 @@ export const AdminProductsView: React.FC = () => {
           targetType: 'product',
           targetId: editingProduct.id,
           targetTitle: title,
-          details: { price, stockCount, category },
+          details: { price, stockCount, category, hasImage: !!primaryImage },
           severity: 'info',
           category: 'inventory'
         });
         showToast({
           type: 'success',
           title: 'Bidhaa Imesasishwa',
-          message: `${title} imesasishwa kwa mafanikio.`
+          message: `${title} imesasishwa na picha yake imehifadhiwa mtandaoni.`
         });
       } else {
         const created = await productService.createProduct(productPayload);
@@ -135,14 +172,14 @@ export const AdminProductsView: React.FC = () => {
           targetType: 'product',
           targetId: created.id,
           targetTitle: title,
-          details: { price, stockCount, category },
+          details: { price, stockCount, category, hasImage: !!primaryImage },
           severity: 'info',
           category: 'inventory'
         });
         showToast({
           type: 'success',
-          title: 'Bidhaa Mpya Imeongezwa',
-          message: `${title} imeongezwa kwenye katalogi kwa ufanisi.`
+          title: 'Bidhaa Mpya Ipo Mtandaoni!',
+          message: `${title} imepakiwa na kuwekwa mtandaoni tayari kwa mauzo.`
         });
       }
 
@@ -289,78 +326,122 @@ export const AdminProductsView: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {filteredProducts.map(p => (
-                  <tr key={p.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700">
-                          {p.images?.[0] ? (
-                            <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-slate-400">
-                              <Package className="w-4 h-4" />
+                {filteredProducts.map(p => {
+                  const productImagesCount = (p.images?.length || 0) + (p.galleryImages?.length || 0);
+                  const displayImage = p.image || p.images?.[0];
+                  const onlineUrl = `/shop/product/${p.slug || p.id}`;
+
+                  return (
+                    <tr key={p.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          {/* Image Box with multi-image indicator */}
+                          <div className="relative w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 shadow-2xs group">
+                            {displayImage ? (
+                              <img src={displayImage} alt={p.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-slate-400">
+                                <Package className="w-5 h-5" />
+                              </div>
+                            )}
+                            {productImagesCount > 1 && (
+                              <span className="absolute bottom-0.5 right-0.5 bg-slate-950/80 text-white text-[9px] font-black px-1 rounded">
+                                +{productImagesCount - 1}
+                              </span>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <p className="font-bold text-slate-900 dark:text-white truncate max-w-[220px]">
+                                {p.name || p.title}
+                              </p>
+                              {p.isFeatured && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                                  Maalum
+                                </span>
+                              )}
+                              {p.isBestSeller && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300">
+                                  Inauzwa Sana
+                                </span>
+                              )}
                             </div>
-                          )}
+                            <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono mt-0.5">
+                              <span>SKU: {p.sku || 'N/A'}</span>
+                              <span>•</span>
+                              <span>{p.brand || 'TK Stationery'}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-bold text-slate-900 dark:text-white truncate max-w-[220px]">
-                            {p.name || p.title}
-                          </p>
-                          <p className="text-[11px] text-slate-400 font-mono">SKU: {p.sku || 'N/A'}</p>
+                      </td>
+                      <td className="p-4 font-semibold text-slate-700 dark:text-slate-300">
+                        {p.category}
+                      </td>
+                      <td className="p-4">
+                        <div className="font-black text-slate-900 dark:text-white">
+                          {formatPrice(p.price)}
                         </div>
-                      </div>
-                    </td>
-                    <td className="p-4 font-semibold text-slate-700 dark:text-slate-300">
-                      {p.category}
-                    </td>
-                    <td className="p-4 font-black text-slate-900 dark:text-white">
-                      {formatPrice(p.price)}
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                          p.stockCount === 0
-                            ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200'
-                            : p.stockCount <= 5
-                            ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200'
-                            : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
-                        }`}
-                      >
-                        {p.stockCount} zipo
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <button
-                        onClick={() => handleToggleActive(p)}
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          p.isActive
-                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                            : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
-                        }`}
-                      >
-                        {p.isActive ? 'Inatumika' : 'Imezimwa'}
-                      </button>
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => handleOpenEdit(p)}
-                          className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                          title="Hariri Bidhaa"
+                        {p.originalPrice && p.originalPrice > p.price && (
+                          <div className="text-[10px] text-slate-400 line-through">
+                            {formatPrice(p.originalPrice)}
+                          </div>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        <span
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            p.stockCount === 0
+                              ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200'
+                              : p.stockCount <= 5
+                              ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200'
+                              : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                          }`}
                         >
-                          <Edit className="w-4 h-4" />
-                        </button>
+                          {p.stockCount} zipo
+                        </span>
+                      </td>
+                      <td className="p-4">
                         <button
-                          onClick={() => handleDeleteProduct(p)}
-                          className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
-                          title="Futa Bidhaa"
+                          onClick={() => handleToggleActive(p)}
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-all ${
+                            p.isActive
+                              ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                              : 'bg-slate-200 hover:bg-slate-300 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                          }`}
+                          title="Bofya kubadili hali mtandaoni"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          {p.isActive ? 'Mtandaoni (Live)' : 'Imezimwa (Draft)'}
                         </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {/* View Online Store Button */}
+                          <button
+                            onClick={() => navigateTo(onlineUrl)}
+                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-colors"
+                            title="Tazama Bidhaa Hii Mtandaoni Dukani"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleOpenEdit(p)}
+                            className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                            title="Hariri Bidhaa na Picha"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(p)}
+                            className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
+                            title="Futa Bidhaa"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -462,26 +543,90 @@ export const AdminProductsView: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Kiungo cha Picha (URL)
-                </label>
-                <input
-                  type="url"
-                  value={imageUrl}
-                  onChange={e => setImageUrl(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-mono"
-                />
+              {/* Primary Image Upload Field */}
+              <ImageUploadField
+                label="Picha Kuu ya Bidhaa (Kwa Ajili ya Kuuza Mtandaoni)"
+                value={imageUrl}
+                onChange={(url) => setImageUrl(url)}
+                folder="products"
+                itemId={editingProduct?.id || sku}
+                helpText="Pakia picha ya bidhaa kutoka simu au kompyuta yako. Picha inaboreshwa na kuhifadhiwa mtandaoni tayari kwa wateja kuinunua."
+                required
+              />
+
+              {/* Gallery Images Upload Field */}
+              <MultiImageUploadField
+                label="Picha za Ziada za Kifaa (Gallery)"
+                values={galleryImages}
+                onChange={(urls) => setGalleryImages(urls)}
+                folder="products"
+                itemId={editingProduct?.id || sku}
+                maxImages={5}
+                helpText="Unaweza kuongeza picha za pembe tofauti au maelezo ya ndani ya bidhaa."
+              />
+
+              {/* Visibility and Online Store Controls */}
+              <div className="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 space-y-3">
+                <p className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <Globe className="w-4 h-4 text-amber-500" />
+                  <span>Hali ya Bidhaa Mtandaoni (Store Visibility)</span>
+                </p>
+
+                <div className="space-y-2.5">
+                  <label className="flex items-start gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isActive}
+                      onChange={(e) => setIsActive(e.target.checked)}
+                      className="w-4 h-4 rounded text-amber-500 focus:ring-amber-400 mt-0.5"
+                    />
+                    <div>
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        Weka Moja kwa Moja Mtandaoni (Active in Online Shop)
+                      </span>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Bidhaa itaonekana mara moja kwenye duka na wateja wataweza kuiweka kwenye kikapu au kuagiza kwa WhatsApp.
+                      </p>
+                    </div>
+                  </label>
+
+                  <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isFeatured}
+                        onChange={(e) => setIsFeatured(e.target.checked)}
+                        className="w-4 h-4 rounded text-amber-500 focus:ring-amber-400"
+                      />
+                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        Bidhaa Maalum (Featured)
+                      </span>
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isBestSeller}
+                        onChange={(e) => setIsBestSeller(e.target.checked)}
+                        className="w-4 h-4 rounded text-amber-500 focus:ring-amber-400"
+                      />
+                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        Inayopendwa (Best Seller)
+                      </span>
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Maelezo Mafupi
+                  Maelezo Mafupi ya Bidhaa
                 </label>
                 <textarea
                   value={shortDescription}
                   onChange={e => setShortDescription(e.target.value)}
-                  rows={3}
+                  rows={2}
+                  placeholder="Maelezo mafupi kuhusu kifaa hiki yatakayoonekana kwa mteja..."
                   className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
                 />
               </div>

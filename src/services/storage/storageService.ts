@@ -243,6 +243,102 @@ export const storageService = {
   },
 
   /**
+   * Upload general image to Firebase Storage with automatic compression and fallback
+   * Useful for products, catalog items, advertisements, and banners
+   */
+  async uploadImage(
+    file: File,
+    folder = 'products',
+    identifier = 'item',
+    onProgress?: UploadProgressCallback
+  ): Promise<string> {
+    // 1. Strict Security & Format Validation
+    const validation = this.validateFile(file);
+    if (!validation.isValid) {
+      throw new Error(validation.errorSw || validation.errorEn || 'Faili la picha halikubaliki');
+    }
+
+    // 2. Client-side Image Optimization (max 1200x1200px, 85% quality)
+    let fileToUpload = file;
+    try {
+      fileToUpload = await this.optimizeImage(file, 1200, 1200, 0.85);
+    } catch (optErr) {
+      console.warn('Product image optimization skipped, using original:', optErr);
+      fileToUpload = file;
+    }
+
+    // 3. Upload to Firebase Storage with Fallback
+    try {
+      const fileExt = fileToUpload.name.split('.').pop() || 'jpg';
+      const timestamp = Date.now();
+      const sanitizedId = (identifier || 'item').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const storagePath = `${folder}/${sanitizedId}_${timestamp}.${fileExt}`;
+      const storageRef = ref(storage, storagePath);
+
+      const metadata = {
+        contentType: fileToUpload.type || 'image/jpeg',
+        customMetadata: {
+          folder,
+          uploadedAt: new Date().toISOString()
+        }
+      };
+
+      const uploadTask = uploadBytesResumable(storageRef, fileToUpload, metadata);
+
+      return new Promise<string>((resolve, reject) => {
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const progress = Math.round(
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            );
+            if (onProgress) {
+              onProgress(Math.min(progress, 95));
+            }
+          },
+          (error) => {
+            console.warn('Firebase Storage upload warning, using resilient fallback:', error);
+            this.convertFileToDataUrl(fileToUpload)
+              .then((dataUrl) => {
+                if (onProgress) onProgress(100);
+                resolve(dataUrl);
+              })
+              .catch(() => reject(error));
+          },
+          async () => {
+            try {
+              const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+              if (onProgress) onProgress(100);
+              resolve(downloadUrl);
+            } catch (urlErr) {
+              console.warn('Failed to retrieve download URL, using data URL fallback:', urlErr);
+              const dataUrl = await this.convertFileToDataUrl(fileToUpload);
+              if (onProgress) onProgress(100);
+              resolve(dataUrl);
+            }
+          }
+        );
+      });
+    } catch (err) {
+      console.warn('Direct image upload error, falling back to data URL:', err);
+      const dataUrl = await this.convertFileToDataUrl(fileToUpload);
+      if (onProgress) onProgress(100);
+      return dataUrl;
+    }
+  },
+
+  /**
+   * Specialized product image upload for selling online
+   */
+  async uploadProductImage(
+    file: File,
+    productId?: string,
+    onProgress?: UploadProgressCallback
+  ): Promise<string> {
+    return this.uploadImage(file, 'products', productId || `prod_${Date.now()}`, onProgress);
+  },
+
+  /**
    * Delete previous photo from Firebase Storage if it matches the bucket URL
    */
   async deleteProfilePhoto(photoUrl: string): Promise<void> {
