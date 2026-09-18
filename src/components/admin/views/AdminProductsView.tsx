@@ -142,19 +142,23 @@ export const AdminProductsView: React.FC = () => {
       if (editingProduct) {
         updateProductInState(editingProduct.id, productPayload);
         await productService.updateProduct(editingProduct.id, productPayload);
-        await auditLogService.logAdminAction({
-          action: 'product_updated',
-          actorId: currentUser?.uid || userProfile?.id || 'admin_master',
-          actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
-          actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
-          actorRole: userRole,
-          targetType: 'product',
-          targetId: editingProduct.id,
-          targetTitle: title,
-          details: { price, stockCount, category, hasImage: !!primaryImage },
-          severity: 'info',
-          category: 'inventory'
-        });
+        try {
+          await auditLogService.logAdminAction({
+            action: 'product_updated',
+            actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+            actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+            actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
+            actorRole: userRole,
+            targetType: 'product',
+            targetId: editingProduct.id,
+            targetTitle: title,
+            details: { price, stockCount, category, hasImage: !!primaryImage },
+            severity: 'info',
+            category: 'inventory'
+          });
+        } catch (auditErr) {
+          console.warn('Audit log notice:', auditErr);
+        }
         showToast({
           type: 'success',
           title: 'Bidhaa Imesasishwa',
@@ -163,19 +167,23 @@ export const AdminProductsView: React.FC = () => {
       } else {
         const created = await productService.createProduct(productPayload);
         addProduct(created);
-        await auditLogService.logAdminAction({
-          action: 'product_created',
-          actorId: currentUser?.uid || userProfile?.id || 'admin_master',
-          actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
-          actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
-          actorRole: userRole,
-          targetType: 'product',
-          targetId: created.id,
-          targetTitle: title,
-          details: { price, stockCount, category, hasImage: !!primaryImage },
-          severity: 'info',
-          category: 'inventory'
-        });
+        try {
+          await auditLogService.logAdminAction({
+            action: 'product_created',
+            actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+            actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+            actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
+            actorRole: userRole,
+            targetType: 'product',
+            targetId: created.id,
+            targetTitle: title,
+            details: { price, stockCount, category, hasImage: !!primaryImage },
+            severity: 'info',
+            category: 'inventory'
+          });
+        } catch (auditErr) {
+          console.warn('Audit log notice:', auditErr);
+        }
         showToast({
           type: 'success',
           title: 'Bidhaa Mpya Ipo Mtandaoni!',
@@ -185,11 +193,12 @@ export const AdminProductsView: React.FC = () => {
 
       await refreshData();
       setIsAddModalOpen(false);
-    } catch {
+    } catch (err: any) {
+      console.error('Save product error:', err);
       showToast({
         type: 'error',
         title: 'Hitilafu',
-        message: 'Imeshindwa kuhifadhi taarifa za bidhaa.'
+        message: err?.message ? `Hitilafu: ${err.message}` : 'Imeshindwa kuhifadhi taarifa za bidhaa.'
       });
     } finally {
       setIsSubmitting(false);
