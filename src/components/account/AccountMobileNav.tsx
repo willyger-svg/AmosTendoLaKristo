@@ -14,25 +14,40 @@ import {
 } from 'lucide-react';
 
 interface AccountMobileNavProps {
-  currentTab: AccountTabId;
+  currentTab?: AccountTabId;
+  activeTab?: AccountTabId;
   onTabChange: (tab: AccountTabId) => void;
-  counts: {
+  counts?: Partial<{
     orders: number;
     tickets: number;
     quotes: number;
     documents: number;
     saved: number;
     unreadNotifications: number;
-  };
+  }>;
+  badges?: Record<string, number>;
 }
 
 export const AccountMobileNav: React.FC<AccountMobileNavProps> = ({
   currentTab,
+  activeTab,
   onTabChange,
-  counts
+  counts,
+  badges
 }) => {
   const { language } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const selectedTab = currentTab || activeTab || 'overview';
+
+  const safeCounts = {
+    orders: counts?.orders ?? badges?.orders ?? 0,
+    tickets: counts?.tickets ?? badges?.['service-requests'] ?? badges?.tickets ?? 0,
+    quotes: counts?.quotes ?? badges?.quotes ?? 0,
+    documents: counts?.documents ?? badges?.documents ?? 0,
+    saved: counts?.saved ?? badges?.saved ?? 0,
+    unreadNotifications: counts?.unreadNotifications ?? badges?.notifications ?? 0
+  };
 
   const tabs: { id: AccountTabId; label: string; icon: React.ReactNode; badge?: number; highlightBadge?: boolean }[] = [
     {
@@ -44,31 +59,31 @@ export const AccountMobileNav: React.FC<AccountMobileNavProps> = ({
       id: 'orders',
       label: language === 'sw' ? 'Oda' : 'Orders',
       icon: <ShoppingBag className="w-3.5 h-3.5" />,
-      badge: counts.orders
+      badge: safeCounts.orders
     },
     {
       id: 'service-requests',
       label: language === 'sw' ? 'Huduma' : 'Services',
       icon: <FileCheck className="w-3.5 h-3.5" />,
-      badge: counts.tickets
+      badge: safeCounts.tickets
     },
     {
       id: 'quotes',
       label: language === 'sw' ? 'Nukuu' : 'Quotes',
       icon: <Sparkles className="w-3.5 h-3.5" />,
-      badge: counts.quotes
+      badge: safeCounts.quotes
     },
     {
       id: 'documents',
       label: language === 'sw' ? 'Nyaraka' : 'Documents',
       icon: <FolderOpen className="w-3.5 h-3.5" />,
-      badge: counts.documents
+      badge: safeCounts.documents
     },
     {
       id: 'saved',
       label: language === 'sw' ? 'Zilizohifadhiwa' : 'Saved',
       icon: <Heart className="w-3.5 h-3.5" />,
-      badge: counts.saved
+      badge: safeCounts.saved
     },
     {
       id: 'profile',
@@ -79,8 +94,8 @@ export const AccountMobileNav: React.FC<AccountMobileNavProps> = ({
       id: 'notifications',
       label: language === 'sw' ? 'Taarifa' : 'Alerts',
       icon: <Bell className="w-3.5 h-3.5" />,
-      badge: counts.unreadNotifications,
-      highlightBadge: counts.unreadNotifications > 0
+      badge: safeCounts.unreadNotifications,
+      highlightBadge: safeCounts.unreadNotifications > 0
     },
     {
       id: 'settings',
@@ -99,7 +114,7 @@ export const AccountMobileNav: React.FC<AccountMobileNavProps> = ({
         container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
       }
     }
-  }, [currentTab]);
+  }, [selectedTab]);
 
   return (
     <div className="lg:hidden w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 -mx-4 px-4 sticky top-16 z-20 py-2.5 shadow-xs">
@@ -108,7 +123,7 @@ export const AccountMobileNav: React.FC<AccountMobileNavProps> = ({
         className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-0.5"
       >
         {tabs.map(tab => {
-          const isActive = currentTab === tab.id;
+          const isActive = selectedTab === tab.id;
           return (
             <button
               key={tab.id}

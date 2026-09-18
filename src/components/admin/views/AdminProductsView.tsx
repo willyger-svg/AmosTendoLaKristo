@@ -105,19 +105,19 @@ export const AdminProductsView: React.FC = () => {
       if (editingProduct) {
         updateProductInState(editingProduct.id, productPayload);
         await productService.updateProduct(editingProduct.id, productPayload);
-        if (currentUser) {
-          await auditLogService.logAdminAction({
-            action: 'product_updated',
-            actorId: currentUser.uid,
-            actorEmail: currentUser.email || '',
-            actorName: userProfile?.fullName || '',
-            actorRole: userRole,
-            targetType: 'product',
-            targetId: editingProduct.id,
-            targetTitle: title,
-            details: { price, stockCount, category }
-          });
-        }
+        await auditLogService.logAdminAction({
+          action: 'product_updated',
+          actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+          actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+          actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
+          actorRole: userRole,
+          targetType: 'product',
+          targetId: editingProduct.id,
+          targetTitle: title,
+          details: { price, stockCount, category },
+          severity: 'info',
+          category: 'inventory'
+        });
         showToast({
           type: 'success',
           title: 'Bidhaa Imesasishwa',
@@ -126,19 +126,19 @@ export const AdminProductsView: React.FC = () => {
       } else {
         const created = await productService.createProduct(productPayload);
         addProduct(created);
-        if (currentUser) {
-          await auditLogService.logAdminAction({
-            action: 'product_created',
-            actorId: currentUser.uid,
-            actorEmail: currentUser.email || '',
-            actorName: userProfile?.fullName || '',
-            actorRole: userRole,
-            targetType: 'product',
-            targetId: created.id,
-            targetTitle: title,
-            details: { price, stockCount, category }
-          });
-        }
+        await auditLogService.logAdminAction({
+          action: 'product_created',
+          actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+          actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+          actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
+          actorRole: userRole,
+          targetType: 'product',
+          targetId: created.id,
+          targetTitle: title,
+          details: { price, stockCount, category },
+          severity: 'info',
+          category: 'inventory'
+        });
         showToast({
           type: 'success',
           title: 'Bidhaa Mpya Imeongezwa',
@@ -164,19 +164,19 @@ export const AdminProductsView: React.FC = () => {
       const nextActive = !product.isActive;
       updateProductInState(product.id, { isActive: nextActive });
       await productService.updateProduct(product.id, { isActive: nextActive });
-      if (currentUser) {
-        await auditLogService.logAdminAction({
-          action: 'product_toggled',
-          actorId: currentUser.uid,
-          actorEmail: currentUser.email || '',
-          actorName: userProfile?.fullName || '',
-          actorRole: userRole,
-          targetType: 'product',
-          targetId: product.id,
-          targetTitle: product.name || product.title || '',
-          details: { isActive: nextActive }
-        });
-      }
+      await auditLogService.logAdminAction({
+        action: 'product_toggled',
+        actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+        actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+        actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
+        actorRole: userRole,
+        targetType: 'product',
+        targetId: product.id,
+        targetTitle: product.name || product.title || '',
+        details: { isActive: nextActive },
+        severity: 'info',
+        category: 'inventory'
+      });
       await refreshData();
     } catch {
       showToast({ type: 'error', title: 'Hitilafu', message: 'Imeshindwa kubadili hali ya bidhaa.' });
@@ -191,19 +191,19 @@ export const AdminProductsView: React.FC = () => {
     try {
       removeProductFromState(product.id);
       await productService.deleteProduct(product.id);
-      if (currentUser) {
-        await auditLogService.logAdminAction({
-          action: 'product_deleted',
-          actorId: currentUser.uid,
-          actorEmail: currentUser.email || '',
-          actorName: userProfile?.fullName || '',
-          actorRole: userRole,
-          targetType: 'product',
-          targetId: product.id,
-          targetTitle: prodName,
-          details: { id: product.id }
-        });
-      }
+      await auditLogService.logAdminAction({
+        action: 'product_deleted',
+        actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+        actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+        actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
+        actorRole: userRole,
+        targetType: 'product',
+        targetId: product.id,
+        targetTitle: prodName,
+        details: { id: product.id },
+        severity: 'critical',
+        category: 'inventory'
+      });
       showToast({
         type: 'success',
         title: 'Bidhaa Imeondolewa',

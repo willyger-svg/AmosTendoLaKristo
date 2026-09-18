@@ -28,32 +28,50 @@ export type AccountTabId =
   | 'saved'
   | 'settings';
 
-interface AccountSidebarProps {
-  currentTab: AccountTabId;
+export interface AccountSidebarProps {
+  currentTab?: AccountTabId;
+  activeTab?: AccountTabId;
   onTabChange: (tab: AccountTabId) => void;
-  onOpenPhotoModal: () => void;
-  counts: {
+  onOpenPhotoModal?: () => void;
+  counts?: Partial<{
     orders: number;
     tickets: number;
     quotes: number;
     documents: number;
     saved: number;
     unreadNotifications: number;
-  };
-  onSignOut: () => void;
+  }>;
+  badges?: Record<string, number>;
+  onSignOut?: () => void;
+  onSignOutClick?: () => void;
   onGoToAdmin?: () => void;
 }
 
 export const AccountSidebar: React.FC<AccountSidebarProps> = ({
   currentTab,
+  activeTab,
   onTabChange,
   onOpenPhotoModal,
   counts,
+  badges,
   onSignOut,
+  onSignOutClick,
   onGoToAdmin
 }) => {
   const { currentUser, userProfile, isAdmin, isStaff } = useAuth();
   const { t, language } = useTranslation();
+
+  const selectedTab = currentTab || activeTab || 'overview';
+  const handleSignOut = onSignOut || onSignOutClick || (() => {});
+
+  const safeCounts = {
+    orders: counts?.orders ?? badges?.orders ?? 0,
+    tickets: counts?.tickets ?? badges?.['service-requests'] ?? badges?.tickets ?? 0,
+    quotes: counts?.quotes ?? badges?.quotes ?? 0,
+    documents: counts?.documents ?? badges?.documents ?? 0,
+    saved: counts?.saved ?? badges?.saved ?? 0,
+    unreadNotifications: counts?.unreadNotifications ?? badges?.notifications ?? 0
+  };
 
   const navItems: { id: AccountTabId; label: string; icon: React.ReactNode; badge?: number; highlightBadge?: boolean }[] = [
     {
@@ -65,31 +83,31 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
       id: 'orders',
       label: language === 'sw' ? 'Oda Zangu za Vifaa' : 'My Orders',
       icon: <ShoppingBag className="w-4 h-4" />,
-      badge: counts.orders
+      badge: safeCounts.orders
     },
     {
       id: 'service-requests',
       label: language === 'sw' ? 'Tiketi za Huduma' : 'Service Requests',
       icon: <FileCheck className="w-4 h-4" />,
-      badge: counts.tickets
+      badge: safeCounts.tickets
     },
     {
       id: 'quotes',
       label: language === 'sw' ? 'Nukuu za Software' : 'Tech Quotes',
       icon: <Sparkles className="w-4 h-4" />,
-      badge: counts.quotes
+      badge: safeCounts.quotes
     },
     {
       id: 'documents',
       label: language === 'sw' ? 'Nyaraka na Mafaili' : 'My Documents',
       icon: <FolderOpen className="w-4 h-4" />,
-      badge: counts.documents
+      badge: safeCounts.documents
     },
     {
       id: 'saved',
       label: language === 'sw' ? 'Bidhaa Zilizohifadhiwa' : 'Saved Products',
       icon: <Heart className="w-4 h-4" />,
-      badge: counts.saved
+      badge: safeCounts.saved
     },
     {
       id: 'profile',
@@ -100,8 +118,8 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
       id: 'notifications',
       label: language === 'sw' ? 'Taarifa & Meseji' : 'Notifications',
       icon: <Bell className="w-4 h-4" />,
-      badge: counts.unreadNotifications,
-      highlightBadge: counts.unreadNotifications > 0
+      badge: safeCounts.unreadNotifications,
+      highlightBadge: safeCounts.unreadNotifications > 0
     },
     {
       id: 'settings',
@@ -223,7 +241,7 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
         {/* Sign Out Action */}
         <button
           type="button"
-          onClick={onSignOut}
+          onClick={handleSignOut}
           className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors min-h-[44px]"
         >
           <LogOut className="w-4 h-4" />

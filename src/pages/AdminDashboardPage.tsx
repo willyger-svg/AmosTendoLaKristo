@@ -41,7 +41,7 @@ export const AdminDashboardPage: React.FC = () => {
     if (path.startsWith('/admin/services')) return 'services';
     if (path.startsWith('/admin/notifications')) return 'notifications';
     if (path.startsWith('/admin/staff')) return 'staff';
-    if (path.startsWith('/admin/audit-logs')) return 'audit-logs';
+    if (path.startsWith('/admin/activity-logs') || path.startsWith('/admin/audit-logs')) return 'audit-logs';
     if (path.startsWith('/admin/settings')) return 'settings';
     return 'dashboard';
   };
@@ -122,8 +122,8 @@ export const AdminDashboardPage: React.FC = () => {
         };
       case 'audit-logs':
         return {
-          title: 'Kumbukumbu za Usalama (Audit)',
-          breadcrumbs: [{ label: 'Kumbukumbu za Mfumo' }]
+          title: 'Kumbukumbu za Shughuli (Activity Logs)',
+          breadcrumbs: [{ label: 'Activity Logs' }]
         };
       case 'settings':
         return {

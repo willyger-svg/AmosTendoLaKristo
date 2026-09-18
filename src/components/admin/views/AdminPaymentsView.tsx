@@ -83,19 +83,19 @@ export const AdminPaymentsView: React.FC = () => {
         currentUser?.uid || 'admin'
       );
 
-      if (currentUser) {
-        await auditLogService.logAdminAction({
-          action: 'payment_verified',
-          actorId: currentUser.uid,
-          actorEmail: currentUser.email || '',
-          actorName: userProfile?.fullName || '',
-          actorRole: userRole,
-          targetType: 'payment',
-          targetId: paymentId,
-          targetTitle: `Payment #${paymentId}`,
-          details: { status: 'successful' }
-        });
-      }
+      await auditLogService.logAdminAction({
+        action: 'payment_verified',
+        actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+        actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+        actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
+        actorRole: userRole,
+        targetType: 'payment',
+        targetId: paymentId,
+        targetTitle: `Malipo #${paymentId}`,
+        details: { status: 'successful' },
+        severity: 'info',
+        category: 'payments'
+      });
 
       showToast({
         type: 'success',
@@ -130,19 +130,19 @@ export const AdminPaymentsView: React.FC = () => {
         currentUser?.uid || 'admin'
       );
 
-      if (currentUser) {
-        await auditLogService.logAdminAction({
-          action: 'payment_refunded',
-          actorId: currentUser.uid,
-          actorEmail: currentUser.email || '',
-          actorName: userProfile?.fullName || '',
-          actorRole: userRole,
-          targetType: 'payment',
-          targetId: refundTarget.id,
-          targetTitle: `Refund for #${refundTarget.id}`,
-          details: { amount: refundTarget.amount, reason: refundReason }
-        });
-      }
+      await auditLogService.logAdminAction({
+        action: 'payment_refunded',
+        actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+        actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+        actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
+        actorRole: userRole,
+        targetType: 'payment',
+        targetId: refundTarget.id,
+        targetTitle: `Kurudisha Pesa kwa #${refundTarget.id}`,
+        details: { amount: refundTarget.amount, reason: refundReason },
+        severity: 'critical',
+        category: 'payments'
+      });
 
       showToast({
         type: res.success ? 'success' : 'error',

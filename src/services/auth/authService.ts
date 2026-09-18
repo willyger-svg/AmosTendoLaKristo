@@ -22,6 +22,7 @@ import {
 import { auth, db } from '../../firebase/config';
 import { UserProfile, UserRole } from '../../types';
 import { storageService, UploadProgressCallback } from '../storage/storageService';
+import { auditLogService } from '../audit/auditLogService';
 
 const INITIAL_SUPER_ADMIN_EMAILS = [
   'admin1010@tkstationery.co.tz'
@@ -335,6 +336,31 @@ export const authService = {
     // Store session cleanly
     setStoredSession(userProfile);
 
+    // Track user signup in Activity Logs with strict privacy protection (passwords/hashes excluded)
+    try {
+      await auditLogService.logAdminAction({
+        action: 'user_signup',
+        actorId: userId,
+        actorEmail: cleanEmail,
+        actorName: cleanName,
+        actorRole: 'customer',
+        targetType: 'user',
+        targetId: userId,
+        targetTitle: cleanName,
+        details: {
+          accountType: 'Customer (Mteja)',
+          region: extraDetails?.region?.trim() || 'Dar es Salaam',
+          city: extraDetails?.city?.trim() || 'Dar es Salaam',
+          phonePrefix: normPhone.canonical0.substring(0, 5) + '...',
+          hasEmail: Boolean(hasExplicitEmail)
+        },
+        severity: 'info',
+        category: 'auth'
+      });
+    } catch (auditErr) {
+      console.warn('User signup activity log notice:', auditErr);
+    }
+
     notifyAuthListeners(user || auth.currentUser, userProfile);
     return userProfile;
   },
@@ -557,6 +583,29 @@ export const authService = {
       }
 
       setStoredSession(adminProfile);
+
+      // Record administrative login event
+      try {
+        await auditLogService.logAdminAction({
+          action: 'admin_login',
+          actorId: 'admin_1010_master',
+          actorEmail: ADMIN_1010_EMAIL,
+          actorName: 'Msimamizi Mkuu',
+          actorRole: 'super_admin',
+          targetType: 'system',
+          targetId: 'admin_portal',
+          targetTitle: 'Kuingia Jopo la Usimamizi (Admin Portal)',
+          details: {
+            authMethod: 'Master Access 1010',
+            portal: 'Admin Dashboard',
+            sessionSecurity: 'Zero-Knowledge Guard Active'
+          },
+          severity: 'info',
+          category: 'auth'
+        });
+      } catch (auditErr) {
+        console.warn('Admin login activity log notice:', auditErr);
+      }
 
       notifyAuthListeners(auth.currentUser, adminProfile);
       return adminProfile;

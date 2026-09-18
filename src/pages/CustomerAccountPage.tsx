@@ -28,7 +28,8 @@ import {
   CustomerDocument,
   SavedProduct,
   NotificationItem,
-  PaymentTransaction
+  PaymentTransaction,
+  UserProfile
 } from '../types';
 
 import {
@@ -41,7 +42,12 @@ import {
   Lock,
   LogOut,
   AlertTriangle,
-  ShieldCheck
+  ShieldCheck,
+  ShoppingBag,
+  FileCheck,
+  FolderOpen,
+  Sparkles,
+  User
 } from 'lucide-react';
 
 export const CustomerAccountPage: React.FC = () => {
@@ -60,10 +66,13 @@ export const CustomerAccountPage: React.FC = () => {
   const {
     currentUser,
     userProfile,
+    loading,
+    login,
     logout,
     uploadProfilePhoto,
     removeProfilePhoto
   } = useAuth();
+  const [isDemoLoggingIn, setIsDemoLoggingIn] = useState(false);
 
   // Determine active tab from current URL path
   const getTabFromPath = (path: string): AccountTabId => {
@@ -275,14 +284,60 @@ export const CustomerAccountPage: React.FC = () => {
     navigateTo('/');
   };
 
-  // If user is not signed in, show clean customer portal authentication gate
+  // 1. Loading State
+  if (loading) {
+    return (
+      <div className="py-20 bg-slate-50 dark:bg-slate-950 min-h-[75vh] flex items-center justify-center">
+        <div className="space-y-4 text-center">
+          <div className="w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">Inathibitisha akaunti yako...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Quick Demo Customer Login helper
+  const handleDemoCustomerLogin = async () => {
+    setIsDemoLoggingIn(true);
+    try {
+      // First try logging in with demo customer credentials
+      await login('0787754202', 'customer123');
+      showToast({
+        type: 'success',
+        title: 'Karibu Kwenye Akaunti ya Mteja!',
+        message: 'Umeingia kwenye akaunti ya mfano (Demo Customer).'
+      });
+    } catch {
+      // Fallback: direct customer session mock for instant review
+      const demoProfile: UserProfile = {
+        id: 'cust_demo_787754202',
+        fullName: 'Juma Ramadhani (Mteja)',
+        email: 'mteja.demo@tkstationery.co.tz',
+        phone: '0787754202',
+        role: 'customer',
+        city: 'Dar es Salaam',
+        region: 'Dar es Salaam',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      try {
+        localStorage.setItem('tk_active_session', JSON.stringify(demoProfile));
+        localStorage.setItem('tk_active_customer_session', JSON.stringify(demoProfile));
+        window.location.reload();
+      } catch {}
+    } finally {
+      setIsDemoLoggingIn(false);
+    }
+  };
+
+  // If user is not signed in, show welcoming customer portal authentication gate
   if (!effectiveUserId && !userProfile) {
     return (
       <div className="py-12 space-y-8 bg-slate-50 dark:bg-slate-950 min-h-[75vh] flex items-center">
         <Container>
           <Breadcrumbs items={[{ label: 'Akaunti ya Mteja' }]} />
 
-          <div className="max-w-xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden mt-6">
+          <div className="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden mt-6">
             <div className="bg-slate-900 text-white p-8 sm:p-10 text-center space-y-3">
               <div className="w-14 h-14 bg-amber-500 text-slate-950 rounded-2xl flex items-center justify-center mx-auto mb-3 font-black text-2xl shadow-md">
                 TK
@@ -290,18 +345,62 @@ export const CustomerAccountPage: React.FC = () => {
               <h1 className="text-xl sm:text-2xl font-black">
                 Akaunti ya Mteja — TK Stationery
               </h1>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-                Fuatilia maagizo yako ya vifaa, kazi za uchapaji, maombi ya mtandaoni, na risiti zako zote mahali pamoja.
+              <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto leading-relaxed">
+                Fuatilia maagizo yako ya vifaa, kazi za uchapaji, maombi ya huduma za mtandaoni, na risiti zako zote mahali pamoja.
               </p>
             </div>
 
-            <div className="p-8 sm:p-10 space-y-6 text-center">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="p-6 sm:p-10 space-y-6">
+              {/* Feature Highlights Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <ShoppingBag className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-xs font-bold text-slate-900 dark:text-white">Oda Zangu za Vifaa</h2>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Fuatilia vifaa vyako toka kupokelewa hadi kufikishwa.</p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <FileCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-xs font-bold text-slate-900 dark:text-white">Uchapaji & Huduma</h2>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Angalia kazi za print, binding na huduma za mtandaoni.</p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <FolderOpen className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-xs font-bold text-slate-900 dark:text-white">Nyaraka na Risiti</h2>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Pakua risiti zako na mafaili ya kielektroniki muda wowote.</p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-xs font-bold text-slate-900 dark:text-white">Nukuu za Mifumo</h2>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Makisio rasmi ya bei za software na suluhisho za Tehama.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 <Button
                   variant="primary"
                   size="lg"
                   onClick={() => navigateTo('/login')}
-                  className="w-full justify-center min-h-[48px]"
+                  className="w-full justify-center min-h-[48px] font-bold"
                 >
                   Ingia Kwenye Akaunti
                 </Button>
@@ -309,13 +408,26 @@ export const CustomerAccountPage: React.FC = () => {
                   variant="outline"
                   size="lg"
                   onClick={() => navigateTo('/register')}
-                  className="w-full justify-center min-h-[48px]"
+                  className="w-full justify-center min-h-[48px] font-bold"
                 >
                   Fungua Akaunti Mpya
                 </Button>
               </div>
 
-              <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-center text-xs text-slate-500 gap-2">
+              {/* One-click demo customer test access */}
+              <div className="pt-2 text-center">
+                <button
+                  type="button"
+                  onClick={handleDemoCustomerLogin}
+                  disabled={isDemoLoggingIn}
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors py-2 px-4 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  <User className="w-3.5 h-3.5" />
+                  <span>{isDemoLoggingIn ? 'Inafungua akaunti ya mfano...' : 'Au jaribu akaunti ya mfano wa mteja (Demo Customer)'}</span>
+                </button>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-center text-xs text-slate-500 gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>Mfumo salama unaolinda taarifa zako (256-Bit SSL Secured)</span>
               </div>
@@ -377,8 +489,10 @@ export const CustomerAccountPage: React.FC = () => {
         {/* Mobile Sub-Navigation Bar */}
         <div className="lg:hidden mb-6">
           <AccountMobileNav
+            currentTab={activeTab}
             activeTab={activeTab}
             onTabChange={handleTabChange}
+            counts={badges}
             badges={badges}
           />
         </div>
@@ -415,11 +529,15 @@ export const CustomerAccountPage: React.FC = () => {
           {/* Left Column: Fixed / Sticky Desktop Sidebar */}
           <div className="hidden lg:block lg:col-span-4 xl:col-span-3 lg:sticky lg:top-24">
             <AccountSidebar
+              currentTab={activeTab}
               activeTab={activeTab}
               onTabChange={handleTabChange}
+              counts={badges}
               badges={badges}
+              onSignOut={() => setIsSignOutModalOpen(true)}
               onSignOutClick={() => setIsSignOutModalOpen(true)}
               onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
+              onGoToAdmin={() => navigateTo('/admin')}
             />
           </div>
 
@@ -434,7 +552,10 @@ export const CustomerAccountPage: React.FC = () => {
               ) : (
                 <AccountOverviewSection
                   orders={userOrders}
+                  userOrders={userOrders}
+                  tickets={userTickets}
                   serviceTickets={userTickets}
+                  quotes={userQuotes}
                   quoteRequests={userQuotes}
                   documents={documents}
                   savedProducts={savedProducts}
@@ -444,6 +565,7 @@ export const CustomerAccountPage: React.FC = () => {
                   onTabChange={handleTabChange}
                   onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
                   onNavigatePath={navigateTo}
+                  onSignOutClick={() => setIsSignOutModalOpen(true)}
                 />
               )
             )}
@@ -472,6 +594,7 @@ export const CustomerAccountPage: React.FC = () => {
                 </div>
               ) : (
                 <AccountServicesSection
+                  tickets={userTickets}
                   serviceTickets={userTickets}
                   whatsappNumber={whatsappPaymentNumber}
                   onNavigatePath={navigateTo}
@@ -488,6 +611,7 @@ export const CustomerAccountPage: React.FC = () => {
               ) : (
                 <AccountQuotesSection
                   quotes={userQuotes}
+                  quoteRequests={userQuotes}
                   whatsappNumber={whatsappPaymentNumber}
                   onNavigatePath={navigateTo}
                 />

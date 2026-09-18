@@ -15,23 +15,27 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-interface AccountQuotesSectionProps {
-  quotes: QuoteRequest[];
-  whatsappNumber: string;
-  onNavigatePath: (path: string) => void;
+export interface AccountQuotesSectionProps {
+  quotes?: QuoteRequest[];
+  quoteRequests?: QuoteRequest[];
+  whatsappNumber?: string;
+  onNavigatePath?: (path: string) => void;
 }
 
 export const AccountQuotesSection: React.FC<AccountQuotesSectionProps> = ({
   quotes,
-  whatsappNumber,
-  onNavigatePath
+  quoteRequests,
+  whatsappNumber = '0787754202',
+  onNavigatePath = (_path: string) => {}
 }) => {
   const { language } = useTranslation();
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [search, setSearch] = useState('');
   const [selectedQuote, setSelectedQuote] = useState<QuoteRequest | null>(null);
 
-  const filteredQuotes = quotes.filter(quote => {
+  const effectiveQuotes = quotes || quoteRequests || [];
+
+  const filteredQuotes = effectiveQuotes.filter(quote => {
     const s = (quote.status || '').toLowerCase();
     const isCompleted = s === 'completed' || s === 'accepted' || s === 'delivered';
     const isActive = !isCompleted && s !== 'rejected' && s !== 'cancelled';

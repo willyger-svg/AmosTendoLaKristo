@@ -19,23 +19,27 @@ import {
   ShoppingBag
 } from 'lucide-react';
 
-interface AccountServicesSectionProps {
-  tickets: ServiceTicket[];
-  whatsappNumber: string;
-  onNavigatePath: (path: string) => void;
+export interface AccountServicesSectionProps {
+  tickets?: ServiceTicket[];
+  serviceTickets?: ServiceTicket[];
+  whatsappNumber?: string;
+  onNavigatePath?: (path: string) => void;
 }
 
 export const AccountServicesSection: React.FC<AccountServicesSectionProps> = ({
   tickets,
-  whatsappNumber,
-  onNavigatePath
+  serviceTickets,
+  whatsappNumber = '0787754202',
+  onNavigatePath = (_path: string) => {}
 }) => {
   const { language } = useTranslation();
   const [filter, setFilter] = useState<'all' | 'active' | 'completed' | 'cancelled'>('all');
   const [search, setSearch] = useState('');
   const [selectedTicket, setSelectedTicket] = useState<ServiceTicket | null>(null);
 
-  const filteredTickets = tickets.filter(ticket => {
+  const effectiveTickets = tickets || serviceTickets || [];
+
+  const filteredTickets = effectiveTickets.filter(ticket => {
     const s = (ticket.status || '').toLowerCase();
     const isCompleted = s === 'completed';
     const isCancelled = s === 'cancelled';

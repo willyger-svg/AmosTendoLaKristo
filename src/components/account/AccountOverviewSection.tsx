@@ -24,55 +24,79 @@ import {
   Edit3
 } from 'lucide-react';
 
-interface AccountOverviewSectionProps {
+export interface AccountOverviewSectionProps {
   orders?: Order[];
+  userOrders?: Order[];
   tickets?: ServiceTicket[];
   serviceTickets?: ServiceTicket[];
+  userTickets?: ServiceTicket[];
   quotes?: QuoteRequest[];
   quoteRequests?: QuoteRequest[];
+  userQuotes?: QuoteRequest[];
   payments?: PaymentTransaction[];
+  userPayments?: PaymentTransaction[];
   savedCount?: number;
   savedProducts?: any[];
+  userSavedProducts?: any[];
   documents?: any[];
+  userDocuments?: any[];
   notifications?: any[];
+  userNotifications?: any[];
   whatsappNumber?: string;
   onNavigateTab?: (tab: AccountTabId) => void;
   onTabChange?: (tab: AccountTabId) => void;
   onOpenPhotoModal?: () => void;
   onNavigatePath?: (path: string) => void;
+  onSignOutClick?: () => void;
 }
 
 export const AccountOverviewSection: React.FC<AccountOverviewSectionProps> = ({
-  orders = [],
+  orders,
+  userOrders,
   tickets,
   serviceTickets,
+  userTickets,
   quotes,
   quoteRequests,
-  payments = [],
+  userQuotes,
+  payments,
+  userPayments,
   savedCount,
-  savedProducts = [],
+  savedProducts,
+  userSavedProducts,
+  documents,
+  userDocuments,
+  notifications,
+  userNotifications,
+  whatsappNumber = '0787754202',
   onNavigateTab: onNavigateTabProp,
   onTabChange,
   onOpenPhotoModal,
-  onNavigatePath
+  onNavigatePath,
+  onSignOutClick
 }) => {
   const { currentUser, userProfile } = useAuth();
   const { language } = useTranslation();
 
-  const effectiveTickets = tickets || serviceTickets || [];
-  const effectiveQuotes = quotes || quoteRequests || [];
-  const effectiveSavedCount = savedCount !== undefined ? savedCount : savedProducts.length;
+  const effectiveOrders = orders || userOrders || [];
+  const effectiveTickets = tickets || serviceTickets || userTickets || [];
+  const effectiveQuotes = quotes || quoteRequests || userQuotes || [];
+  const effectivePayments = payments || userPayments || [];
+  const effectiveDocuments = documents || userDocuments || [];
+  const effectiveSavedProducts = savedProducts || userSavedProducts || [];
+  const effectiveNotifications = notifications || userNotifications || [];
+  const effectiveSavedCount = savedCount !== undefined ? savedCount : effectiveSavedProducts.length;
   const onNavigateTab = onNavigateTabProp || onTabChange || (() => {});
 
   // Compute real metrics from loaded user data
-  const totalOrders = (orders || []).length;
+  const totalOrders = effectiveOrders.length;
 
-  const activeOrders = (orders || []).filter(o => {
+  const activeOrders = effectiveOrders.filter(o => {
     const s = (o.orderStatus || o.status || '').toLowerCase();
     return s === 'submitted' || s === 'processing' || s === 'packed' || s === 'ready' || s === 'ready_for_pickup' || s === 'out for delivery' || s === 'out_for_delivery';
   }).length;
 
-  const completedOrders = (orders || []).filter(o => {
+  const completedOrders = effectiveOrders.filter(o => {
     const s = (o.orderStatus || o.status || '').toLowerCase();
     return s === 'completed' || s === 'delivered';
   }).length;
@@ -87,12 +111,12 @@ export const AccountOverviewSection: React.FC<AccountOverviewSectionProps> = ({
     return s !== 'completed' && s !== 'rejected' && s !== 'cancelled';
   }).length;
 
-  const pendingPayments = (orders || []).filter(o => {
+  const pendingPayments = effectiveOrders.filter(o => {
     const ps = (o.paymentStatus || '').toLowerCase();
     return ps.includes('pending') || ps === 'unpaid';
   }).length;
 
-  const recentOrders = (orders || []).slice(0, 3);
+  const recentOrders = effectiveOrders.slice(0, 3);
   const recentTickets = effectiveTickets.slice(0, 3);
 
   const formattedJoinDate = userProfile?.createdAt

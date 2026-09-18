@@ -424,20 +424,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileNav }) => {
             </div>
 
             {/* Account Link / Sign In Trigger */}
-            <Tooltip content={currentUser || userProfile ? (isStaff || userProfile?.role === 'super_admin' || userProfile?.role === 'admin' ? `Jopo la Usimamizi: ${userProfile?.fullName || 'Msimamizi'}` : `Akaunti ya Mteja: ${userProfile?.fullName || currentUser?.email}`) : 'Ingia kwenye akaunti yako'}>
+            <Tooltip content={currentUser || userProfile ? (isStaff || userProfile?.role === 'super_admin' || userProfile?.role === 'admin' ? `Akaunti ya Msimamizi: ${userProfile?.fullName || 'Msimamizi'}` : `Akaunti ya Mteja: ${userProfile?.fullName || currentUser?.email}`) : 'Akaunti Yangu / Ingia'}>
               <button
                 type="button"
-                onClick={() => {
-                  if (currentUser || userProfile) {
-                    if (isStaff || userProfile?.role === 'super_admin' || userProfile?.role === 'admin') {
-                      navigateTo('/admin');
-                    } else {
-                      navigateTo('/account');
-                    }
-                  } else {
-                    navigateTo('/login');
-                  }
-                }}
+                onClick={() => navigateTo('/account')}
                 className="p-2 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl transition-colors flex items-center gap-2 active:scale-[0.98]"
                 aria-label={currentUser ? (isStaff ? 'Jopo la Usimamizi' : 'Akaunti Yangu') : 'Ingia'}
               >

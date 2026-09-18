@@ -12,9 +12,11 @@ import {
   LayoutGrid
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 
 export const DesktopNavigation: React.FC = () => {
   const { currentPath, navigateTo } = useApp();
+  const { currentUser, userProfile } = useAuth();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const isActive = (path: string) => {
@@ -130,10 +132,10 @@ export const DesktopNavigation: React.FC = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigateTo('/login')}
-            className="text-xs font-semibold text-slate-900 bg-amber-400 hover:bg-amber-300 py-1.5 px-3.5 rounded-lg transition-colors shadow-xs"
+            onClick={() => navigateTo('/account')}
+            className="text-xs font-semibold text-slate-900 bg-amber-400 hover:bg-amber-300 py-1.5 px-3.5 rounded-lg transition-colors shadow-xs flex items-center gap-1.5"
           >
-            Akaunti Yangu
+            <span>{currentUser || userProfile ? (userProfile?.fullName ? userProfile.fullName.split(' ')[0] : 'Akaunti Yangu') : 'Akaunti Yangu'}</span>
           </button>
         </div>
       </div>

@@ -45,19 +45,19 @@ export const AdminOrdersView: React.FC = () => {
       await updateOrderStatus(orderId, newStatus);
 
       // Audit log
-      if (currentUser) {
-        await auditLogService.logAdminAction({
-          action: 'order_status_updated',
-          actorId: currentUser.uid,
-          actorEmail: currentUser.email || '',
-          actorName: userProfile?.fullName || '',
-          actorRole: userRole,
-          targetType: 'order',
-          targetId: orderId,
-          targetTitle: `Order #${orderId}`,
-          details: { newStatus }
-        });
-      }
+      await auditLogService.logAdminAction({
+        action: 'order_status_updated',
+        actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+        actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+        actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
+        actorRole: userRole,
+        targetType: 'order',
+        targetId: orderId,
+        targetTitle: `Oda #${orderId}`,
+        details: { newStatus },
+        severity: newStatus === 'Cancelled' ? 'warning' : 'info',
+        category: 'orders'
+      });
 
       showToast({
         type: 'success',

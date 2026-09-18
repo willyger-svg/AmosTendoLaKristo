@@ -33,23 +33,23 @@ export const AdminSettingsView: React.FC = () => {
     try {
       await updateStoreSettings(form);
 
-      if (currentUser) {
-        await auditLogService.logAdminAction({
-          action: 'store_settings_updated',
-          actorId: currentUser.uid,
-          actorEmail: currentUser.email || '',
-          actorName: userProfile?.fullName || '',
-          actorRole: userRole,
-          targetType: 'settings',
-          targetId: 'store_settings',
-          targetTitle: 'Store Configuration',
-          details: {
-            storeName: form.storeName,
-            supportPhone: form.supportPhone,
-            whatsappOrderNumber: form.whatsappOrderNumber
-          }
-        });
-      }
+      await auditLogService.logAdminAction({
+        action: 'store_settings_updated',
+        actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+        actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+        actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi Mkuu',
+        actorRole: userRole,
+        targetType: 'settings',
+        targetId: 'store_settings',
+        targetTitle: 'Mipangilio ya Duka (Store Configuration)',
+        details: {
+          storeName: form.storeName,
+          supportPhone: form.supportPhone,
+          whatsappOrderNumber: form.whatsappOrderNumber
+        },
+        severity: 'critical',
+        category: 'settings'
+      });
 
       showToast({
         type: 'success',

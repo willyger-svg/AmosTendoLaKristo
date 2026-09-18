@@ -17,7 +17,7 @@ import {
 import { TableSkeleton } from '../../common/Skeleton';
 
 export const AdminStaffView: React.FC = () => {
-  const { currentUser, userRole, isSuperAdmin, getAllUsers, setUserRole } = useAuth();
+  const { currentUser, userProfile, userRole, isSuperAdmin, getAllUsers, setUserRole } = useAuth();
   const { showToast } = useApp();
 
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -64,19 +64,19 @@ export const AdminStaffView: React.FC = () => {
     try {
       await setUserRole(targetUser.id, newRole);
 
-      if (currentUser) {
-        await auditLogService.logAdminAction({
-          action: 'user_role_updated',
-          actorId: currentUser.uid,
-          actorEmail: currentUser.email || '',
-          actorName: currentUser.displayName || '',
-          actorRole: userRole,
-          targetType: 'user_role',
-          targetId: targetUser.id,
-          targetTitle: targetUser.fullName || targetUser.email,
-          details: { previousRole: targetUser.role, newRole }
-        });
-      }
+      await auditLogService.logAdminAction({
+        action: 'user_role_updated',
+        actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+        actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+        actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi Mkuu',
+        actorRole: userRole,
+        targetType: 'user_role',
+        targetId: targetUser.id,
+        targetTitle: targetUser.fullName || targetUser.email,
+        details: { previousRole: targetUser.role, newRole },
+        severity: 'critical',
+        category: 'staff'
+      });
 
       showToast({
         type: 'success',

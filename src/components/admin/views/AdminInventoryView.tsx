@@ -58,19 +58,19 @@ export const AdminInventoryView: React.FC = () => {
     setUpdatingId(product.id);
     try {
       await productService.updateProduct(product.id, { stockCount: nextCount });
-      if (currentUser) {
-        await auditLogService.logAdminAction({
-          action: 'inventory_adjusted',
-          actorId: currentUser.uid,
-          actorEmail: currentUser.email || '',
-          actorName: userProfile?.fullName || '',
-          actorRole: userRole,
-          targetType: 'product',
-          targetId: product.id,
-          targetTitle: product.title,
-          details: { previousStock: product.stockCount, newStock: nextCount, delta }
-        });
-      }
+      await auditLogService.logAdminAction({
+        action: 'inventory_adjusted',
+        actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+        actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+        actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
+        actorRole: userRole,
+        targetType: 'product',
+        targetId: product.id,
+        targetTitle: product.title,
+        details: { previousStock: product.stockCount, newStock: nextCount, delta },
+        severity: 'warning',
+        category: 'inventory'
+      });
       showToast({
         type: 'success',
         title: 'Stoo Imesasishwa',

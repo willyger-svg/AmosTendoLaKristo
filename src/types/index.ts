@@ -347,7 +347,13 @@ export interface NotificationItem {
 }
 
 export type AdminActionType =
+  | 'user_signup'
+  | 'admin_login'
+  | 'user_login'
+  | 'user_role_updated'
   | 'order_status_updated'
+  | 'order_created'
+  | 'order_cancelled'
   | 'payment_verified'
   | 'payment_failed'
   | 'payment_refunded'
@@ -356,13 +362,16 @@ export type AdminActionType =
   | 'product_deleted'
   | 'product_toggled'
   | 'inventory_adjusted'
-  | 'user_role_updated'
   | 'store_settings_updated'
   | 'ad_created'
   | 'ad_updated'
   | 'ad_deleted'
   | 'ticket_status_updated'
   | 'quote_status_updated'
+  | 'category_created'
+  | 'category_deleted'
+  | 'document_uploaded'
+  | 'document_deleted'
   | 'system_sync'
   | string;
 
@@ -373,11 +382,14 @@ export interface AdminAuditLog {
   actorEmail?: string;
   actorName?: string;
   actorRole: UserRole | 'system';
-  targetType: 'order' | 'payment' | 'product' | 'category' | 'inventory' | 'customer' | 'service_request' | 'quote' | 'ad' | 'settings' | 'user_role' | 'system';
+  targetType: 'order' | 'payment' | 'product' | 'category' | 'inventory' | 'customer' | 'user' | 'service_request' | 'quote' | 'ad' | 'settings' | 'user_role' | 'document' | 'system';
   targetId: string;
   targetTitle?: string;
   details: Record<string, any>;
   timestamp: string;
+  severity?: 'info' | 'warning' | 'critical';
+  category?: 'auth' | 'orders' | 'payments' | 'inventory' | 'staff' | 'settings' | 'content' | 'general';
+  privacyStatus?: 'redacted' | 'zero_knowledge';
 }
 
 export interface PaymentAuditLog {

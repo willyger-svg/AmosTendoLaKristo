@@ -19,6 +19,7 @@ import {
   Bell,
   ShieldCheck,
   History,
+  Activity,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -187,9 +188,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         },
         {
           id: 'audit-logs',
-          path: '/admin/audit-logs',
-          label: 'Kumbukumbu za Mfumo',
-          icon: History
+          path: '/admin/activity-logs',
+          label: 'Activity Logs (Shughuli)',
+          icon: Activity
         },
         {
           id: 'settings',
@@ -211,6 +212,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const isCurrentActive = (itemPath: string, itemId: string) => {
     if (itemId === 'dashboard') {
       return currentPath === '/admin' || currentPath === '/admin/' || currentPath === '/admin/dashboard';
+    }
+    if (itemId === 'audit-logs') {
+      return currentPath.startsWith('/admin/activity-logs') || currentPath.startsWith('/admin/audit-logs');
     }
     return currentPath === itemPath || currentPath.startsWith(itemPath + '/');
   };
