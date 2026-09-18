@@ -26,7 +26,6 @@ import { OnlineServicesPage } from './pages/OnlineServicesPage';
 import { TrackOrderPage } from './pages/TrackOrderPage';
 import { CustomerAccountPage } from './pages/CustomerAccountPage';
 import { CustomerLoginPage } from './pages/CustomerLoginPage';
-import { AdminLoginPage } from './pages/AdminLoginPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
@@ -34,16 +33,6 @@ import { ContactPage } from './pages/ContactPage';
 const AppContent: React.FC = () => {
   const { currentPath } = useApp();
   const [isMobileNavOpen, setIsMobileNavOpen] = React.useState(false);
-
-  // 1. Dedicated standalone admin login view
-  if (currentPath === '/admin/login') {
-    return (
-      <div className="min-h-screen bg-slate-950 font-sans selection:bg-amber-400 selection:text-slate-950">
-        <AdminLoginPage />
-        <ToastContainer />
-      </div>
-    );
-  }
 
   const renderCurrentPage = () => {
     // Route matching
@@ -87,7 +76,7 @@ const AppContent: React.FC = () => {
       return <TrackOrderPage />;
     }
 
-    if (currentPath === '/login' || currentPath === '/register') {
+    if (currentPath === '/login' || currentPath === '/register' || currentPath === '/admin/login') {
       return <CustomerLoginPage />;
     }
 

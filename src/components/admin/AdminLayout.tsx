@@ -22,7 +22,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   pageTitle,
   breadcrumbs = []
 }) => {
-  const { currentUser, userProfile, userRole, loading: authLoading } = useAuth();
+  const { currentUser, userProfile, userRole, isStaff, isSuperAdmin, loading: authLoading } = useAuth();
   const { navigateTo } = useApp();
 
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
@@ -75,15 +75,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     );
   }
 
-  // 2. Not Signed In State (Check both currentUser and authenticated admin profile)
-  const isProfileAdmin = userProfile && ['super_admin', 'admin', 'staff'].includes(userProfile.role);
-  const SUPER_ADMINS = ['wshavu@gmail.com', 'amosstationery@gmail.com', 'admin1010@tkstationery.co.tz'];
-  const isHardcodedAdmin = Boolean(
-    (currentUser?.email && SUPER_ADMINS.includes(currentUser.email.toLowerCase())) ||
-    (userProfile?.email && SUPER_ADMINS.includes(userProfile.email.toLowerCase()))
+  // 2. Not Signed In State (Check authenticated admin/staff privileges)
+  const hasAdminAccess = Boolean(
+    isStaff ||
+    isSuperAdmin ||
+    (userProfile && ['super_admin', 'admin', 'staff'].includes(userProfile.role))
   );
 
-  if (!currentUser && !isProfileAdmin && !isHardcodedAdmin) {
+  if (!currentUser && !hasAdminAccess) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center text-white shadow-2xl space-y-6">
@@ -100,11 +99,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
           <div className="pt-2 flex flex-col gap-3">
             <button
-              onClick={() => navigateTo('/admin/login')}
+              onClick={() => navigateTo('/login')}
               className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2"
             >
               <LogIn className="w-4 h-4" />
-              <span>Ingia kama Msimamizi (Admin Login)</span>
+              <span>Ingia kwenye Akaunti (Log In)</span>
             </button>
             <button
               onClick={() => navigateTo('/')}
@@ -119,8 +118,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     );
   }
 
-  // 3. Customer Role (Denied from Admin Area unless hardcoded admin)
-  if (userRole === 'customer' && !isHardcodedAdmin) {
+  // 3. Customer Role (Denied from Admin Area unless has administrative privileges)
+  if (userRole === 'customer' && !hasAdminAccess) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center text-white shadow-2xl space-y-6">
@@ -132,16 +131,16 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               Ufikiaji wa Jopo la Usimamizi
             </h2>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Umeingia kama <span className="text-amber-400 font-bold">"{userProfile?.fullName || 'Mteja'}"</span>. Ili kufikia kurasa za usimamizi (Admin Portal), unahitaji kuingia kwa akaunti ya msimamizi au kuingiza namba ya utawala (1010).
+              Umeingia kama <span className="text-amber-400 font-bold">"{userProfile?.fullName || 'Mteja'}"</span>. Sehemu hii inahitaji akaunti ya Msimamizi au Mfanyakazi. Tafadhali ingia kwa kutumia akaunti yenye mamlaka ya usimamizi.
             </p>
           </div>
           <div className="pt-2 flex flex-col gap-3">
             <button
-              onClick={() => navigateTo('/admin/login')}
+              onClick={() => navigateTo('/login')}
               className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2"
             >
               <LogIn className="w-4 h-4" />
-              <span>Ingia kama Msimamizi (Admin Login / 1010)</span>
+              <span>Ingia kama Msimamizi</span>
             </button>
             <button
               onClick={() => navigateTo('/account')}

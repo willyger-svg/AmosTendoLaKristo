@@ -553,7 +553,7 @@ export const authService = {
     if (isMasterCode1010) {
       const adminProfile: UserProfile = {
         id: 'admin_1010_master',
-        fullName: 'TK Super Administrator (1010)',
+        fullName: 'Msimamizi Mkuu - TK Stationery',
         email: ADMIN_1010_EMAIL,
         phone: '+255 787 754 202',
         role: 'super_admin',
@@ -570,7 +570,7 @@ export const authService = {
           updatedAt: new Date().toISOString()
         }, { merge: true });
       } catch (docErr) {
-        console.warn('Could not sync 1010 admin doc in Firestore:', docErr);
+        console.warn('Could not sync admin profile document in Firestore:', docErr);
       }
 
       setStoredSession(adminProfile);
@@ -611,7 +611,7 @@ export const authService = {
     if (userId === 'admin_1010_master') {
       return {
         id: 'admin_1010_master',
-        fullName: 'TK Super Administrator (1010)',
+        fullName: 'Msimamizi Mkuu - TK Stationery',
         email: ADMIN_1010_EMAIL,
         phone: '+255 787 754 202',
         role: 'super_admin',

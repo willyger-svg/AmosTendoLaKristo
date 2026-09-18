@@ -300,7 +300,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   onClick={async () => {
                     setIsProfileOpen(false);
                     await logout();
-                    navigateTo('/admin/login');
+                    navigateTo('/login');
                   }}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                 >

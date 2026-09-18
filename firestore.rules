@@ -6,22 +6,12 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isHardcodedSuperAdmin() {
-      return (
-        isSignedIn() && (
-          (request.auth.token.email != null && (
-            request.auth.token.email.lower() == 'wshavu@gmail.com' ||
-            request.auth.token.email.lower() == 'amosstationery@gmail.com' ||
-            request.auth.token.email.lower() == 'admin1010@tkstationery.co.tz'
-          )) ||
-          request.auth.uid == 'admin_1010_master'
-        )
-      );
-    }
-
     function isSuperAdmin() {
-      return isHardcodedSuperAdmin() ||
-        (isSignedIn() && request.auth.token.role == 'super_admin');
+      return isSignedIn() && (
+        request.auth.token.role == 'super_admin' ||
+        request.auth.token.role == 'admin' ||
+        (request.auth.token.email != null && request.auth.token.email.matches('.*@tkstationery\\.co\\.tz$'))
+      );
     }
 
     // Phone Index for phone-to-user customer lookup during login
