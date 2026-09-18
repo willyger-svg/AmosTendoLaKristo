@@ -16,6 +16,7 @@ import {
   User,
   Calendar
 } from 'lucide-react';
+import { KpiGridSkeleton, TableSkeleton } from '../../common/Skeleton';
 
 interface UnifiedCustomer {
   id: string;
@@ -182,6 +183,9 @@ export const AdminCustomersView: React.FC = () => {
       </div>
 
       {/* KPI Cards */}
+      {loadingUsers ? (
+        <KpiGridSkeleton count={4} />
+      ) : (
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div
           onClick={() => setFilterType('all')}
@@ -255,6 +259,7 @@ export const AdminCustomersView: React.FC = () => {
           <p className="text-[11px] text-slate-400 mt-1">Kupitia oda zilizothibitishwa</p>
         </div>
       </div>
+      )}
 
       {/* Search & Filters Toolbar */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -306,10 +311,7 @@ export const AdminCustomersView: React.FC = () => {
       {/* Customers Table */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
         {loadingUsers ? (
-          <div className="py-16 text-center text-slate-400">
-            <Users className="w-8 h-8 mx-auto mb-2 animate-spin text-amber-500" />
-            <p className="text-xs">Inapakia daftari la wateja...</p>
-          </div>
+          <TableSkeleton rows={6} columns={7} />
         ) : filteredCustomers.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
             <Users className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />

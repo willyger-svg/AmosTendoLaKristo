@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Lock
 } from 'lucide-react';
+import { TableSkeleton } from '../../common/Skeleton';
 
 export const AdminStaffView: React.FC = () => {
   const { currentUser, userRole, isSuperAdmin, getAllUsers, setUserRole } = useAuth();
@@ -142,7 +143,7 @@ export const AdminStaffView: React.FC = () => {
       {/* Users Table */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
         {loading ? (
-          <div className="py-16 text-center text-xs text-slate-400">Inapakia orodha ya watumiaji...</div>
+          <TableSkeleton rows={5} columns={5} />
         ) : filteredUsers.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
             <Users className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />

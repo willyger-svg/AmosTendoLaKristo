@@ -213,7 +213,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const [storeSettings, setStoreSettings] = useState<StoreSettings>(DEFAULT_STORE_SETTINGS);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>(mockAdvertisements);
-  const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
 
   // Sync products cache to localStorage whenever products state updates
   useEffect(() => {

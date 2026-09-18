@@ -17,9 +17,10 @@ import {
   ChevronDown,
   Filter
 } from 'lucide-react';
+import { TableSkeleton } from '../../common/Skeleton';
 
 export const AdminOrdersView: React.FC = () => {
-  const { orders, updateOrderStatus, showToast } = useApp();
+  const { orders, updateOrderStatus, showToast, isLoadingData } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -124,7 +125,9 @@ export const AdminOrdersView: React.FC = () => {
 
       {/* Orders Table */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
-        {filteredOrders.length === 0 ? (
+        {isLoadingData && orders.length === 0 ? (
+          <TableSkeleton rows={6} columns={6} />
+        ) : filteredOrders.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
             <ShoppingBag className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />
             <p className="text-sm font-semibold">Hakuna oda inayolingana na vigezo vyako</p>

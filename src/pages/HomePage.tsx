@@ -5,6 +5,7 @@ import { Container } from '../components/layout/Container';
 import { Button } from '../components/common/Button';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { ProductCard } from '../components/shop/ProductCard';
+import { ProductGridSkeleton, Skeleton } from '../components/common/Skeleton';
 import { PrintPriceEstimator } from '../components/printing/PrintPriceEstimator';
 import { DisclaimerBanner } from '../components/common/DisclaimerBanner';
 import { createWhatsAppUrl } from '../utils/whatsapp';
@@ -38,7 +39,7 @@ import {
 } from 'lucide-react';
 
 export const HomePage: React.FC = () => {
-  const { navigateTo, storeSettings, advertisements, trackAdClick, products, publicServices, testimonials } = useApp();
+  const { navigateTo, storeSettings, advertisements, trackAdClick, products, publicServices, testimonials, isLoadingData } = useApp();
   const { t, language } = useTranslation();
   const [selectedCategoryTab, setSelectedCategoryTab] = useState<'all' | 'paper' | 'school' | 'office' | 'accessories'>('all');
 
@@ -443,11 +444,15 @@ export const HomePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {filteredProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {isLoadingData && products.length === 0 ? (
+            <ProductGridSkeleton count={8} columns="grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" />
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {filteredProducts.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
 
           <div className="mt-10 text-center">
             <Button
@@ -549,31 +554,49 @@ export const HomePage: React.FC = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {featuredPublicServices.map(srv => (
-              <div key={srv.id} className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 flex flex-col justify-between hover:border-emerald-500/50 transition-colors">
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                    {srv.agencyName || srv.code}
-                  </span>
-                  <h3 className="font-bold text-sm text-white leading-snug">{srv.title}</h3>
-                  <p className="text-xs text-slate-400 line-clamp-2">{srv.shortDescription}</p>
+          {isLoadingData && publicServices.length === 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 flex flex-col justify-between animate-pulse">
+                  <div className="space-y-2">
+                    <div className="w-16 h-4 bg-slate-800 rounded" />
+                    <div className="w-4/5 h-4 bg-slate-800 rounded" />
+                    <div className="w-full h-3 bg-slate-800/60 rounded" />
+                  </div>
+                  <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+                    <div className="w-20 h-3 bg-slate-800 rounded" />
+                    <div className="w-16 h-3 bg-slate-800 rounded" />
+                  </div>
                 </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {featuredPublicServices.map(srv => (
+                <div key={srv.id} className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 flex flex-col justify-between hover:border-emerald-500/50 transition-colors">
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                      {srv.agencyName || srv.code}
+                    </span>
+                    <h3 className="font-bold text-sm text-white leading-snug">{srv.title}</h3>
+                    <p className="text-xs text-slate-400 line-clamp-2">{srv.shortDescription}</p>
+                  </div>
 
-                <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                  <span className="font-mono text-slate-300 font-semibold text-[11px] truncate max-w-[140px]">
-                    {srv.tkAssistanceFeeNote?.split(':')[0] || 'Gharama ya Msaada'}
-                  </span>
-                  <button
-                    onClick={() => navigateTo('/online-services')}
-                    className="text-emerald-400 font-bold hover:underline"
-                  >
-                    Omba Msaada
-                  </button>
+                  <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
+                    <span className="font-mono text-slate-300 font-semibold text-[11px] truncate max-w-[140px]">
+                      {srv.tkAssistanceFeeNote?.split(':')[0] || 'Gharama ya Msaada'}
+                    </span>
+                    <button
+                      onClick={() => navigateTo('/online-services')}
+                      className="text-emerald-400 font-bold hover:underline"
+                    >
+                      Omba Msaada
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           <div className="mt-8">
             <DisclaimerBanner />

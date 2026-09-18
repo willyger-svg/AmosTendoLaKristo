@@ -4,6 +4,7 @@ import { Container } from '../components/layout/Container';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { ProductCard } from '../components/shop/ProductCard';
+import { ProductGridSkeleton } from '../components/common/Skeleton';
 import {
   ProductFilterSidebar,
   FilterState
@@ -13,7 +14,7 @@ import { Search, Filter, SlidersHorizontal, Package, AlertCircle } from 'lucide-
 import { Button } from '../components/common/Button';
 
 export const ShopPage: React.FC = () => {
-  const { searchQuery, setSearchQuery, products } = useApp();
+  const { searchQuery, setSearchQuery, products, isLoadingData } = useApp();
 
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
@@ -176,7 +177,9 @@ export const ShopPage: React.FC = () => {
             </div>
 
             {/* Grid */}
-            {filteredProducts.length > 0 ? (
+            {isLoadingData && products.length === 0 ? (
+              <ProductGridSkeleton count={6} columns="grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" />
+            ) : filteredProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredProducts.map(product => (
                   <ProductCard key={product.id} product={product} />

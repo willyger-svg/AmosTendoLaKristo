@@ -19,6 +19,7 @@ import {
   Building2,
   Banknote
 } from 'lucide-react';
+import { TableSkeleton } from '../../common/Skeleton';
 
 export const AdminPaymentsView: React.FC = () => {
   const { showToast, orders } = useApp();
@@ -215,7 +216,7 @@ export const AdminPaymentsView: React.FC = () => {
       {/* Table */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
         {loading ? (
-          <div className="py-16 text-center text-xs text-slate-400">Inapakia orodha ya miamala ya malipo...</div>
+          <TableSkeleton rows={6} columns={7} />
         ) : filteredPayments.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
             <CreditCard className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />

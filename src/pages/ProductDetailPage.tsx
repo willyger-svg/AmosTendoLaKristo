@@ -5,6 +5,7 @@ import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
 import { ProductCard } from '../components/shop/ProductCard';
+import { ProductDetailSkeleton } from '../components/common/Skeleton';
 import { formatTSh } from '../utils/formatters';
 import { getProductWhatsAppUrl } from '../utils/whatsapp';
 import {
@@ -33,17 +34,9 @@ export const ProductDetailPage: React.FC = () => {
 
   if (!product) {
     return (
-      <div className="py-16 text-center">
-        <Container>
-          <div className="max-w-md mx-auto space-y-4">
-            <Package className="w-12 h-12 text-slate-400 mx-auto animate-pulse" />
-            <h2 className="text-lg font-bold text-slate-800">Inapakia taarifa za bidhaa...</h2>
-            <Button variant="outline" onClick={() => navigateTo('/shop')}>
-              Rudi Dukani
-            </Button>
-          </div>
-        </Container>
-      </div>
+      <Container>
+        <ProductDetailSkeleton />
+      </Container>
     );
   }
 

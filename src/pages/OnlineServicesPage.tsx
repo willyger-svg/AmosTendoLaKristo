@@ -6,6 +6,7 @@ import { SectionHeader } from '../components/common/SectionHeader';
 import { DisclaimerBanner } from '../components/common/DisclaimerBanner';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
+import { ServiceGridSkeleton } from '../components/common/Skeleton';
 import { PublicServiceItem } from '../types';
 import { createWhatsAppUrl } from '../utils/whatsapp';
 import {
@@ -121,8 +122,11 @@ export const OnlineServicesPage: React.FC = () => {
           </div>
 
           {/* Services List Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {filteredServices.map(service => (
+          {isLoadingData && publicServices.length === 0 ? (
+            <ServiceGridSkeleton count={4} />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {filteredServices.map(service => (
               <div
                 key={service.id}
                 className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-7 shadow-xs hover:shadow-xl transition-all flex flex-col justify-between space-y-6"
@@ -230,6 +234,7 @@ export const OnlineServicesPage: React.FC = () => {
               </div>
             ))}
           </div>
+          )}
         </div>
       </Container>
     </div>

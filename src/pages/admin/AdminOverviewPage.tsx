@@ -5,6 +5,7 @@ import { auditLogService } from '../../services/audit/auditLogService';
 import { AdminAuditLog } from '../../types';
 import { formatPrice, formatTimeAgo, formatDate } from '../../utils/formatters';
 import { canAccessSection, ADMIN_ROLE_CONFIGS } from '../../utils/adminPermissions';
+import { KpiGridSkeleton, AuditLogRowSkeleton, TableSkeleton } from '../../components/common/Skeleton';
 import {
   ShoppingBag,
   CreditCard,
@@ -119,6 +120,9 @@ export const AdminOverviewPage: React.FC = () => {
       </div>
 
       {/* Core Real-Time Metrics Grid */}
+      {isLoadingData && orders.length === 0 ? (
+        <KpiGridSkeleton count={4} />
+      ) : (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1: Total Orders */}
         <div
@@ -210,6 +214,7 @@ export const AdminOverviewPage: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Secondary Metrics Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800">
@@ -277,7 +282,23 @@ export const AdminOverviewPage: React.FC = () => {
           </div>
 
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
-            {orders.slice(0, 6).map(order => {
+            {isLoadingData && orders.length === 0 ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="p-4 flex items-center justify-between gap-4 animate-pulse">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700" />
+                    <div className="space-y-1.5">
+                      <div className="w-32 h-3.5 bg-slate-200 dark:bg-slate-700 rounded" />
+                      <div className="w-48 h-2.5 bg-slate-100 dark:bg-slate-800 rounded" />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 text-right">
+                    <div className="w-16 h-3.5 bg-slate-200 dark:bg-slate-700 rounded ml-auto" />
+                    <div className="w-20 h-3 bg-slate-100 dark:bg-slate-800 rounded ml-auto" />
+                  </div>
+                </div>
+              ))
+            ) : orders.slice(0, 6).map(order => {
               const statusLabel =
                 order.status === 'Completed'
                   ? 'Imekamilika'
@@ -406,7 +427,11 @@ export const AdminOverviewPage: React.FC = () => {
 
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-3 space-y-2.5">
               {loadingLogs ? (
-                <div className="py-6 text-center text-xs text-slate-400">Inapakia kumbukumbu...</div>
+                <div className="space-y-2">
+                  {[1, 2, 3, 4].map(i => (
+                    <AuditLogRowSkeleton key={i} />
+                  ))}
+                </div>
               ) : auditLogs.length === 0 ? (
                 <div className="py-6 text-center text-xs text-slate-400">
                   <ShieldCheck className="w-5 h-5 mx-auto text-slate-300 dark:text-slate-700 mb-1" />

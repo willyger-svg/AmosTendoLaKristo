@@ -22,6 +22,7 @@ import { savedProductsService } from '../services/saved/savedProductsService';
 import { notificationService } from '../services/notifications/notificationService';
 import { paymentService } from '../services/payments/paymentService';
 import { storageService } from '../services/storage/storageService';
+import { TableSkeleton, KpiGridSkeleton, Skeleton } from '../components/common/Skeleton';
 
 import {
   CustomerDocument,
@@ -52,7 +53,8 @@ export const CustomerAccountPage: React.FC = () => {
     quoteRequests,
     showToast,
     openModal,
-    storeSettings
+    storeSettings,
+    isLoadingData
   } = useApp();
 
   const {
@@ -424,53 +426,88 @@ export const CustomerAccountPage: React.FC = () => {
           {/* Right Column: Dynamic Section View */}
           <div className="lg:col-span-8 xl:col-span-9 min-w-0">
             {activeTab === 'overview' && (
-              <AccountOverviewSection
-                orders={userOrders}
-                serviceTickets={userTickets}
-                quoteRequests={userQuotes}
-                documents={documents}
-                savedProducts={savedProducts}
-                notifications={notifications}
-                payments={payments}
-                whatsappNumber={whatsappPaymentNumber}
-                onTabChange={handleTabChange}
-                onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
-                onNavigatePath={navigateTo}
-              />
+              isLoadingData && userOrders.length === 0 && isLoadingCustomerData ? (
+                <div className="space-y-6">
+                  <KpiGridSkeleton count={4} />
+                  <TableSkeleton rows={4} columns={4} />
+                </div>
+              ) : (
+                <AccountOverviewSection
+                  orders={userOrders}
+                  serviceTickets={userTickets}
+                  quoteRequests={userQuotes}
+                  documents={documents}
+                  savedProducts={savedProducts}
+                  notifications={notifications}
+                  payments={payments}
+                  whatsappNumber={whatsappPaymentNumber}
+                  onTabChange={handleTabChange}
+                  onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
+                  onNavigatePath={navigateTo}
+                />
+              )
             )}
 
             {activeTab === 'orders' && (
-              <OrderHistory
-                initialOrders={userOrders}
-                whatsappNumber={whatsappPaymentNumber}
-                showToast={showToast}
-                onNavigatePath={navigateTo}
-              />
+              isLoadingData && userOrders.length === 0 ? (
+                <div className="space-y-4">
+                  <div className="h-6 w-36 bg-slate-200 dark:bg-slate-700 rounded-md animate-pulse" />
+                  <TableSkeleton rows={5} columns={5} />
+                </div>
+              ) : (
+                <OrderHistory
+                  initialOrders={userOrders}
+                  whatsappNumber={whatsappPaymentNumber}
+                  showToast={showToast}
+                  onNavigatePath={navigateTo}
+                />
+              )
             )}
 
             {activeTab === 'service-requests' && (
-              <AccountServicesSection
-                serviceTickets={userTickets}
-                whatsappNumber={whatsappPaymentNumber}
-                onNavigatePath={navigateTo}
-              />
+              isLoadingData && userTickets.length === 0 ? (
+                <div className="space-y-4">
+                  <div className="h-6 w-36 bg-slate-200 dark:bg-slate-700 rounded-md animate-pulse" />
+                  <TableSkeleton rows={4} columns={4} />
+                </div>
+              ) : (
+                <AccountServicesSection
+                  serviceTickets={userTickets}
+                  whatsappNumber={whatsappPaymentNumber}
+                  onNavigatePath={navigateTo}
+                />
+              )
             )}
 
             {activeTab === 'quotes' && (
-              <AccountQuotesSection
-                quotes={userQuotes}
-                whatsappNumber={whatsappPaymentNumber}
-                onNavigatePath={navigateTo}
-              />
+              isLoadingData && userQuotes.length === 0 ? (
+                <div className="space-y-4">
+                  <div className="h-6 w-36 bg-slate-200 dark:bg-slate-700 rounded-md animate-pulse" />
+                  <TableSkeleton rows={4} columns={4} />
+                </div>
+              ) : (
+                <AccountQuotesSection
+                  quotes={userQuotes}
+                  whatsappNumber={whatsappPaymentNumber}
+                  onNavigatePath={navigateTo}
+                />
+              )
             )}
 
             {activeTab === 'documents' && (
-              <AccountDocumentsSection
-                documents={documents}
-                serviceTickets={userTickets}
-                showToast={showToast}
-                onRefresh={loadCustomerData}
-              />
+              isLoadingCustomerData && documents.length === 0 ? (
+                <div className="space-y-4">
+                  <div className="h-6 w-36 bg-slate-200 dark:bg-slate-700 rounded-md animate-pulse" />
+                  <TableSkeleton rows={4} columns={4} />
+                </div>
+              ) : (
+                <AccountDocumentsSection
+                  documents={documents}
+                  serviceTickets={userTickets}
+                  showToast={showToast}
+                  onRefresh={loadCustomerData}
+                />
+              )
             )}
 
             {activeTab === 'profile' && (
@@ -481,21 +518,35 @@ export const CustomerAccountPage: React.FC = () => {
             )}
 
             {activeTab === 'notifications' && (
-              <AccountNotificationsSection
-                notifications={notifications}
-                onRefresh={loadCustomerData}
-                showToast={showToast}
-                onNavigatePath={navigateTo}
-              />
+              isLoadingCustomerData && notifications.length === 0 ? (
+                <div className="space-y-4">
+                  <div className="h-6 w-36 bg-slate-200 dark:bg-slate-700 rounded-md animate-pulse" />
+                  <TableSkeleton rows={4} columns={3} />
+                </div>
+              ) : (
+                <AccountNotificationsSection
+                  notifications={notifications}
+                  onRefresh={loadCustomerData}
+                  showToast={showToast}
+                  onNavigatePath={navigateTo}
+                />
+              )
             )}
 
             {activeTab === 'saved' && (
-              <AccountSavedSection
-                savedProducts={savedProducts}
-                onRefresh={loadCustomerData}
-                showToast={showToast}
-                onNavigatePath={navigateTo}
-              />
+              isLoadingCustomerData && savedProducts.length === 0 ? (
+                <div className="space-y-4">
+                  <div className="h-6 w-36 bg-slate-200 dark:bg-slate-700 rounded-md animate-pulse" />
+                  <TableSkeleton rows={4} columns={3} />
+                </div>
+              ) : (
+                <AccountSavedSection
+                  savedProducts={savedProducts}
+                  onRefresh={loadCustomerData}
+                  showToast={showToast}
+                  onNavigatePath={navigateTo}
+                />
+              )
             )}
 
             {activeTab === 'settings' && (

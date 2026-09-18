@@ -3,6 +3,7 @@ import { auditLogService } from '../../../services/audit/auditLogService';
 import { AdminAuditLog } from '../../../types';
 import { formatTimeAgo, formatDate } from '../../../utils/formatters';
 import { History, ShieldCheck, Search, Filter, RefreshCw, Lock } from 'lucide-react';
+import { TableSkeleton } from '../../common/Skeleton';
 
 export const AdminAuditLogsView: React.FC = () => {
   const [logs, setLogs] = useState<AdminAuditLog[]>([]);
@@ -107,7 +108,7 @@ export const AdminAuditLogsView: React.FC = () => {
       {/* Logs Table */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
         {loading ? (
-          <div className="py-16 text-center text-xs text-slate-400">Inapakia kumbukumbu za usalama...</div>
+          <TableSkeleton rows={8} columns={5} />
         ) : filteredLogs.length === 0 ? (
           <div className="py-16 text-center text-slate-400">
             <ShieldCheck className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />

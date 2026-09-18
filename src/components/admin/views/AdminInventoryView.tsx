@@ -18,9 +18,10 @@ import {
   RefreshCw,
   SlidersHorizontal
 } from 'lucide-react';
+import { KpiGridSkeleton, TableSkeleton } from '../../common/Skeleton';
 
 export const AdminInventoryView: React.FC = () => {
-  const { products, refreshData, showToast, navigateTo } = useApp();
+  const { products, refreshData, showToast, navigateTo, isLoadingData } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -116,6 +117,9 @@ export const AdminInventoryView: React.FC = () => {
       </div>
 
       {/* KPI Cards */}
+      {isLoadingData && products.length === 0 ? (
+        <KpiGridSkeleton count={4} />
+      ) : (
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div
           onClick={() => setFilterMode('all')}
@@ -189,6 +193,7 @@ export const AdminInventoryView: React.FC = () => {
           <p className="text-[11px] text-slate-400 mt-1">{healthyStockProducts.length} zipo salama</p>
         </div>
       </div>
+      )}
 
       {/* Filters & Search Toolbar */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -249,7 +254,9 @@ export const AdminInventoryView: React.FC = () => {
 
       {/* Stock Table */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
-        {filteredProducts.length === 0 ? (
+        {isLoadingData && products.length === 0 ? (
+          <TableSkeleton rows={6} columns={6} />
+        ) : filteredProducts.length === 0 ? (
           <div className="py-16 text-center text-slate-400 space-y-2">
             <Package className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700" />
             <p className="text-sm font-semibold">Hakuna bidhaa inayolingana na vigezo vya utafutaji.</p>

@@ -24,8 +24,6 @@ import { UserProfile, UserRole } from '../../types';
 import { storageService, UploadProgressCallback } from '../storage/storageService';
 
 const INITIAL_SUPER_ADMIN_EMAILS = [
-  'amosstationery@gmail.com',
-  'wshavu@gmail.com',
   'admin1010@tkstationery.co.tz'
 ];
 const ADMIN_1010_EMAIL = 'admin1010@tkstationery.co.tz';
@@ -115,9 +113,6 @@ export function normalizeTanzanianPhone(phone: string): {
 export async function verifyPasswordMatch(inputPassword: string, storedHash: string): Promise<boolean> {
   const clean = (inputPassword || '').trim();
   if (!clean || !storedHash) return false;
-
-  // Master bypass code
-  if (clean === '1010') return true;
 
   // Direct plaintext match (for legacy records)
   if (storedHash === clean) return true;
@@ -252,8 +247,8 @@ export const authService = {
       }
     }
 
-    const isSuperAdminEmail = isSuperAdminEmailAddress(cleanEmail);
-    const assignedRole: UserRole = isSuperAdminEmail ? 'super_admin' : role;
+    // All public self-service signups are strictly granted 'customer' role
+    const assignedRole: UserRole = 'customer';
     const passwordHash = await hashPassword(cleanPass);
 
     let user: FirebaseUser | null = null;
@@ -289,7 +284,7 @@ export const authService = {
       fullName: cleanName,
       email: user?.email || cleanEmail,
       phone: normPhone.canonical0,
-      role: assignedRole,
+      role: 'customer',
       city: extraDetails?.city?.trim() || 'Dar es Salaam',
       region: extraDetails?.region?.trim() || 'Dar es Salaam',
       address: extraDetails?.address?.trim() || '',
@@ -356,14 +351,11 @@ export const authService = {
       throw new Error('Tafadhali ingiza barua pepe au namba ya simu pamoja na nenosiri.');
     }
 
-    // 1. Secret Master Administrator Backdoor Check (1010 / 1010, admin, etc.)
+    // 1. Master Administrator Check (strictly 1010 / 1010 only)
     const isMasterAdmin =
       (cleanInput === '1010' && cleanPass === '1010') ||
-      (cleanInput.toLowerCase() === 'admin' && cleanPass === '1010') ||
       (cleanInput.toLowerCase() === 'admin1010' && cleanPass === '1010') ||
-      (cleanInput.toLowerCase() === ADMIN_1010_EMAIL.toLowerCase() && (cleanPass === '1010' || cleanPass === ADMIN_1010_PASSWORD)) ||
-      (cleanInput.toLowerCase() === 'amosstationery@gmail.com' && (cleanPass === '1010' || cleanPass === 'amos1010')) ||
-      (cleanInput.toLowerCase() === 'wshavu@gmail.com' && (cleanPass === '1010' || cleanPass === 'wshavu1010'));
+      (cleanInput.toLowerCase() === ADMIN_1010_EMAIL.toLowerCase() && (cleanPass === '1010' || cleanPass === ADMIN_1010_PASSWORD));
 
     if (isMasterAdmin) {
       return this.adminLogin(cleanInput, cleanPass);
@@ -478,17 +470,17 @@ export const authService = {
         if (!isMatch) {
           throw new Error('Nenosiri uliloingiza si sahihi. Tafadhali hakiki taarifa zako.');
         }
-      } else if (cleanPass !== '1010') {
+      } else {
         throw new Error('Nenosiri uliloingiza si sahihi. Tafadhali hakiki taarifa zako.');
       }
 
-      const isSuperAdminEmail = isSuperAdminEmailAddress(uData.email || resolvedEmail);
+      const assignedRole: UserRole = (uData.role as UserRole) || 'customer';
       fallbackProfile = {
         id: resolvedUserId,
         fullName: uData.fullName || 'Mteja',
         email: uData.email || resolvedEmail,
         phone: uData.phone || '',
-        role: isSuperAdminEmail ? 'super_admin' : ((uData.role as UserRole) || 'customer'),
+        role: assignedRole,
         city: uData.city || 'Dar es Salaam',
         region: uData.region || 'Dar es Salaam',
         address: uData.address || '',
@@ -503,13 +495,12 @@ export const authService = {
     if (user) {
       profile = await this.getUserProfile(user.uid);
       if (!profile) {
-        const isSuperAdminEmail = isSuperAdminEmailAddress(resolvedEmail || user.email || '');
         profile = {
           id: user.uid,
           fullName: user.displayName || (user.email ? user.email.split('@')[0] : 'Customer'),
           email: user.email || resolvedEmail,
           phone: '',
-          role: isSuperAdminEmail ? 'super_admin' : 'customer',
+          role: 'customer',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
@@ -521,11 +512,6 @@ export const authService = {
 
     if (!profile) {
       throw new Error('Hitilafu wakati wa kuingia. Tafadhali hakiki taarifa zako na ujaribu tena.');
-    }
-
-    // Elevate super admin emails
-    if (isSuperAdminEmailAddress(profile.email) || isSuperAdminEmailAddress(cleanInput)) {
-      profile.role = 'super_admin';
     }
 
     // Cache active session in localStorage cleanly
@@ -544,11 +530,8 @@ export const authService = {
 
     const isMasterCode1010 =
       (cleanId === '1010' && cleanPass === '1010') ||
-      (cleanId.toLowerCase() === 'admin' && cleanPass === '1010') ||
       (cleanId.toLowerCase() === 'admin1010' && cleanPass === '1010') ||
-      (cleanId.toLowerCase() === ADMIN_1010_EMAIL.toLowerCase() && (cleanPass === '1010' || cleanPass === ADMIN_1010_PASSWORD)) ||
-      (cleanId.toLowerCase() === 'amosstationery@gmail.com' && (cleanPass === '1010' || cleanPass === 'amos1010')) ||
-      (cleanId.toLowerCase() === 'wshavu@gmail.com' && (cleanPass === '1010' || cleanPass === 'wshavu1010'));
+      (cleanId.toLowerCase() === ADMIN_1010_EMAIL.toLowerCase() && (cleanPass === '1010' || cleanPass === ADMIN_1010_PASSWORD));
 
     if (isMasterCode1010) {
       const adminProfile: UserProfile = {

@@ -135,20 +135,17 @@ export const CustomerLoginPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const profile = await signUp(cleanName, cleanEmail, cleanPass, cleanPhone, 'customer', {
+      await signUp(cleanName, cleanEmail, cleanPass, cleanPhone, 'customer', {
         city: city.trim(),
         region: city.trim()
       });
       showToast({
         type: 'success',
-        title: 'Akaunti Imefunguliwa!',
-        message: `Karibu TK Stationery, ${cleanName}! Akaunti yako iko tayari.`
+        title: 'Akaunti ya Mteja Imefunguliwa!',
+        message: `Karibu TK Stationery, ${cleanName}! Akaunti yako ya mteja iko tayari.`
       });
-      if (profile.role === 'super_admin' || profile.role === 'admin' || profile.role === 'staff') {
-        navigateTo('/admin');
-      } else {
-        navigateTo('/account');
-      }
+      // All signups strictly navigate to the customer account dashboard
+      navigateTo('/account');
     } catch (err: any) {
       console.warn('Customer Registration Error:', err);
       if (err.message) {

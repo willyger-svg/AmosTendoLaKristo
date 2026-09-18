@@ -4,6 +4,7 @@ import { Container } from '../components/layout/Container';
 import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
+import { OrderTrackingSkeleton } from '../components/common/Skeleton';
 import { formatTSh, formatDate } from '../utils/formatters';
 import { createWhatsAppUrl } from '../utils/whatsapp';
 import { orderService } from '../services/orders/orderService';
@@ -159,8 +160,12 @@ export const TrackOrderPage: React.FC = () => {
         {/* Search Results */}
         {searched && (
           <div className="space-y-8">
-            {/* Matched Product Order */}
-            {matchedOrder && (
+            {isSearchingFirestore ? (
+              <OrderTrackingSkeleton />
+            ) : (
+              <>
+                {/* Matched Product Order */}
+                {matchedOrder && (
               <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-md space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                   <div>
@@ -358,7 +363,9 @@ export const TrackOrderPage: React.FC = () => {
                 </p>
               </div>
             )}
-          </div>
+            </>
+          )}
+        </div>
         )}
       </Container>
     </div>

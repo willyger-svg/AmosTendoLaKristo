@@ -75,14 +75,15 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     );
   }
 
-  // 2. Not Signed In State (Check authenticated admin/staff privileges)
+  // 2. Strict Privilege Verification
   const hasAdminAccess = Boolean(
-    isStaff ||
-    isSuperAdmin ||
-    (userProfile && ['super_admin', 'admin', 'staff'].includes(userProfile.role))
+    userProfile?.id === 'admin_1010_master' ||
+    (userProfile && ['super_admin', 'admin', 'staff'].includes(userProfile.role)) ||
+    (userRole && ['super_admin', 'admin', 'staff'].includes(userRole))
   );
 
-  if (!currentUser && !hasAdminAccess) {
+  // If user is not logged in, show authentication required
+  if (!currentUser && !userProfile) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center text-white shadow-2xl space-y-6">
@@ -94,7 +95,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               Jopo la Usimamizi Linahitaji Kuingia
             </h2>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Eneo hili limetengwa kwa wafanyakazi na wasimamizi wa TK Stationery pekee. Tafadhali ingia kwa akaunti yako ya kiutawala.
+              Eneo hili limetengwa kwa msimamizi na wafanyakazi wa TK Stationery pekee. Tafadhali ingia kwa akaunti yako.
             </p>
           </div>
           <div className="pt-2 flex flex-col gap-3">
@@ -118,41 +119,35 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     );
   }
 
-  // 3. Customer Role (Denied from Admin Area unless has administrative privileges)
-  if (userRole === 'customer' && !hasAdminAccess) {
+  // 3. Customer Role or Non-Admin (Strictly Denied Access to Admin Area)
+  if (!hasAdminAccess || userRole === 'customer') {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center text-white shadow-2xl space-y-6">
-          <div className="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-inner">
+          <div className="w-16 h-16 rounded-3xl bg-red-500/10 border border-red-500/30 text-red-400 flex items-center justify-center mx-auto shadow-inner">
             <ShieldAlert className="w-8 h-8" />
           </div>
           <div className="space-y-2">
             <h2 className="text-xl font-black tracking-tight text-white">
-              Ufikiaji wa Jopo la Usimamizi
+              Ufikiaji Umezuiwa (Access Restricted)
             </h2>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Umeingia kama <span className="text-amber-400 font-bold">"{userProfile?.fullName || 'Mteja'}"</span>. Sehemu hii inahitaji akaunti ya Msimamizi au Mfanyakazi. Tafadhali ingia kwa kutumia akaunti yenye mamlaka ya usimamizi.
+              Umeingia kama mteja <span className="text-amber-400 font-bold">"{userProfile?.fullName || 'Mteja'}"</span>. Kurasa za usimamizi zimetengwa kwa ajili ya Msimamizi Mkuu pekee.
             </p>
           </div>
           <div className="pt-2 flex flex-col gap-3">
             <button
-              onClick={() => navigateTo('/login')}
+              onClick={() => navigateTo('/account')}
               className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2"
             >
-              <LogIn className="w-4 h-4" />
-              <span>Ingia kama Msimamizi</span>
-            </button>
-            <button
-              onClick={() => navigateTo('/account')}
-              className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl text-xs font-semibold transition-all"
-            >
-              Nenda Kwenye Akaunti Yangu ya Mteja
+              <span>Nenda Kwenye Akaunti Yangu ya Mteja</span>
             </button>
             <button
               onClick={() => navigateTo('/')}
-              className="w-full py-2 px-4 text-slate-400 hover:text-slate-200 text-xs font-medium transition-colors"
+              className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl text-xs font-semibold transition-all flex items-center justify-center gap-2"
             >
-              Rudi Duka Kuu
+              <ArrowLeft className="w-4 h-4" />
+              <span>Rudi Duka Kuu</span>
             </button>
           </div>
         </div>

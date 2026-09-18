@@ -106,12 +106,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     email: string,
     password: string,
     phone: string,
-    role: UserRole = 'customer',
+    _role: UserRole = 'customer',
     extraDetails?: { city?: string; region?: string; address?: string }
   ): Promise<UserProfile> => {
     setLoading(true);
     try {
-      const profile = await authService.signUp(fullName, email, password, phone, role, extraDetails);
+      // All new registrations are strictly assigned 'customer' role
+      const profile = await authService.signUp(fullName, email, password, phone, 'customer', extraDetails);
       setUserProfile(profile);
       return profile;
     } finally {
@@ -187,16 +188,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const SUPER_ADMIN_EMAILS = ['wshavu@gmail.com', 'amosstationery@gmail.com', 'admin1010@tkstationery.co.tz'];
-  const isSuperAdminEmail = (email?: string | null) =>
-    Boolean(email && SUPER_ADMIN_EMAILS.some(e => e.toLowerCase() === email.trim().toLowerCase()));
-
   const computedRole: UserRole = (() => {
-    if (userProfile?.role === 'super_admin') return 'super_admin';
+    // 1. Dedicated Master Administrator (1010 account)
     if (userProfile?.id === 'admin_1010_master') return 'super_admin';
-    if (isSuperAdminEmail(currentUser?.email)) return 'super_admin';
-    if (isSuperAdminEmail(userProfile?.email)) return 'super_admin';
-    return userProfile?.role || 'customer';
+    // 2. Explicit roles assigned in database
+    if (userProfile?.role === 'super_admin') return 'super_admin';
+    if (userProfile?.role === 'admin') return 'admin';
+    if (userProfile?.role === 'staff') return 'staff';
+    // 3. Default strictly to customer
+    return 'customer';
   })();
 
   const userRole: UserRole = computedRole;

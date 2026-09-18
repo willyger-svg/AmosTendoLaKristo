@@ -5,6 +5,7 @@ import { Breadcrumbs } from '../components/common/Breadcrumbs';
 import { SectionHeader } from '../components/common/SectionHeader';
 import { Button } from '../components/common/Button';
 import { Badge } from '../components/common/Badge';
+import { ServiceGridSkeleton } from '../components/common/Skeleton';
 import { PrintPriceEstimator } from '../components/printing/PrintPriceEstimator';
 import { formatTSh } from '../utils/formatters';
 import { createWhatsAppUrl } from '../utils/whatsapp';
@@ -122,62 +123,66 @@ export const PrintingPage: React.FC = () => {
             subtitle="Kuanzia picha binafsi za pasipoti hadi makabrasha ya mamia ya kurasa za mikutano."
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {printingServices.map(service => (
-              <div
-                key={service.id}
-                className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <Badge variant="brand" size="sm">
-                      {service.turnaroundTime}
-                    </Badge>
-                    <span className="text-xs font-black text-slate-950">
-                      {service.pricingLabel}
-                    </span>
+          {isLoadingData && printingServices.length === 0 ? (
+            <ServiceGridSkeleton count={6} />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {printingServices.map(service => (
+                <div
+                  key={service.id}
+                  className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <Badge variant="brand" size="sm">
+                        {service.turnaroundTime}
+                      </Badge>
+                      <span className="text-xs font-black text-slate-950">
+                        {service.pricingLabel}
+                      </span>
+                    </div>
+
+                    <h3 className="text-base font-bold text-slate-900">
+                      {service.title}
+                    </h3>
+                    <p className="mt-1.5 text-xs text-slate-600 leading-relaxed">
+                      {service.shortDescription}
+                    </p>
+
+                    {/* Highlights */}
+                    <div className="mt-4 pt-3 border-t border-slate-100 space-y-1">
+                      {service.features.map((feat, idx) => (
+                        <div key={idx} className="flex items-center gap-1.5 text-xs text-slate-600">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                          <span>{feat}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <h3 className="text-base font-bold text-slate-900">
-                    {service.title}
-                  </h3>
-                  <p className="mt-1.5 text-xs text-slate-600 leading-relaxed">
-                    {service.shortDescription}
-                  </p>
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      fullWidth
+                      onClick={() => handleOrderService(service.title)}
+                      icon={<Printer className="w-3.5 h-3.5" />}
+                    >
+                      Agiza Huduma Hii
+                    </Button>
 
-                  {/* Highlights */}
-                  <div className="mt-4 pt-3 border-t border-slate-100 space-y-1">
-                    {service.features.map((feat, idx) => (
-                      <div key={idx} className="flex items-center gap-1.5 text-xs text-slate-600">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        <span>{feat}</span>
-                      </div>
-                    ))}
+                    <Button
+                      variant="whatsapp"
+                      size="sm"
+                      onClick={() => window.open(createWhatsAppUrl(`Habari TK Stationery! Nahitaji huduma ya ${service.title}.`), '_blank')}
+                    >
+                      WhatsApp
+                    </Button>
                   </div>
                 </div>
-
-                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    fullWidth
-                    onClick={() => handleOrderService(service.title)}
-                    icon={<Printer className="w-3.5 h-3.5" />}
-                  >
-                    Agiza Huduma Hii
-                  </Button>
-
-                  <Button
-                    variant="whatsapp"
-                    size="sm"
-                    onClick={() => window.open(createWhatsAppUrl(`Habari TK Stationery! Nahitaji huduma ya ${service.title}.`), '_blank')}
-                  >
-                    WhatsApp
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 3. Document Typing, Formatting & Professional CV Bureau */}
