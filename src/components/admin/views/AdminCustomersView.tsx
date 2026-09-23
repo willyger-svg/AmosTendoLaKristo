@@ -406,9 +406,9 @@ export const AdminCustomersView: React.FC = () => {
                             </>
                           )}
                           <button
-                            onClick={() => navigateTo('/admin/orders')}
+                            onClick={() => navigateTo(`/admin/orders?q=${encodeURIComponent(c.phone || c.name)}`)}
                             className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 transition-colors"
-                            title="Tazama Oda"
+                            title={`Tazama Oda za ${c.name}`}
                           >
                             <ShoppingBag className="w-3.5 h-3.5" />
                           </button>

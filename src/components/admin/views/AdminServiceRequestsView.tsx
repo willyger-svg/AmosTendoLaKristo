@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useAuth } from '../../../context/AuthContext';
 import { auditLogService } from '../../../services/audit/auditLogService';
@@ -18,13 +18,48 @@ import {
 import { TableSkeleton } from '../../common/Skeleton';
 
 export const AdminServiceRequestsView: React.FC = () => {
-  const { serviceTickets, updateTicketStatus, showToast, isLoadingData } = useApp();
+  const { serviceTickets, updateTicketStatus, showToast, isLoadingData, currentPath } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => {
+    try {
+      const url = new URL(window.location.href);
+      const hashPart = window.location.hash || '';
+      const queryIdx = hashPart.indexOf('?');
+      if (queryIdx !== -1) {
+        const params = new URLSearchParams(hashPart.substring(queryIdx));
+        return params.get('ticketId') || params.get('q') || '';
+      }
+      return url.searchParams.get('ticketId') || url.searchParams.get('q') || '';
+    } catch {
+      return '';
+    }
+  });
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedTicket, setSelectedTicket] = useState<ServiceTicket | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // Sync searchTerm when path changes with query params
+  useEffect(() => {
+    try {
+      const hashPart = window.location.hash || currentPath || '';
+      const queryIdx = hashPart.indexOf('?');
+      if (queryIdx !== -1) {
+        const params = new URLSearchParams(hashPart.substring(queryIdx));
+        const ticketParam = params.get('ticketId') || params.get('q');
+        if (ticketParam) {
+          setSearchTerm(ticketParam);
+          // If direct ticketId match, auto-select ticket modal for quick inspection
+          const directMatch = serviceTickets.find(t => t.id.toLowerCase() === ticketParam.toLowerCase());
+          if (directMatch) {
+            setSelectedTicket(directMatch);
+          }
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }, [currentPath, serviceTickets]);
 
   const filteredTickets = serviceTickets.filter(t => {
     const matchStatus = statusFilter === 'all' || t.status === statusFilter;

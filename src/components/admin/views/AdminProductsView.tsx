@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useAuth } from '../../../context/AuthContext';
 import { productService } from '../../../services/products/productService';
@@ -29,11 +29,35 @@ import { TableSkeleton } from '../../common/Skeleton';
 import { ImageUploadField, MultiImageUploadField } from '../../common/ImageUploadField';
 
 export const AdminProductsView: React.FC = () => {
-  const { products, refreshData, showToast, addProduct, updateProductInState, removeProductFromState, clearProductImage, isLoadingData, navigateTo } = useApp();
+  const { products, refreshData, showToast, addProduct, updateProductInState, removeProductFromState, clearProductImage, isLoadingData, navigateTo, currentPath } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState(() => {
+    try {
+      const hashPart = window.location.hash || '';
+      const queryIdx = hashPart.indexOf('?');
+      if (queryIdx !== -1) {
+        const params = new URLSearchParams(hashPart.substring(queryIdx));
+        return params.get('q') || '';
+      }
+      return new URL(window.location.href).searchParams.get('q') || '';
+    } catch {
+      return '';
+    }
+  });
+  const [categoryFilter, setCategoryFilter] = useState(() => {
+    try {
+      const hashPart = window.location.hash || '';
+      const queryIdx = hashPart.indexOf('?');
+      if (queryIdx !== -1) {
+        const params = new URLSearchParams(hashPart.substring(queryIdx));
+        return params.get('category') || 'all';
+      }
+      return new URL(window.location.href).searchParams.get('category') || 'all';
+    } catch {
+      return 'all';
+    }
+  });
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
@@ -52,6 +76,31 @@ export const AdminProductsView: React.FC = () => {
   const [isFeatured, setIsFeatured] = useState(false);
   const [isBestSeller, setIsBestSeller] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sync category, search, or edit trigger when path changes
+  useEffect(() => {
+    try {
+      const hashPart = window.location.hash || currentPath || '';
+      const queryIdx = hashPart.indexOf('?');
+      if (queryIdx !== -1) {
+        const params = new URLSearchParams(hashPart.substring(queryIdx));
+        const cat = params.get('category');
+        const q = params.get('q');
+        const editId = params.get('edit');
+
+        if (cat) setCategoryFilter(cat);
+        if (q) setSearchTerm(q);
+        if (editId) {
+          const match = products.find(p => p.id === editId);
+          if (match) {
+            handleOpenEdit(match);
+          }
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }, [currentPath, products]);
 
   const categories: ProductCategory[] = [
     'Paper & Printing',

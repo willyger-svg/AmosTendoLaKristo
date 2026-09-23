@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useAuth } from '../../../context/AuthContext';
 import { orderService } from '../../../services/orders/orderService';
@@ -18,19 +18,57 @@ import {
   Filter,
   FileDown,
   Printer,
-  MessageSquare
+  MessageSquare,
+  Download,
+  Calendar
 } from 'lucide-react';
 import { TableSkeleton } from '../../common/Skeleton';
 import { invoicePdfService } from '../../../services/pdf/invoicePdfService';
+import { salesExportService } from '../../../services/export/salesExportService';
 
 export const AdminOrdersView: React.FC = () => {
-  const { orders, updateOrderStatus, showToast, isLoadingData } = useApp();
+  const { orders, updateOrderStatus, showToast, isLoadingData, currentPath } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => {
+    try {
+      const url = new URL(window.location.href);
+      const hashPart = window.location.hash || '';
+      const queryIdx = hashPart.indexOf('?');
+      if (queryIdx !== -1) {
+        const params = new URLSearchParams(hashPart.substring(queryIdx));
+        return params.get('orderId') || params.get('q') || '';
+      }
+      return url.searchParams.get('orderId') || url.searchParams.get('q') || '';
+    } catch {
+      return '';
+    }
+  });
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // Sync searchTerm when path changes with query params
+  useEffect(() => {
+    try {
+      const hashPart = window.location.hash || currentPath || '';
+      const queryIdx = hashPart.indexOf('?');
+      if (queryIdx !== -1) {
+        const params = new URLSearchParams(hashPart.substring(queryIdx));
+        const orderParam = params.get('orderId') || params.get('q');
+        if (orderParam) {
+          setSearchTerm(orderParam);
+          // If direct orderId match, auto-select order modal for immediate inspection
+          const directMatch = orders.find(o => o.id.toLowerCase() === orderParam.toLowerCase());
+          if (directMatch) {
+            setSelectedOrder(directMatch);
+          }
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }, [currentPath, orders]);
 
   const filteredOrders = orders.filter(order => {
     const matchStatus = statusFilter === 'all' || order.status === statusFilter;
@@ -110,7 +148,7 @@ export const AdminOrdersView: React.FC = () => {
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <Filter className="w-4 h-4 text-slate-400" />
           <select
             value={statusFilter}
@@ -124,6 +162,24 @@ export const AdminOrdersView: React.FC = () => {
             <option value="Completed">Zilizokamilika ({orders.filter(o => o.status === 'Completed').length})</option>
             <option value="Cancelled">Zilizoghairiwa</option>
           </select>
+
+          <button
+            type="button"
+            onClick={() => {
+              salesExportService.exportOrdersToCsv(filteredOrders);
+              showToast({
+                type: 'success',
+                title: 'Ripoti Imepakuliwa',
+                message: `Ripoti ya oda (${filteredOrders.length}) imepakuliwa kama CSV.`
+              });
+            }}
+            disabled={filteredOrders.length === 0}
+            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-amber-500 hover:text-slate-950 dark:bg-slate-800 dark:hover:bg-amber-500 dark:hover:text-slate-950 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+            title="Pakua ripoti ya mauzo na oda kwenye faili la Excel/CSV"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Pakua Ripoti ({filteredOrders.length})</span>
+          </button>
         </div>
       </div>
 
@@ -215,6 +271,21 @@ export const AdminOrdersView: React.FC = () => {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-1">
+                        {order.customerPhone && (
+                          <a
+                            href={`https://wa.me/${order.customerPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                              `Habari ${order.customerName}, tunakutaarifu kuwa oda yako #${order.id} ya TZS ${formatPrice(
+                                order.totalAmount || order.total || 0
+                              )} kutoka TK Stationery ipo katika hatua ya: ${order.status}. Karibu!`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors"
+                            title={`Tuma ujumbe wa WhatsApp kwa ${order.customerName} (${order.customerPhone})`}
+                          >
+                            <MessageSquare className="w-4 h-4" />
+                          </a>
+                        )}
                         <button
                           onClick={() => invoicePdfService.downloadOrderPdf(order)}
                           className="p-1.5 text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 rounded-lg transition-colors"

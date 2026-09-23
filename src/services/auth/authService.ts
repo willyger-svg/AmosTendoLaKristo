@@ -131,6 +131,55 @@ export async function verifyPasswordMatch(inputPassword: string, storedHash: str
   return false;
 }
 
+// ========================================================
+// BRUTE-FORCE DEFENSE & RATE LIMITING
+// ========================================================
+interface LoginAttemptRecord {
+  count: number;
+  lastAttempt: number;
+  lockUntil?: number;
+}
+
+const loginAttemptsMap = new Map<string, LoginAttemptRecord>();
+
+function checkLoginRateLimit(identifier: string) {
+  const key = (identifier || '').toLowerCase().replace(/\s+/g, '');
+  const now = Date.now();
+  const record = loginAttemptsMap.get(key);
+
+  if (record && record.lockUntil && now < record.lockUntil) {
+    const remainingSec = Math.ceil((record.lockUntil - now) / 1000);
+    throw new Error(
+      `Ulinzi wa Akaunti: Majaribio mengi ya nenosiri yasiyo sahihi yamegunduliwa. Akaunti imezuiwa kwa muda kulinda usalama wako. Tafadhali subiri sekunde ${remainingSec} kabla ya kujaribu tena.`
+    );
+  }
+}
+
+function recordFailedLoginAttempt(identifier: string) {
+  const key = (identifier || '').toLowerCase().replace(/\s+/g, '');
+  const now = Date.now();
+  const record = loginAttemptsMap.get(key) || { count: 0, lastAttempt: now };
+
+  if (now - record.lastAttempt > 15 * 60 * 1000) {
+    record.count = 1;
+  } else {
+    record.count += 1;
+  }
+  record.lastAttempt = now;
+
+  if (record.count >= 5) {
+    // 60-second temporary lock after 5 consecutive bad attempts
+    record.lockUntil = now + 60 * 1000;
+  }
+
+  loginAttemptsMap.set(key, record);
+}
+
+function clearLoginAttempts(identifier: string) {
+  const key = (identifier || '').toLowerCase().replace(/\s+/g, '');
+  loginAttemptsMap.delete(key);
+}
+
 // In-memory listener registry for immediate cross-app auth sync
 type AuthStateCallback = (user: FirebaseUser | null, profile: UserProfile | null) => void;
 const authListeners: Set<AuthStateCallback> = new Set();
@@ -377,6 +426,9 @@ export const authService = {
       throw new Error('Tafadhali ingiza barua pepe au namba ya simu pamoja na nenosiri.');
     }
 
+    // Security Gate: Check brute-force rate limit
+    checkLoginRateLimit(cleanInput);
+
     // 1. Master Administrator Check (strictly 1010 / 1010 only)
     const isMasterAdmin =
       (cleanInput === '1010' && cleanPass === '1010') ||
@@ -494,11 +546,16 @@ export const authService = {
       if (profileHash) {
         const isMatch = await verifyPasswordMatch(cleanPass, profileHash);
         if (!isMatch) {
+          recordFailedLoginAttempt(cleanInput);
           throw new Error('Nenosiri uliloingiza si sahihi. Tafadhali hakiki taarifa zako.');
         }
       } else {
+        recordFailedLoginAttempt(cleanInput);
         throw new Error('Nenosiri uliloingiza si sahihi. Tafadhali hakiki taarifa zako.');
       }
+
+      // Success: clear rate-limit tracking
+      clearLoginAttempts(cleanInput);
 
       const assignedRole: UserRole = (uData.role as UserRole) || 'customer';
       fallbackProfile = {
@@ -732,6 +789,9 @@ export const authService = {
       updatedAt: new Date().toISOString()
     };
     delete payload.id;
+    delete payload.role; // Role escalation prevention: role changes must use dedicated admin flow
+    delete payload.createdAt;
+    delete payload.createdAtServer;
 
     try {
       await setDoc(userDocRef, payload, { merge: true });

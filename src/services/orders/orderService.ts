@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { Order, OrderStatus } from '../../types';
+import { sanitizeString, sanitizeId } from '../../utils/sanitize';
 
 const ORDERS_COLLECTION = 'orders';
 
@@ -21,15 +22,16 @@ export const orderService = {
    * Create new customer order with authoritative total calculation & data validation
    */
   async createOrder(orderInput: Partial<Order> & { customerName: string; customerPhone: string; items: any[] }): Promise<Order> {
-    const id = orderInput.id || `TK-ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+    const rawId = orderInput.id || `TK-ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+    const id = sanitizeId(rawId);
 
     // Authoritative calculation of subtotal and total
     const sanitizedItems = (orderInput.items || []).map((item: any) => {
-      const unitPrice = Number(item.unitPrice || item.price || (item.product && item.product.price) || 0);
+      const unitPrice = Math.max(0, Number(item.unitPrice || item.price || (item.product && item.product.price) || 0));
       const quantity = Math.max(1, Math.floor(Number(item.quantity || 1)));
       return {
-        productId: item.productId || (item.product && item.product.id) || 'custom-item',
-        productName: item.productName || (item.product && item.product.name) || 'Stationery Item',
+        productId: sanitizeId(item.productId || (item.product && item.product.id) || 'item'),
+        productName: sanitizeString(item.productName || (item.product && item.product.name) || 'Stationery Item'),
         unitPrice,
         quantity,
         totalPrice: Number(item.totalPrice) || (unitPrice * quantity),
@@ -38,30 +40,30 @@ export const orderService = {
     });
 
     const subtotal = sanitizedItems.reduce((sum, item) => sum + item.totalPrice, 0);
-    const deliveryFee = Number(orderInput.deliveryFee || 0);
+    const deliveryFee = Math.max(0, Number(orderInput.deliveryFee || 0));
     const total = subtotal + deliveryFee;
 
     const orderDoc: Order = {
       id,
       orderId: id,
-      customerId: orderInput.customerId || '',
-      customerName: orderInput.customerName.trim(),
-      customerPhone: orderInput.customerPhone.trim(),
-      customerEmail: orderInput.customerEmail?.trim() || '',
+      customerId: sanitizeId(orderInput.customerId || ''),
+      customerName: sanitizeString(orderInput.customerName),
+      customerPhone: sanitizeString(orderInput.customerPhone),
+      customerEmail: sanitizeString(orderInput.customerEmail || ''),
       items: sanitizedItems,
       subtotal,
       deliveryFee,
       total,
       totalAmount: total,
-      deliveryMethod: orderInput.deliveryMethod || 'Store Pickup',
-      fulfillmentMethod: orderInput.fulfillmentMethod || orderInput.deliveryMethod || 'Store Pickup',
-      deliveryAddress: orderInput.deliveryAddress || '',
-      deliveryDistrict: orderInput.deliveryDistrict || '',
-      paymentMethod: orderInput.paymentMethod || 'Cash / Pay at Store',
-      paymentStatus: orderInput.paymentStatus || 'Pending (Pay on Delivery/Pickup)',
+      deliveryMethod: sanitizeString(orderInput.deliveryMethod || 'Store Pickup'),
+      fulfillmentMethod: sanitizeString(orderInput.fulfillmentMethod || orderInput.deliveryMethod || 'Store Pickup'),
+      deliveryAddress: sanitizeString(orderInput.deliveryAddress || ''),
+      deliveryDistrict: sanitizeString(orderInput.deliveryDistrict || ''),
+      paymentMethod: sanitizeString(orderInput.paymentMethod || 'Cash / Pay at Store'),
+      paymentStatus: (orderInput.paymentStatus as any) || 'Pending (Pay on Delivery/Pickup)',
       status: (orderInput.status as OrderStatus) || 'Submitted',
       orderStatus: (orderInput.status as OrderStatus) || 'Submitted',
-      notes: orderInput.notes || '',
+      notes: sanitizeString(orderInput.notes || ''),
       createdAt: orderInput.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };

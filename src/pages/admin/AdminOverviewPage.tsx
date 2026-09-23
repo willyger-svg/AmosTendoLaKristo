@@ -218,42 +218,58 @@ export const AdminOverviewPage: React.FC = () => {
 
       {/* Secondary Metrics Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+        <div
+          onClick={() => navigateTo('/admin/products')}
+          className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer transition-colors group"
+          title="Fungua orodha ya bidhaa zote"
+        >
+          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
             <Package className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Jumla ya Bidhaa</p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Jumla ya Bidhaa</p>
             <p className="text-sm font-black text-slate-900 dark:text-white">Bidhaa {products.length}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+        <div
+          onClick={() => navigateTo('/admin/quotes')}
+          className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer transition-colors group"
+          title="Fungua maombi ya nukuu na makadirio"
+        >
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
             <Globe className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Maombi ya Bei</p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Maombi ya Bei</p>
             <p className="text-sm font-black text-slate-900 dark:text-white">Maombi {pendingQuotes.length} yanaendelea</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
+        <div
+          onClick={() => navigateTo('/admin/payments')}
+          className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer transition-colors group"
+          title="Fungua orodha ya malipo ya kuthibitishwa"
+        >
+          <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
             <CreditCard className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Malipo Yanayosubiri</p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">Malipo Yanayosubiri</p>
             <p className="text-sm font-black text-slate-900 dark:text-white">Miamala {pendingPayments.length}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0">
+        <div
+          onClick={() => navigateTo('/admin/customers')}
+          className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer transition-colors group"
+          title="Fungua daftari la wateja"
+        >
+          <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
             <Users className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Wateja Waliojisajili</p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Wateja Waliojisajili</p>
             <p className="text-sm font-black text-slate-900 dark:text-white">Wateja {uniqueCustomerCount} wa kipekee</p>
           </div>
         </div>

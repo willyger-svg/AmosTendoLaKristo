@@ -11,6 +11,8 @@ interface AuthContextType {
   isStaff: boolean;
   isSuperAdmin: boolean;
   loading: boolean;
+  sessionTimeoutWarning: boolean;
+  dismissSessionWarning: () => void;
   login: (emailOrPhone: string, password: string) => Promise<UserProfile>;
   adminLogin: (identifier: string, password: string) => Promise<UserProfile>;
   signUp: (
@@ -33,6 +35,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// 15 minutes of inactivity triggers automatic secure logout
+const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000;
+// Show warning modal 60 seconds before auto-logout
+const INACTIVITY_WARNING_MS = 14 * 60 * 1000;
+const LAST_ACTIVITY_KEY = 'tk_last_user_activity_timestamp';
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
@@ -49,6 +57,80 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return null;
   });
   const [loading, setLoading] = useState<boolean>(true);
+  const [sessionTimeoutWarning, setSessionTimeoutWarning] = useState<boolean>(false);
+
+  // Inactivity tracking: updates the last activity timestamp whenever user interacts
+  const updateActivityTimestamp = () => {
+    try {
+      localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+    } catch {
+      // ignore
+    }
+  };
+
+  const dismissSessionWarning = () => {
+    updateActivityTimestamp();
+    setSessionTimeoutWarning(false);
+  };
+
+  // Listen to user input events (mousemove, keydown, click, scroll, touchstart)
+  useEffect(() => {
+    if (!currentUser && !userProfile) return;
+
+    // Initialize activity timestamp upon login
+    updateActivityTimestamp();
+
+    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    let throttleTimeout: NodeJS.Timeout | null = null;
+
+    const handleUserActivity = () => {
+      if (!throttleTimeout) {
+        throttleTimeout = setTimeout(() => {
+          updateActivityTimestamp();
+          throttleTimeout = null;
+        }, 3000); // Throttle activity updates to once every 3 seconds
+      }
+    };
+
+    activityEvents.forEach(evt => {
+      window.addEventListener(evt, handleUserActivity, { passive: true });
+    });
+
+    // Interval to inspect inactivity every 10 seconds
+    const intervalId = setInterval(() => {
+      // Check if user is logged in
+      const currentSessionActive = Boolean(
+        localStorage.getItem('tk_active_session') ||
+        localStorage.getItem('tk_active_customer_session') ||
+        localStorage.getItem('tk_active_admin_session')
+      );
+
+      if (!currentSessionActive) return;
+
+      const lastActivityStr = localStorage.getItem(LAST_ACTIVITY_KEY);
+      const lastActivity = lastActivityStr ? parseInt(lastActivityStr, 10) : Date.now();
+      const elapsed = Date.now() - lastActivity;
+
+      if (elapsed >= INACTIVITY_TIMEOUT_MS) {
+        // Automatic secure logout due to inactivity
+        console.warn('Session expired due to user inactivity (15 minutes). Logging out for security.');
+        setSessionTimeoutWarning(false);
+        logout();
+      } else if (elapsed >= INACTIVITY_WARNING_MS) {
+        setSessionTimeoutWarning(true);
+      } else {
+        setSessionTimeoutWarning(false);
+      }
+    }, 10000);
+
+    return () => {
+      activityEvents.forEach(evt => {
+        window.removeEventListener(evt, handleUserActivity);
+      });
+      if (throttleTimeout) clearTimeout(throttleTimeout);
+      clearInterval(intervalId);
+    };
+  }, [currentUser, userProfile]);
 
   useEffect(() => {
     const unsubscribe = authService.onAuthState((user, profile) => {
@@ -214,6 +296,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isStaff,
         isSuperAdmin,
         loading,
+        sessionTimeoutWarning,
+        dismissSessionWarning,
         login,
         adminLogin,
         signUp,

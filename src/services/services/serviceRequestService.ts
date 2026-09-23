@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { ServiceTicket, OrderStatus } from '../../types';
+import { sanitizeString, sanitizeId } from '../../utils/sanitize';
 
 const SERVICE_REQUESTS_COLLECTION = 'serviceRequests';
 
@@ -26,26 +27,27 @@ export const serviceRequestService = {
     else if (st.includes('it') || st.includes('tech')) prefix = 'TK-IT';
     else if (st.includes('design') || st.includes('graphic')) prefix = 'TK-DES';
 
-    const id = input.id || `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const rawId = input.id || `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const id = sanitizeId(rawId);
 
     const ticketDoc: ServiceTicket = {
       id,
       ticketId: id,
-      customerId: input.customerId || '',
-      serviceType: input.serviceType,
-      serviceTitle: input.serviceTitle || `${input.serviceType} Assistance`,
-      customerName: input.customerName.trim(),
-      customerPhone: input.customerPhone.trim(),
-      customerEmail: input.customerEmail?.trim() || '',
-      description: input.description || '',
+      customerId: sanitizeId(input.customerId || ''),
+      serviceType: sanitizeString(input.serviceType),
+      serviceTitle: sanitizeString(input.serviceTitle || `${input.serviceType} Assistance`),
+      customerName: sanitizeString(input.customerName),
+      customerPhone: sanitizeString(input.customerPhone),
+      customerEmail: sanitizeString(input.customerEmail || ''),
+      description: sanitizeString(input.description || ''),
       status: (input.status as OrderStatus) || 'Submitted',
       priority: input.priority || 'normal',
-      estimatedCost: input.estimatedCost || 'Assessment Pending',
-      assignedStaffId: input.assignedStaffId || '',
-      assignedStaffName: input.assignedStaffName || '',
-      internalNotes: input.internalNotes || '',
+      estimatedCost: sanitizeString(input.estimatedCost || 'Assessment Pending'),
+      assignedStaffId: sanitizeId(input.assignedStaffId || ''),
+      assignedStaffName: sanitizeString(input.assignedStaffName || ''),
+      internalNotes: sanitizeString(input.internalNotes || ''),
       details: input.details || {},
-      fileName: input.fileName || '',
+      fileName: sanitizeString(input.fileName || ''),
       fileUrl: input.fileUrl || '',
       createdAt: input.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()

@@ -14,6 +14,7 @@ import { QuickHelpModal } from './components/common/QuickHelpModal';
 import { ConfirmModal } from './components/common/ConfirmModal';
 import { AuthModal } from './components/auth/AuthModal';
 import { ToastContainer } from './components/common/ToastContainer';
+import { SessionTimeoutModal } from './components/common/SessionTimeoutModal';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -126,6 +127,7 @@ const AppContent: React.FC = () => {
       <PrintRequestModal />
       <PublicServiceWizardModal />
       <AuthModal />
+      <SessionTimeoutModal />
       <ToastContainer />
     </div>
   );

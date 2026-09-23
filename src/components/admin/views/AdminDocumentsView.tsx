@@ -96,7 +96,7 @@ export const AdminDocumentsView: React.FC = () => {
 
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigateTo('/admin/services-requests')}
+            onClick={() => navigateTo('/admin/service-requests')}
             className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-md flex items-center gap-2 active:scale-95"
           >
             <FolderOpen className="w-4 h-4" />
@@ -249,8 +249,9 @@ export const AdminDocumentsView: React.FC = () => {
                       </td>
                       <td className="p-4 font-medium text-slate-700 dark:text-slate-300">
                         <button
-                          onClick={() => navigateTo('/admin/services-requests')}
+                          onClick={() => navigateTo(`/admin/service-requests?ticketId=${encodeURIComponent(doc.ticketId)}`)}
                           className="font-mono text-amber-600 dark:text-amber-400 font-bold hover:underline block"
+                          title="Fungua tiketi hii ya huduma"
                         >
                           #{doc.ticketId}
                         </button>

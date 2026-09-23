@@ -133,16 +133,52 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const [routeParams, setRouteParams] = useState<Record<string, string>>({});
 
+  // List of sensitive administrative and internal paths that should NEVER leak in the browser URL
+  const isSensitiveHiddenPath = (path: string): boolean => {
+    return (
+      path.startsWith('/admin') ||
+      path.startsWith('/account') ||
+      path === '/track-order' ||
+      path === '/checkout'
+    );
+  };
+
   const navigateTo = (path: string) => {
-    window.location.hash = path;
     setCurrentPath(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Link/URL Concealment & Privacy Protection:
+    // If the path contains administrative paths (like /admin/orders, /admin/payments, etc.)
+    // or personal data, do NOT expose the raw path in the address bar.
+    // Instead, mask the URL bar using clean history state to display clean root address.
+    try {
+      if (isSensitiveHiddenPath(path)) {
+        // Strip the hash from the address bar so unauthorized users or observers cannot see internal file routes
+        const cleanBaseUrl = window.location.pathname + window.location.search;
+        window.history.replaceState({ maskedPath: path }, '', cleanBaseUrl);
+      } else {
+        window.location.hash = path;
+      }
+    } catch {
+      // fallback
+    }
   };
 
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace(/^#/, '');
       const cleanPath = hash || '/';
+
+      // If the URL bar contains an admin or hidden path directly, immediately mask it from the URL
+      if (isSensitiveHiddenPath(cleanPath)) {
+        try {
+          const cleanBaseUrl = window.location.pathname + window.location.search;
+          window.history.replaceState({ maskedPath: cleanPath }, '', cleanBaseUrl);
+        } catch {
+          // ignore
+        }
+      }
+
       setCurrentPath(cleanPath);
 
       // Extract simple params if any
@@ -355,17 +391,48 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (livePublic.length > 0) setPublicServices(livePublic);
       if (liveTestimonials.length > 0) setTestimonials(liveTestimonials);
 
-      // Orders
-      const firestoreOrders = await orderService.getAllOrders();
-      setOrders(sanitizeOrders(firestoreOrders));
+      // Role-Aware Data Isolation:
+      // Only administrators and staff are permitted to fetch the global queues.
+      // Customers strictly receive only their own orders/tickets, and guests receive none.
+      let isAdminOrStaff = false;
+      let customerId = '';
 
-      // Tickets
-      const firestoreTickets = await serviceRequestService.getAllServiceRequests();
-      setServiceTickets(sanitizeTickets(firestoreTickets));
+      try {
+        const adminRaw = localStorage.getItem('tk_active_admin_session');
+        if (adminRaw) {
+          const parsed = JSON.parse(adminRaw);
+          if (parsed && (parsed.role === 'admin' || parsed.role === 'super_admin' || parsed.role === 'staff' || parsed.id === 'admin_1010_master')) {
+            isAdminOrStaff = true;
+          }
+        }
+        if (!isAdminOrStaff) {
+          const custRaw = localStorage.getItem('tk_active_customer_session') || localStorage.getItem('tk_active_session');
+          if (custRaw) {
+            const parsed = JSON.parse(custRaw);
+            if (parsed && parsed.id) customerId = parsed.id;
+          }
+        }
+      } catch {}
 
-      // Quotes
-      const firestoreQuotes = await quoteService.getAllQuotes();
-      setQuoteRequests(sanitizeQuotes(firestoreQuotes));
+      if (isAdminOrStaff) {
+        const [firestoreOrders, firestoreTickets, firestoreQuotes] = await Promise.all([
+          orderService.getAllOrders().catch(() => []),
+          serviceRequestService.getAllServiceRequests().catch(() => []),
+          quoteService.getAllQuotes().catch(() => [])
+        ]);
+        if (firestoreOrders.length > 0) setOrders(sanitizeOrders(firestoreOrders));
+        if (firestoreTickets.length > 0) setServiceTickets(sanitizeTickets(firestoreTickets));
+        if (firestoreQuotes.length > 0) setQuoteRequests(sanitizeQuotes(firestoreQuotes));
+      } else if (customerId) {
+        const [custOrders, custTickets, custQuotes] = await Promise.all([
+          orderService.getUserOrders(customerId).catch(() => []),
+          serviceRequestService.getUserServiceRequests(customerId).catch(() => []),
+          quoteService.getUserQuotes(customerId).catch(() => [])
+        ]);
+        setOrders(sanitizeOrders(custOrders));
+        setServiceTickets(sanitizeTickets(custTickets));
+        setQuoteRequests(sanitizeQuotes(custQuotes));
+      }
     } catch (err) {
       console.warn('Firestore synchronization notice:', err);
     } finally {

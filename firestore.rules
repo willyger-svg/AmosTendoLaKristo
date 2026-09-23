@@ -2,110 +2,259 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ==========================================
+    // GLOBAL SECURITY PRIMITIVES & HELPERS
+    // ==========================================
+
     function isSignedIn() {
       return request.auth != null;
     }
 
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\.]+$');
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Role-based privilege checks using trusted admin records and email roots
     function isSuperAdmin() {
       return isSignedIn() && (
-        request.auth.token.role == 'super_admin' ||
-        request.auth.token.role == 'admin' ||
-        (request.auth.token.email != null && request.auth.token.email.matches('.*@tkstationery\\.co\\.tz$'))
+        request.auth.token.email in ['wshavu@gmail.com', 'admin1010@tkstationery.co.tz'] ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['super_admin'])
       );
     }
 
-    // Phone Index for phone-to-user customer lookup during login
-    match /phone_index/{phoneDigits} {
-      allow read, write: if true;
+    function isAdmin() {
+      return isSignedIn() && (
+        isSuperAdmin() ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'super_admin'])
+      );
     }
 
-    // Users Collection - Resilient Customer Registration & Profiles
-    match /users/{userId} {
-      allow read, write: if true;
-
-      match /savedProducts/{productId} {
-        allow read, write: if request.auth != null && (request.auth.uid == userId || isSuperAdmin());
-      }
-
-      match /documents/{docId} {
-        allow read, write: if true;
-      }
+    function isStaffOrAdmin() {
+      return isSignedIn() && (
+        isAdmin() ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['staff', 'admin', 'super_admin'])
+      );
     }
 
-    // Products Collection
+    // ==========================================
+    // 1. PRODUCTS & CATALOG (PUBLIC READ / ADMIN WRITE)
+    // ==========================================
     match /products/{productId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create, update, delete: if isStaffOrAdmin() && isValidId(productId);
     }
 
-    // Services Catalog (Printing, Scanning, Copying, Binding, Typing)
-    match /services/{serviceId} {
-      allow read, write: if true;
-    }
-
-    // Public / Government Assistance Services
-    match /publicServices/{serviceId} {
-      allow read, write: if true;
-    }
-
-    // Customer Testimonials & Reviews
-    match /testimonials/{testimonialId} {
-      allow read, write: if true;
-    }
-
-    // Categories Collection
     match /categories/{categoryId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create, update, delete: if isStaffOrAdmin() && isValidId(categoryId);
     }
 
-    // Orders Collection
-    match /orders/{orderId} {
-      allow read, write: if true;
+    match /services/{serviceId} {
+      allow read: if true;
+      allow create, update, delete: if isStaffOrAdmin() && isValidId(serviceId);
     }
 
-    // Service Requests & Tickets Collection
-    match /serviceRequests/{requestId} {
-      allow read, write: if true;
+    match /publicServices/{serviceId} {
+      allow read: if true;
+      allow create, update, delete: if isStaffOrAdmin() && isValidId(serviceId);
     }
 
-    // Quotes Collection
-    match /quotes/{quoteId} {
-      allow read, write: if true;
-    }
-
-    // General Store Settings
-    match /settings/{settingId} {
-      allow read, write: if true;
-    }
-
-    // Payments Collection
-    match /payments/{paymentId} {
-      allow read, write: if true;
-    }
-
-    // Documents Collection
-    match /documents/{docId} {
-      allow read, write: if true;
-    }
-
-    // Notifications Collection
-    match /notifications/{notificationId} {
-      allow read, write: if true;
-    }
-
-    // Advertisements & Banners CMS
     match /advertisements/{adId} {
-      allow read, write: if true;
+      allow read: if true;
+      allow create, update, delete: if isStaffOrAdmin() && isValidId(adId);
     }
 
-    // Payment & Security Audit Logs
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+      allow create: if isValidId(testimonialId) &&
+                       incoming().name is string && incoming().name.size() <= 120 &&
+                       incoming().comment is string && incoming().comment.size() <= 2000;
+      allow update, delete: if isStaffOrAdmin();
+    }
+
+    // ==========================================
+    // 2. USERS & PERSONAL DATA PROTECTION (PII ISOLATION)
+    // ==========================================
+    match /users/{userId} {
+      // Individual users can read their own profile; staff/admins can list & manage
+      allow get: if isOwner(userId) || isStaffOrAdmin();
+      allow list: if isStaffOrAdmin();
+
+      // Creation allows customer registration, but blocks self-assigning admin roles
+      allow create: if isValidId(userId) &&
+                       (isOwner(userId) || isStaffOrAdmin() || !isSignedIn()) &&
+                       (incoming().role == 'customer' || isAdmin());
+
+      // Updates strictly protect against role escalation (users cannot change their role to admin)
+      allow update: if isValidId(userId) && (
+        isAdmin() ||
+        (isOwner(userId) &&
+         incoming().role == existing().role &&
+         incoming().diff(existing()).affectedKeys().hasOnly([
+           'fullName', 'phone', 'phoneFormatted', 'phoneCanonical',
+           'avatarUrl', 'address', 'city', 'region', 'updatedAt',
+           'updatedAtServer', 'passwordHash'
+         ]))
+      );
+
+      allow delete: if isAdmin();
+
+      // Customer Wishlist / Saved Products
+      match /savedProducts/{productId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+
+      // Customer uploaded personal documents
+      match /documents/{docId} {
+        allow read: if isOwner(userId) || isStaffOrAdmin();
+        allow create, update: if (isOwner(userId) || isStaffOrAdmin()) && isValidId(docId);
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Phone index for customer phone number login lookup
+    match /phone_index/{phoneDigits} {
+      allow get: if true;
+      allow list: if isStaffOrAdmin();
+      allow create, update: if true;
+      allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // 3. ORDERS & FINANCIAL TRANSACTIONS
+    // ==========================================
+    match /orders/{orderId} {
+      // Direct single-order lookup allows order tracking by ID; list is strictly restricted
+      allow get: if isValidId(orderId) && (
+        isStaffOrAdmin() ||
+        (isSignedIn() && (resource.data.customerId == request.auth.uid || resource.data.userId == request.auth.uid)) ||
+        true
+      );
+
+      // Never allow untargeted global listing of all customer orders to unauthorized users
+      allow list: if isStaffOrAdmin() ||
+                     (isSignedIn() && resource.data.customerId == request.auth.uid);
+
+      // Order creation requires valid payload, valid items, and non-negative total
+      allow create: if isValidId(orderId) &&
+                       incoming().customerName is string && incoming().customerName.size() <= 150 &&
+                       incoming().customerPhone is string && incoming().customerPhone.size() <= 50 &&
+                       incoming().items is list && incoming().items.size() <= 200 &&
+                       incoming().total is number && incoming().total >= 0;
+
+      // Status alterations (Completed, Out for Delivery, Paid) are restricted to staff/admin
+      allow update: if isStaffOrAdmin() || (
+        isSignedIn() &&
+        existing().customerId == request.auth.uid &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['notes', 'customerPhone', 'deliveryAddress', 'updatedAt'])
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    match /payments/{paymentId} {
+      allow get: if isStaffOrAdmin() || (isSignedIn() && resource.data.customerId == request.auth.uid);
+      allow list: if isStaffOrAdmin() || (isSignedIn() && resource.data.customerId == request.auth.uid);
+      allow create: if isValidId(paymentId) &&
+                       incoming().orderId is string &&
+                       incoming().amount is number && incoming().amount > 0;
+      allow update: if isStaffOrAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // 4. SERVICE REQUESTS & QUOTES (PRINTING & IT)
+    // ==========================================
+    match /serviceRequests/{requestId} {
+      allow get: if isValidId(requestId) && (
+        isStaffOrAdmin() ||
+        (isSignedIn() && resource.data.customerId == request.auth.uid) ||
+        true
+      );
+      allow list: if isStaffOrAdmin() || (isSignedIn() && resource.data.customerId == request.auth.uid);
+
+      allow create: if isValidId(requestId) &&
+                       incoming().customerName is string && incoming().customerName.size() <= 150 &&
+                       incoming().customerPhone is string && incoming().customerPhone.size() <= 50 &&
+                       incoming().serviceType is string;
+
+      allow update: if isStaffOrAdmin() || (
+        isSignedIn() &&
+        existing().customerId == request.auth.uid &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['description', 'notes', 'customerPhone', 'updatedAt'])
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    match /quotes/{quoteId} {
+      allow get: if isStaffOrAdmin() || (isSignedIn() && resource.data.customerId == request.auth.uid);
+      allow list: if isStaffOrAdmin() || (isSignedIn() && resource.data.customerId == request.auth.uid);
+      allow create: if isValidId(quoteId) &&
+                       incoming().customerName is string && incoming().customerName.size() <= 150 &&
+                       incoming().customerPhone is string && incoming().customerPhone.size() <= 50 &&
+                       incoming().projectType is string;
+      allow update: if isStaffOrAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /documents/{docId} {
+      allow get: if isStaffOrAdmin() || (isSignedIn() && resource.data.uploadedBy == request.auth.uid);
+      allow list: if isStaffOrAdmin() || (isSignedIn() && resource.data.uploadedBy == request.auth.uid);
+      allow create: if isValidId(docId) && incoming().fileName is string;
+      allow update, delete: if isStaffOrAdmin() || (isSignedIn() && existing().uploadedBy == request.auth.uid);
+    }
+
+    match /notifications/{notificationId} {
+      allow get, list: if isStaffOrAdmin() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.userId == 'all'));
+      allow create: if true;
+      allow update: if isStaffOrAdmin() || (isSignedIn() && existing().userId == request.auth.uid);
+      allow delete: if isStaffOrAdmin() || (isSignedIn() && existing().userId == request.auth.uid);
+    }
+
+    // ==========================================
+    // 5. AUDIT LOGS (IMMUTABLE RECORD KEEPING)
+    // ==========================================
     match /auditLogs/{logId} {
-      allow read, write: if true;
+      // Strictly accessible only by authenticated administrators
+      allow get, list: if isAdmin();
+      // Appended by system and authenticated events
+      allow create: if true;
+      // Absolute immutability: Cannot be modified or deleted to prevent hiding unauthorized actions
+      allow update, delete: if false;
     }
 
-    // Default Fallback
+    match /admins/{adminId} {
+      allow read: if isStaffOrAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    // ==========================================
+    // GLOBAL DEFAULT CATCH-ALL (DEFAULT DENY)
+    // ==========================================
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }
-

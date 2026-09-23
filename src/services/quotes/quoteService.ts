@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { QuoteRequest } from '../../types';
+import { sanitizeString, sanitizeId } from '../../utils/sanitize';
 
 const QUOTES_COLLECTION = 'quotes';
 
@@ -19,23 +20,24 @@ export const quoteService = {
    * Create new tech quote inquiry
    */
   async createQuote(input: Partial<QuoteRequest> & { customerName: string; customerPhone: string; projectType: string }): Promise<QuoteRequest> {
-    const id = input.id || `TK-QTE-${Math.floor(1000 + Math.random() * 9000)}`;
+    const rawId = input.id || `TK-QTE-${Math.floor(1000 + Math.random() * 9000)}`;
+    const id = sanitizeId(rawId);
 
     const quoteDoc: QuoteRequest = {
       id,
       quoteId: id,
-      customerId: input.customerId || '',
-      customerName: input.customerName.trim(),
-      customerCompany: input.customerCompany?.trim() || 'Individual',
-      customerPhone: input.customerPhone.trim(),
-      customerEmail: input.customerEmail?.trim() || '',
-      projectType: input.projectType,
-      businessScale: input.businessScale || 'Growing SME',
-      features: input.features || [],
-      timeline: input.timeline || '2-4 Weeks',
-      estimatedRange: input.estimatedRange || 'Estimate Upon Consultation',
-      projectNotes: input.projectNotes || '',
-      internalNotes: input.internalNotes || '',
+      customerId: sanitizeId(input.customerId || ''),
+      customerName: sanitizeString(input.customerName),
+      customerCompany: sanitizeString(input.customerCompany || 'Individual'),
+      customerPhone: sanitizeString(input.customerPhone),
+      customerEmail: sanitizeString(input.customerEmail || ''),
+      projectType: sanitizeString(input.projectType),
+      businessScale: sanitizeString(input.businessScale || 'Growing SME'),
+      features: (input.features || []).map(f => sanitizeString(f)),
+      timeline: sanitizeString(input.timeline || '2-4 Weeks'),
+      estimatedRange: sanitizeString(input.estimatedRange || 'Estimate Upon Consultation'),
+      projectNotes: sanitizeString(input.projectNotes || ''),
+      internalNotes: sanitizeString(input.internalNotes || ''),
       status: input.status || 'New',
       createdAt: input.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()

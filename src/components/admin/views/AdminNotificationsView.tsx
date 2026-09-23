@@ -7,7 +7,7 @@ import { formatTimeAgo, formatDate } from '../../../utils/formatters';
 import { Bell, Check, Trash2, ShoppingBag, FileCheck, Globe, CreditCard, ExternalLink } from 'lucide-react';
 
 export const AdminNotificationsView: React.FC = () => {
-  const { navigateTo, showToast } = useApp();
+  const { navigateTo, showToast, orders, serviceTickets, quoteRequests, products } = useApp();
   const { currentUser } = useAuth();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -16,7 +16,65 @@ export const AdminNotificationsView: React.FC = () => {
     setLoading(true);
     try {
       const list = await notificationService.getAllNotifications();
-      setNotifications(list);
+      if (list && list.length > 0) {
+        setNotifications(list);
+      } else {
+        // Fallback to active system alerts
+        const generated: NotificationItem[] = [];
+        const now = new Date().toISOString();
+
+        // Check critical stock
+        const criticalStock = products.filter(p => (p.stockCount || 0) <= 5);
+        if (criticalStock.length > 0) {
+          const outOfStockCount = criticalStock.filter(p => (p.stockCount || 0) === 0).length;
+          generated.push({
+            id: 'gen-low-stock-alert-view',
+            userId: 'admin',
+            type: 'system_alert',
+            channel: 'in_app',
+            title: `Tahadhari ya Stoo: Bidhaa ${criticalStock.length} Zinahitaji Kuongezwa`,
+            message: `${outOfStockCount > 0 ? `${outOfStockCount} zimeisha kabisa. ` : ''}Mfano: "${criticalStock[0].title}" zimebaki ${criticalStock[0].stockCount || 0} tu.`,
+            status: 'sent',
+            createdAt: now,
+            actionUrl: '/admin/inventory'
+          });
+        }
+
+        // Check pending orders
+        const pendingOrders = orders.filter(o => o.status === 'Submitted');
+        if (pendingOrders.length > 0) {
+          generated.push({
+            id: 'gen-pending-orders-view',
+            userId: 'admin',
+            orderId: pendingOrders[0].id,
+            type: 'system_alert',
+            channel: 'in_app',
+            title: `Oda ${pendingOrders.length} Mpya Zinazosubiri Ukaguzi`,
+            message: `Oda ya hivi karibuni ni #${pendingOrders[0].id} kutoka kwa ${pendingOrders[0].customerName}`,
+            status: 'sent',
+            createdAt: pendingOrders[0].createdAt || now,
+            actionUrl: '/admin/orders'
+          });
+        }
+
+        // Check active tickets
+        const pendingTickets = serviceTickets.filter(t => t.status === 'Received');
+        if (pendingTickets.length > 0) {
+          generated.push({
+            id: 'gen-pending-tickets-view',
+            userId: 'admin',
+            type: 'ticket_created',
+            channel: 'in_app',
+            title: `Tiketi ${pendingTickets.length} Mpya za Huduma & Uchapishaji`,
+            message: `Tiketi #${pendingTickets[0].id} (${pendingTickets[0].serviceType}) inahitaji kufanyiwa kazi`,
+            status: 'sent',
+            createdAt: pendingTickets[0].createdAt || now,
+            actionUrl: '/admin/service-requests'
+          });
+        }
+
+        setNotifications(generated);
+      }
     } catch (err) {
       console.warn('Failed to load notifications:', err);
     } finally {
@@ -26,7 +84,7 @@ export const AdminNotificationsView: React.FC = () => {
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
+  }, [orders, serviceTickets, quoteRequests, products]);
 
   const handleMarkAsRead = async (id: string) => {
     try {

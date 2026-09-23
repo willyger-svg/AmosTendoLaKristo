@@ -29,7 +29,7 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
   onNavigateToSection
 }) => {
   const { userProfile, userRole } = useAuth();
-  const { orders, serviceTickets, quoteRequests } = useApp();
+  const { orders, serviceTickets, quoteRequests, products } = useApp();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -119,6 +119,23 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
             });
           }
 
+          // Check low stock & out-of-stock items
+          const criticalStock = products.filter(p => (p.stockCount || 0) <= 5);
+          if (criticalStock.length > 0) {
+            const outOfStockCount = criticalStock.filter(p => (p.stockCount || 0) === 0).length;
+            generated.push({
+              id: 'gen-low-stock-alert',
+              userId: 'admin',
+              type: 'system_alert',
+              channel: 'in_app',
+              title: `Tahadhari ya Stoo: Bidhaa ${criticalStock.length} Zinakaribia Kuisha!`,
+              message: `${outOfStockCount > 0 ? `${outOfStockCount} zimekwisha kabisa. ` : ''}Mfano: "${criticalStock[0].title}" zimebaki ${criticalStock[0].stockCount || 0}.`,
+              status: 'sent',
+              createdAt: now,
+              actionUrl: '/admin/inventory'
+            });
+          }
+
           setNotifications(generated);
         } else {
           setNotifications(unique.slice(0, 20));
@@ -131,7 +148,7 @@ export const AdminNotificationsPopover: React.FC<AdminNotificationsPopoverProps>
     };
 
     fetchNotifications();
-  }, [isOpen, userProfile, orders, serviceTickets, quoteRequests]);
+  }, [isOpen, userProfile, orders, serviceTickets, quoteRequests, products]);
 
   const handleMarkAsRead = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();

@@ -22,7 +22,7 @@ import {
 import { TableSkeleton } from '../../common/Skeleton';
 
 export const AdminPaymentsView: React.FC = () => {
-  const { showToast, orders } = useApp();
+  const { showToast, orders, refreshData, navigateTo } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
 
   const [payments, setPayments] = useState<PaymentTransaction[]>([]);
@@ -106,6 +106,7 @@ export const AdminPaymentsView: React.FC = () => {
       setPayments(prev =>
         prev.map(p => (p.paymentId === paymentId || p.id === paymentId ? { ...p, status: 'successful' } : p))
       );
+      await refreshData();
     } catch {
       showToast({
         type: 'error',
@@ -244,7 +245,13 @@ export const AdminPaymentsView: React.FC = () => {
                       <p className="text-[11px] text-slate-400 font-mono mt-0.5">{p.reference || 'REF-N/A'}</p>
                     </td>
                     <td className="p-4">
-                      <span className="font-mono font-bold text-amber-600 dark:text-amber-400">#{p.orderId}</span>
+                      <button
+                        onClick={() => navigateTo(`/admin/orders?orderId=${encodeURIComponent(p.orderId)}`)}
+                        className="font-mono font-bold text-amber-600 dark:text-amber-400 hover:underline text-left block"
+                        title="Fungua oda hii"
+                      >
+                        #{p.orderId}
+                      </button>
                       <p className="text-[11px] text-slate-400 mt-0.5">{formatDate(p.createdAt)}</p>
                     </td>
                     <td className="p-4">
