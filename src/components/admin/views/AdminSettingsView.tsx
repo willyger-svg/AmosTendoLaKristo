@@ -11,11 +11,13 @@ import {
   Building2,
   Save,
   CheckCircle2,
-  ShieldAlert
+  ShieldAlert,
+  Camera,
+  User
 } from 'lucide-react';
 
 export const AdminSettingsView: React.FC = () => {
-  const { storeSettings, updateStoreSettings, showToast } = useApp();
+  const { storeSettings, updateStoreSettings, showToast, openModal } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
 
   const [form, setForm] = useState<StoreSettings>(storeSettings);
@@ -83,6 +85,57 @@ export const AdminSettingsView: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Administrator Profile Card */}
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+          <div className="flex items-center gap-4">
+            <div className="relative group flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => openModal({ type: 'profile-photo' })}
+                className="w-16 h-16 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-2xl shadow-md overflow-hidden border-2 border-amber-400 hover:opacity-90 transition-all focus:outline-hidden focus:ring-2 focus:ring-amber-500"
+                title="Badili Picha ya Wasifu"
+              >
+                {userProfile?.avatarUrl ? (
+                  <img
+                    src={userProfile.avatarUrl}
+                    alt={userProfile.fullName || 'Admin'}
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <span>{(userProfile?.fullName || currentUser?.email || 'AD').charAt(0).toUpperCase()}</span>
+                )}
+                <div className="absolute inset-0 bg-slate-950/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="w-5 h-5 text-amber-400" />
+                </div>
+              </button>
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                {userProfile?.fullName || 'Msimamizi Mkuu'}
+              </h4>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {currentUser?.email || userProfile?.email}
+              </p>
+              <div className="mt-1 flex items-center gap-1.5">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                  {userRole.toUpperCase()}
+                </span>
+                <span className="text-[11px] text-slate-500">Picha ya akaunti yako</span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => openModal({ type: 'profile-photo' })}
+            className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-xs flex items-center gap-2"
+          >
+            <Camera className="w-4 h-4" />
+            <span>Badili Picha ya Wasifu</span>
+          </button>
+        </div>
+
         {/* General Store Info */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
           <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">

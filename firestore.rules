@@ -113,7 +113,8 @@ service cloud.firestore {
          incoming().role == existing().role &&
          incoming().diff(existing()).affectedKeys().hasOnly([
            'fullName', 'phone', 'phoneFormatted', 'phoneCanonical',
-           'avatarUrl', 'address', 'city', 'region', 'updatedAt',
+           'avatarUrl', 'address', 'city', 'region', 'street',
+           'companyName', 'tin', 'updatedAt',
            'updatedAtServer', 'passwordHash'
          ]))
       );

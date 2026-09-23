@@ -249,6 +249,7 @@ export type ActiveModal =
   | { type: 'it-support-booking'; serviceTitle?: string }
   | { type: 'design-brief'; serviceTitle?: string }
   | { type: 'confirm-dialog'; title: string; message: string; confirmLabel?: string; cancelLabel?: string; onConfirm: () => void; isDestructive?: boolean }
+  | { type: 'profile-photo' }
   | { type: 'auth-modal'; mode?: 'login' | 'register' | 'forgot' };
 
 export interface ToastMessage {

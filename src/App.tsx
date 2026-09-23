@@ -15,6 +15,7 @@ import { ConfirmModal } from './components/common/ConfirmModal';
 import { AuthModal } from './components/auth/AuthModal';
 import { ToastContainer } from './components/common/ToastContainer';
 import { SessionTimeoutModal } from './components/common/SessionTimeoutModal';
+import { ProfilePhotoModal } from './components/common/ProfilePhotoModal';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -32,7 +33,7 @@ import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 
 const AppContent: React.FC = () => {
-  const { currentPath } = useApp();
+  const { currentPath, activeModal, closeModal } = useApp();
   const [isMobileNavOpen, setIsMobileNavOpen] = React.useState(false);
 
   const renderCurrentPage = () => {
@@ -128,6 +129,10 @@ const AppContent: React.FC = () => {
       <PublicServiceWizardModal />
       <AuthModal />
       <SessionTimeoutModal />
+      <ProfilePhotoModal
+        isOpen={activeModal?.type === 'profile-photo'}
+        onClose={closeModal}
+      />
       <ToastContainer />
     </div>
   );

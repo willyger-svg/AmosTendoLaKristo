@@ -16,6 +16,7 @@ import { AccountProfileSection } from '../components/account/AccountProfileSecti
 import { AccountNotificationsSection } from '../components/account/AccountNotificationsSection';
 import { AccountSavedSection } from '../components/account/AccountSavedSection';
 import { AccountSettingsSection } from '../components/account/AccountSettingsSection';
+import { ProfilePhotoModal } from '../components/common/ProfilePhotoModal';
 
 import { documentService } from '../services/documents/documentService';
 import { savedProductsService } from '../services/saved/savedProductsService';
@@ -113,15 +114,7 @@ export const CustomerAccountPage: React.FC = () => {
 
   // Sign out confirmation modal
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
-
-  // Profile Photo Upload State
-  const modalFileInputRef = useRef<HTMLInputElement>(null);
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [selectedPhotoFile, setSelectedPhotoFile] = useState<File | null>(null);
-  const [isDraggingPhoto, setIsDraggingPhoto] = useState(false);
 
   const effectiveUserId = currentUser?.uid || userProfile?.id;
   const effectiveEmail = currentUser?.email || userProfile?.email;
@@ -189,89 +182,6 @@ export const CustomerAccountPage: React.FC = () => {
       };
     }
   }, [effectiveUserId]);
-
-  // Handle Photo Selection
-  const processSelectedPhoto = (file: File) => {
-    const validation = storageService.validateFile(file);
-    if (!validation.isValid) {
-      showToast({
-        type: 'error',
-        title: 'Faili Halifai',
-        message: validation.errorSw || 'Faili halina vigezo vinavyotakiwa.'
-      });
-      return;
-    }
-    setSelectedPhotoFile(file);
-    const objectUrl = URL.createObjectURL(file);
-    setPreviewImage(objectUrl);
-  };
-
-  const handleModalPhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) processSelectedPhoto(file);
-  };
-
-  const handlePhotoDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDraggingPhoto(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) processSelectedPhoto(file);
-  };
-
-  const performPhotoUpload = async (file: File) => {
-    setIsUploadingPhoto(true);
-    setUploadProgress(10);
-    try {
-      await uploadProfilePhoto(file, progress => {
-        setUploadProgress(progress);
-      });
-      showToast({
-        type: 'success',
-        title: 'Picha Imepakiwa',
-        message: 'Picha ya wasifu imesasishwa kikamilifu!'
-      });
-      setIsPhotoModalOpen(false);
-      setSelectedPhotoFile(null);
-      setPreviewImage(null);
-    } catch (err: any) {
-      console.warn('Profile photo upload error:', err);
-      showToast({
-        type: 'error',
-        title: 'Hitilafu ya Upakiaji',
-        message: err.message || 'Haikuweza kupakia picha. Tafadhali jaribu tena.'
-      });
-    } finally {
-      setIsUploadingPhoto(false);
-      setUploadProgress(0);
-    }
-  };
-
-  const handleRemovePhoto = async () => {
-    const confirmMessage = 'Je, una uhakika unataka kuondoa picha yako ya wasifu?';
-
-    if (window.confirm && !window.confirm(confirmMessage)) return;
-
-    setIsUploadingPhoto(true);
-    try {
-      await removeProfilePhoto();
-      showToast({
-        type: 'info',
-        title: 'Picha Imeondolewa',
-        message: 'Picha ya wasifu imeondolewa kikamilifu.'
-      });
-      setIsPhotoModalOpen(false);
-      setSelectedPhotoFile(null);
-      setPreviewImage(null);
-    } catch (err: any) {
-      showToast({
-        type: 'error',
-        title: 'Hitilafu',
-        message: err.message || 'Haikuweza kuondoa picha.'
-      });
-    } finally {
-      setIsUploadingPhoto(false);
-    }
-  };
 
   const handleConfirmSignOut = async () => {
     setIsSignOutModalOpen(false);
@@ -687,188 +597,12 @@ export const CustomerAccountPage: React.FC = () => {
       {/* ========================================================== */}
       {/* 1. PROFILE PHOTO UPLOAD MODAL (Intact & Validated) */}
       {/* ========================================================== */}
-      {isPhotoModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
-          <div
-            className="bg-white dark:bg-slate-900 w-full max-w-md max-h-[90vh] flex flex-col rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden"
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 flex items-center justify-center">
-                  <Camera className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                    Picha ya Wasifu ya Mteja
-                  </h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Itahifadhiwa kwenye mfumo salama wa data
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsPhotoModalOpen(false);
-                  setSelectedPhotoFile(null);
-                  setPreviewImage(null);
-                }}
-                className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2 rounded-xl min-h-[44px] min-w-[44px] flex items-center justify-center"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Body */}
-            <div className="p-6 space-y-5 overflow-y-auto flex-1 text-xs">
-              <input
-                type="file"
-                ref={modalFileInputRef}
-                onChange={handleModalPhotoSelect}
-                accept="image/jpeg,image/png,image/webp"
-                className="hidden"
-              />
-
-              {previewImage ? (
-                <div className="space-y-3">
-                  <div className="relative w-36 h-36 mx-auto rounded-3xl overflow-hidden border-4 border-amber-400 shadow-md">
-                    <img
-                      src={previewImage}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="text-center">
-                    <p className="font-bold text-slate-800 dark:text-slate-200 truncate">
-                      {selectedPhotoFile?.name}
-                    </p>
-                    <p className="text-[11px] text-slate-400">
-                      {selectedPhotoFile ? `${(selectedPhotoFile.size / 1024 / 1024).toFixed(2)} MB` : ''}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => modalFileInputRef.current?.click()}
-                      className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:underline mt-1 inline-block py-1 min-h-[36px]"
-                    >
-                      Chagua picha tofauti
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  onDragOver={e => {
-                    e.preventDefault();
-                    setIsDraggingPhoto(true);
-                  }}
-                  onDragLeave={e => {
-                    e.preventDefault();
-                    setIsDraggingPhoto(false);
-                  }}
-                  onDrop={handlePhotoDrop}
-                  onClick={() => modalFileInputRef.current?.click()}
-                  className={`border-2 border-dashed rounded-3xl p-8 text-center cursor-pointer transition-all ${
-                    isDraggingPhoto
-                      ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/20'
-                      : 'border-slate-300 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 bg-slate-50 dark:bg-slate-800/40'
-                  }`}
-                >
-                  <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto mb-3">
-                    <UploadCloud className="w-6 h-6" />
-                  </div>
-                  <p className="font-bold text-slate-800 dark:text-slate-200">
-                    Bofya kupakia au kokota picha hapa
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                    PNG, JPG, WEBP (Upeo 5MB)
-                  </p>
-
-                  {userProfile?.avatarUrl && (
-                    <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2">
-                      <img
-                        src={userProfile.avatarUrl}
-                        alt="Current Profile"
-                        className="w-7 h-7 rounded-full object-cover border border-slate-300 dark:border-slate-600"
-                      />
-                      <span className="text-[11px] text-slate-500">
-                        Picha ya sasa inatumika
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Progress */}
-              {isUploadingPhoto && (
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    <span className="flex items-center gap-1.5">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-600" />
-                      <span>Inapakia picha kwenye mfumo...</span>
-                    </span>
-                    <span>{uploadProgress}%</span>
-                  </div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-amber-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="p-5 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
-              <div>
-                {userProfile?.avatarUrl && (
-                  <button
-                    type="button"
-                    onClick={handleRemovePhoto}
-                    disabled={isUploadingPhoto}
-                    className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 flex items-center gap-1 min-h-[44px] px-2 rounded-lg"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Ondoa Picha</span>
-                  </button>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setIsPhotoModalOpen(false);
-                    setSelectedPhotoFile(null);
-                    setPreviewImage(null);
-                  }}
-                  disabled={isUploadingPhoto}
-                  className="min-h-[44px]"
-                >
-                  Ghairi
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="primary"
-                  size="sm"
-                  onClick={() => selectedPhotoFile && performPhotoUpload(selectedPhotoFile)}
-                  disabled={!selectedPhotoFile || isUploadingPhoto}
-                  icon={isUploadingPhoto ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                  className="min-h-[44px]"
-                >
-                  {isUploadingPhoto
-                    ? 'Inapakia...'
-                    : 'Hifadhi Picha'}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 1. PROFILE PHOTO MODAL */}
+      {/* ========================================================== */}
+      <ProfilePhotoModal
+        isOpen={isPhotoModalOpen}
+        onClose={() => setIsPhotoModalOpen(false)}
+      />
 
       {/* ========================================================== */}
       {/* 2. SIGN OUT CONFIRMATION MODAL */}

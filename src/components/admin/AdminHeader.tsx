@@ -18,7 +18,8 @@ import {
   Settings,
   Shield,
   User,
-  ChevronRight
+  ChevronRight,
+  Camera
 } from 'lucide-react';
 
 interface AdminHeaderProps {
@@ -36,7 +37,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   pageTitle,
   breadcrumbs = []
 }) => {
-  const { navigateTo, refreshData, isLoadingData, showToast, orders, serviceTickets } = useApp();
+  const { navigateTo, refreshData, isLoadingData, showToast, orders, serviceTickets, openModal } = useApp();
   const { userProfile, userRole, logout } = useAuth();
   const { theme, setTheme, isDark } = useTheme();
 
@@ -272,6 +273,18 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
               {/* Menu items */}
               <div className="p-1 space-y-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    openModal({ type: 'profile-photo' });
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50/70 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/60 transition-colors"
+                >
+                  <Camera className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <span>Badili Picha ya Wasifu</span>
+                </button>
+
                 <button
                   onClick={() => {
                     navigateTo('/admin/settings');

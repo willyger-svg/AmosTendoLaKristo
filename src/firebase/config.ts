@@ -1,6 +1,11 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import {
+  initializeFirestore,
+  getFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager
+} from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import configJson from '../../firebase-applet-config.json';
 
@@ -21,9 +26,33 @@ export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getA
 // Initialize Auth
 export const auth = getAuth(app);
 
-// Initialize Firestore (with databaseId if configured)
+// Initialize Firestore with robust connection settings and offline-first cache
 const dbId = metaEnv.VITE_FIREBASE_FIRESTORE_DATABASE_ID || configJson.firestoreDatabaseId;
-export const db = dbId && dbId !== '(default)' ? getFirestore(app, dbId) : getFirestore(app);
+
+const initDb = () => {
+  const firestoreSettings = {
+    // Enable offline persistence across browser tabs
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager()
+    }),
+    // Force long polling in iframe/preview environments to avoid WebChannel streaming timeouts
+    experimentalLongPollingOptions: {
+      timeoutSeconds: 20
+    }
+  };
+
+  try {
+    if (dbId && dbId !== '(default)') {
+      return initializeFirestore(app, firestoreSettings, dbId);
+    }
+    return initializeFirestore(app, firestoreSettings);
+  } catch {
+    // If initializeFirestore fails (e.g. instance already exists), retrieve it
+    return dbId && dbId !== '(default)' ? getFirestore(app, dbId) : getFirestore(app);
+  }
+};
+
+export const db = initDb();
 
 // Initialize Storage
 export const storage = getStorage(app);
