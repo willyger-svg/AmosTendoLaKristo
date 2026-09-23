@@ -25,12 +25,14 @@ import {
   X,
   Send,
   Printer,
+  FileDown,
   Eye,
   MapPin,
   Calendar,
   MessageSquare,
   Sparkles
 } from 'lucide-react';
+import { invoicePdfService } from '../../services/pdf/invoicePdfService';
 
 export interface OrderHistoryProps {
   initialOrders?: Order[];
@@ -579,6 +581,17 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({
                       <span>{language === 'sw' ? 'Maelezo Kamili' : 'Order Details'}</span>
                     </button>
 
+                    {/* Download PDF Invoice */}
+                    <button
+                      type="button"
+                      onClick={() => invoicePdfService.downloadOrderPdf(order)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-300 dark:border-amber-700/80 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 text-amber-800 dark:text-amber-300 text-xs font-bold transition-colors min-h-[36px]"
+                      title={language === 'sw' ? 'Pakua Ankara / Risiti ya PDF' : 'Download PDF Invoice'}
+                    >
+                      <FileDown className="w-3.5 h-3.5" />
+                      <span>{language === 'sw' ? 'Pakua PDF' : 'PDF'}</span>
+                    </button>
+
                     {/* WhatsApp Inquire */}
                     <a
                       href={getOrderWhatsAppUrl(
@@ -731,15 +744,26 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 sm:p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-              >
-                <Printer className="w-4 h-4" />
-                <span>{language === 'sw' ? 'Chapisha Risiti' : 'Print'}</span>
-              </button>
+            <div className="p-4 sm:p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => invoicePdfService.downloadOrderPdf(selectedOrder)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-xs"
+                >
+                  <FileDown className="w-4 h-4" />
+                  <span>{language === 'sw' ? 'Pakua PDF (Ankara/Risiti)' : 'Download PDF Invoice'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => invoicePdfService.printOrderReceipt(selectedOrder)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>{language === 'sw' ? 'Chapisha Risiti (POS)' : 'Print POS Receipt'}</span>
+                </button>
+              </div>
 
               <button
                 type="button"

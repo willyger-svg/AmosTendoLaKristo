@@ -426,7 +426,7 @@ export interface StoreSettings {
   updatedBy?: string;
 }
 
-export type AdPlacement = 'hero_banner' | 'popup_modal' | 'sidebar' | 'footer_banner' | 'home_highlight';
+export type AdPlacement = 'hero_banner' | 'popup_modal' | 'sidebar' | 'footer_banner' | 'home_highlight' | 'shop_top';
 
 export interface Advertisement {
   id: string;

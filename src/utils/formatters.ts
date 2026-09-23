@@ -38,9 +38,11 @@ export function formatTimeAgo(isoString: string): string {
 /**
  * Format ISO date string into readable local format (e.g. 29 Aug 2026, 14:30)
  */
-export function formatDate(isoString: string): string {
+export function formatDate(dateInput: string | Date | undefined | null): string {
+  if (!dateInput) return 'N/A';
   try {
-    const date = new Date(isoString);
+    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    if (isNaN(date.getTime())) return String(dateInput);
     return date.toLocaleDateString('en-GB', {
       day: 'numeric',
       month: 'short',
@@ -49,7 +51,7 @@ export function formatDate(isoString: string): string {
       minute: '2-digit'
     });
   } catch {
-    return isoString;
+    return String(dateInput);
   }
 }
 

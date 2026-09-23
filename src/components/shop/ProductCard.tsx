@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Eye, MessageSquare, Check, Plus, Minus, Heart } from 'lucide-react';
+import { ShoppingCart, Eye, MessageSquare, Check, Plus, Minus, Heart, Package } from 'lucide-react';
 import { Product } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { formatTSh } from '../../utils/formatters';
@@ -104,13 +104,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Product Image Container */}
-      <div className="relative aspect-4/3 bg-slate-100 overflow-hidden">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
-        />
+      <div className="relative aspect-4/3 bg-slate-100 overflow-hidden flex items-center justify-center">
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 to-amber-50/50 p-4 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mb-1 shadow-2xs">
+              <Package className="w-6 h-6" />
+            </div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TK Stationery</span>
+          </div>
+        )}
 
         {/* Quick View Overlay Button */}
         <div className="absolute inset-0 bg-slate-950/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">

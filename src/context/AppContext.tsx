@@ -63,6 +63,10 @@ interface AppContextType {
   advertisements: Advertisement[];
   updateStoreSettings: (settings: Partial<StoreSettings>) => Promise<StoreSettings>;
   refreshAds: () => Promise<void>;
+  addAdvertisement: (ad: Advertisement) => void;
+  updateAdvertisement: (id: string, updates: Partial<Advertisement>) => void;
+  removeAdvertisement: (id: string) => void;
+  clearProductImage: (productId: string) => Promise<void>;
   isLoadingData: boolean;
   refreshData: () => Promise<void>;
   addProduct: (product: Product) => void;
@@ -276,16 +280,44 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const removeProductFromState = (id: string) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
+    setProducts(prev => {
+      const next = prev.filter(p => p.id !== id);
+      try {
+        localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
+
+  const clearProductImage = async (productId: string) => {
+    updateProductInState(productId, { image: '', images: [], galleryImages: [] });
+    await productService.clearProductImage(productId);
+  };
+
+  // Immediate Advertisement State Management
+  const addAdvertisement = (ad: Advertisement) => {
+    setAdvertisements(prev => {
+      const exists = prev.some(a => a.id === ad.id);
+      if (exists) return prev.map(a => a.id === ad.id ? ad : a);
+      return [ad, ...prev];
+    });
+  };
+
+  const updateAdvertisement = (id: string, updates: Partial<Advertisement>) => {
+    setAdvertisements(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
+  };
+
+  const removeAdvertisement = (id: string) => {
+    setAdvertisements(prev => prev.filter(a => a.id !== id));
   };
 
   // Synchronize settings & ads
   const refreshAds = useCallback(async () => {
     try {
       const ads = await adService.getActiveAds();
-      if (ads.length > 0) {
-        setAdvertisements(ads);
-      }
+      setAdvertisements(ads);
     } catch (e) {
       console.warn('Ads sync error:', e);
     }
@@ -307,15 +339,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       // Ads
       const ads = await adService.getActiveAds();
-      if (ads.length > 0) {
-        setAdvertisements(ads);
-      }
+      setAdvertisements(ads);
 
       // Products
       const firestoreProducts = await productService.getProducts({ includeInactive: true });
-      if (firestoreProducts.length > 0) {
-        setProducts(firestoreProducts);
-      }
+      setProducts(firestoreProducts);
 
       // Live Services & Public Portal Services & Testimonials from Firestore
       const [livePrinting, livePublic, liveTestimonials] = await Promise.all([
@@ -763,6 +791,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         advertisements,
         updateStoreSettings,
         refreshAds,
+        addAdvertisement,
+        updateAdvertisement,
+        removeAdvertisement,
+        clearProductImage,
         isLoadingData,
         refreshData,
         createOrder,

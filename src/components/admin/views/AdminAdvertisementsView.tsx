@@ -18,7 +18,7 @@ import {
 import { ImageUploadField } from '../../common/ImageUploadField';
 
 export const AdminAdvertisementsView: React.FC = () => {
-  const { advertisements, refreshAds, showToast } = useApp();
+  const { advertisements, refreshAds, addAdvertisement, updateAdvertisement, removeAdvertisement, showToast } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -87,6 +87,7 @@ export const AdminAdvertisementsView: React.FC = () => {
       };
 
       if (editingAd) {
+        updateAdvertisement(editingAd.id, payload);
         await adService.updateAd(editingAd.id, payload);
         if (currentUser) {
           await auditLogService.logAdminAction({
@@ -108,6 +109,7 @@ export const AdminAdvertisementsView: React.FC = () => {
         });
       } else {
         const created = await adService.createAd(payload);
+        addAdvertisement(created);
         if (currentUser) {
           await auditLogService.logAdminAction({
             action: 'ad_created',
@@ -124,7 +126,7 @@ export const AdminAdvertisementsView: React.FC = () => {
         showToast({
           type: 'success',
           title: 'Tangazo Jipya Limeundwa',
-          message: `${title} limechapishwa kwenye tovuti.`
+          message: `${title} limechapishwa kwenye tovuti na linaonekana kwa wateja.`
         });
       }
 
@@ -140,6 +142,7 @@ export const AdminAdvertisementsView: React.FC = () => {
   const handleToggleActive = async (ad: Advertisement) => {
     try {
       const next = !ad.isActive;
+      updateAdvertisement(ad.id, { isActive: next });
       await adService.updateAd(ad.id, { isActive: next });
       if (currentUser) {
         await auditLogService.logAdminAction({
@@ -161,8 +164,9 @@ export const AdminAdvertisementsView: React.FC = () => {
   };
 
   const handleDelete = async (ad: Advertisement) => {
-    if (!window.confirm(`Are you sure you want to delete "${ad.title}"?`)) return;
+    if (!window.confirm(`Je, una uhakika unataka kufuta tangazo "${ad.title}" kabisa bila kurudi?`)) return;
     try {
+      removeAdvertisement(ad.id);
       await adService.deleteAd(ad.id);
       if (currentUser) {
         await auditLogService.logAdminAction({
@@ -173,10 +177,11 @@ export const AdminAdvertisementsView: React.FC = () => {
           actorRole: userRole,
           targetType: 'ad',
           targetId: ad.id,
-          targetTitle: ad.title
+          targetTitle: ad.title,
+          details: {}
         });
       }
-      showToast({ type: 'success', title: 'Deleted', message: 'Ad deleted from database.' });
+      showToast({ type: 'success', title: 'Tangazo Limefutwa', message: `Tangazo limeondolewa kabisa.` });
       await refreshAds();
     } catch {
       showToast({ type: 'error', title: 'Error', message: 'Could not delete ad.' });
@@ -366,7 +371,8 @@ export const AdminAdvertisementsView: React.FC = () => {
                     className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none"
                   >
                     <option value="hero_banner">Bango Kuu la Juu (Hero Slider)</option>
-                    <option value="home_highlight">Bango la Vivutio vya Nyumbani</option>
+                    <option value="home_highlight">Bango la Vivutio vya Nyumbani (Home Highlights)</option>
+                    <option value="shop_top">Bango la Juu ya Duka (Shop Top Banner)</option>
                     <option value="popup_modal">Tangazo Linalojitokeza (Popup)</option>
                     <option value="sidebar">Bango la Pembeni (Sidebar)</option>
                   </select>

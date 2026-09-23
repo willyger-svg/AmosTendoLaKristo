@@ -21,8 +21,10 @@ import {
   MessageSquare,
   ArrowRight,
   ShieldCheck,
-  Loader2
+  Loader2,
+  FileDown
 } from 'lucide-react';
+import { invoicePdfService } from '../services/pdf/invoicePdfService';
 import { Order, ServiceTicket } from '../types';
 
 export const TrackOrderPage: React.FC = () => {
@@ -252,8 +254,27 @@ export const TrackOrderPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* WhatsApp Update Link */}
-                <div className="pt-2 flex justify-end">
+                {/* Actions: Download PDF, Print, and WhatsApp */}
+                <div className="pt-2 flex flex-wrap items-center justify-end gap-2">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => invoicePdfService.downloadOrderPdf(matchedOrder)}
+                    icon={<FileDown className="w-4 h-4" />}
+                    className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold"
+                  >
+                    Pakua Risiti (PDF)
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => invoicePdfService.printOrderReceipt(matchedOrder)}
+                    icon={<Printer className="w-4 h-4" />}
+                  >
+                    Chapisha
+                  </Button>
+
                   <Button
                     variant="whatsapp"
                     size="sm"

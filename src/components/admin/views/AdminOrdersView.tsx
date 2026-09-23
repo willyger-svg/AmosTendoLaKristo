@@ -15,9 +15,13 @@ import {
   Eye,
   ExternalLink,
   ChevronDown,
-  Filter
+  Filter,
+  FileDown,
+  Printer,
+  MessageSquare
 } from 'lucide-react';
 import { TableSkeleton } from '../../common/Skeleton';
+import { invoicePdfService } from '../../../services/pdf/invoicePdfService';
 
 export const AdminOrdersView: React.FC = () => {
   const { orders, updateOrderStatus, showToast, isLoadingData } = useApp();
@@ -210,13 +214,29 @@ export const AdminOrdersView: React.FC = () => {
                       </div>
                     </td>
                     <td className="p-4 text-right">
-                      <button
-                        onClick={() => setSelectedOrder(order)}
-                        className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                        title="Tazama Maelezo Kamili ya Oda"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => invoicePdfService.downloadOrderPdf(order)}
+                          className="p-1.5 text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 rounded-lg transition-colors"
+                          title="Pakua Ankara ya Malipo (PDF)"
+                        >
+                          <FileDown className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => invoicePdfService.printOrderReceipt(order)}
+                          className="p-1.5 text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-colors"
+                          title="Chapisha Risiti ya POS (Thermal 80mm/A4)"
+                        >
+                          <Printer className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setSelectedOrder(order)}
+                          className="p-1.5 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                          title="Tazama Maelezo Kamili ya Oda"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -309,10 +329,47 @@ export const AdminOrdersView: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+            <div className="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => invoicePdfService.downloadOrderPdf(selectedOrder)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-xs"
+                >
+                  <FileDown className="w-4 h-4" />
+                  <span>Pakua PDF (Ankara/Risiti)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => invoicePdfService.printOrderReceipt(selectedOrder)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-bold transition-colors"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Chapisha Risiti (POS)</span>
+                </button>
+
+                {selectedOrder.customerPhone && (
+                  <a
+                    href={`https://wa.me/${selectedOrder.customerPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                      `Habari ${selectedOrder.customerName}, hii ni taarifa ya oda yako #${selectedOrder.id} kutoka TK Stationery ya jumla ya TZS ${formatPrice(
+                        selectedOrder.totalAmount || selectedOrder.total || 0
+                      )}. Hali ya oda: ${selectedOrder.status}. Karibu tukuhudumie!`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-bold transition-colors"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Tuma Ujumbe WhatsApp</span>
+                  </a>
+                )}
+              </div>
+
               <button
+                type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold"
+                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors"
               >
                 Funga
               </button>

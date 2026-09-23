@@ -23,8 +23,11 @@ import {
   Banknote,
   Copy,
   Check,
-  Truck
+  Truck,
+  FileDown,
+  Printer
 } from 'lucide-react';
+import { invoicePdfService } from '../services/pdf/invoicePdfService';
 
 export const CheckoutPage: React.FC = () => {
   const { cart, cartSubtotal, createOrder, clearCart, showToast, navigateTo, storeSettings } = useApp();
@@ -324,13 +327,33 @@ export const CheckoutPage: React.FC = () => {
             </div>
 
             {/* Quick Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 justify-center pt-2 max-w-lg mx-auto">
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => invoicePdfService.downloadOrderPdf(completedOrder)}
+                className="flex-1 min-w-[200px] flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold"
+              >
+                <FileDown className="w-4 h-4" />
+                <span>Pakua Risiti (PDF)</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                size="md"
+                onClick={() => invoicePdfService.printOrderReceipt(completedOrder)}
+                className="flex items-center justify-center gap-2"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Chapisha</span>
+              </Button>
+
               <Button
                 variant="outline"
                 size="md"
                 onClick={() => navigateTo('/track-order')}
               >
-                Fuatilia Hali ya Oda
+                Fuatilia Oda
               </Button>
 
               <Button

@@ -22,13 +22,14 @@ import {
   UploadCloud,
   Sparkles,
   Layers,
-  Check
+  Check,
+  ImageOff
 } from 'lucide-react';
 import { TableSkeleton } from '../../common/Skeleton';
 import { ImageUploadField, MultiImageUploadField } from '../../common/ImageUploadField';
 
 export const AdminProductsView: React.FC = () => {
-  const { products, refreshData, showToast, addProduct, updateProductInState, removeProductFromState, isLoadingData, navigateTo } = useApp();
+  const { products, refreshData, showToast, addProduct, updateProductInState, removeProductFromState, clearProductImage, isLoadingData, navigateTo } = useApp();
   const { currentUser, userRole, userProfile } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -112,8 +113,8 @@ export const AdminProductsView: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const primaryImage = imageUrl || galleryImages[0] || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80';
-      const allImages = [primaryImage, ...galleryImages.filter(g => g !== primaryImage)];
+      const primaryImage = imageUrl.trim() || (galleryImages[0] || '');
+      const allImages = primaryImage ? [primaryImage, ...galleryImages.filter(g => g !== primaryImage)] : [];
 
       const productPayload: any = {
         name: title.trim(),
@@ -229,9 +230,42 @@ export const AdminProductsView: React.FC = () => {
     }
   };
 
+  const handleClearImage = async (product: Product) => {
+    const prodName = product.name || product.title || 'Bidhaa hii';
+    if (!window.confirm(`Je, una uhakika unataka kufuta kabisa picha ya "${prodName}" bila kuiondoa bidhaa nzima?`)) {
+      return;
+    }
+    try {
+      await clearProductImage(product.id);
+      if (currentUser) {
+        await auditLogService.logAdminAction({
+          action: 'product_updated',
+          actorId: currentUser?.uid || userProfile?.id || 'admin_master',
+          actorEmail: currentUser?.email || userProfile?.email || 'admin1010@tkstationery.co.tz',
+          actorName: userProfile?.fullName || currentUser?.displayName || 'Msimamizi',
+          actorRole: userRole,
+          targetType: 'product',
+          targetId: product.id,
+          targetTitle: prodName,
+          details: { action: 'image_cleared' },
+          severity: 'info',
+          category: 'inventory'
+        });
+      }
+      showToast({
+        type: 'success',
+        title: 'Picha Imefutwa',
+        message: `Picha ya "${prodName}" imefutwa kabisa bila kurudi tena.`
+      });
+      await refreshData();
+    } catch {
+      showToast({ type: 'error', title: 'Hitilafu', message: 'Imeshindwa kufuta picha ya bidhaa.' });
+    }
+  };
+
   const handleDeleteProduct = async (product: Product) => {
     const prodName = product.name || product.title || 'Bidhaa hii';
-    if (!window.confirm(`Je, una uhakika unataka kuiondoa bidhaa "${prodName}" kwenye duka?`)) {
+    if (!window.confirm(`Je, una uhakika unataka kuiondoa bidhaa "${prodName}" moja kwa moja na kabisa kwenye duka (bila kurudi tena)?`)) {
       return;
     }
     try {
@@ -252,8 +286,8 @@ export const AdminProductsView: React.FC = () => {
       });
       showToast({
         type: 'success',
-        title: 'Bidhaa Imeondolewa',
-        message: `"${prodName}" imeondolewa kwenye katalogi.`
+        title: 'Bidhaa Imeondolewa Moja kwa Moja',
+        message: `"${prodName}" imeondolewa kabisa bila kurudi tena.`
       });
       await refreshData();
     } catch {
@@ -439,10 +473,19 @@ export const AdminProductsView: React.FC = () => {
                           >
                             <Edit className="w-4 h-4" />
                           </button>
+                          {Boolean(p.image || (p.images && p.images.length > 0)) && (
+                            <button
+                              onClick={() => handleClearImage(p)}
+                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
+                              title="Futa Picha ya Bidhaa Hii Moja kwa Moja"
+                            >
+                              <ImageOff className="w-4 h-4" />
+                            </button>
+                          )}
                           <button
                             onClick={() => handleDeleteProduct(p)}
                             className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
-                            title="Futa Bidhaa"
+                            title="Futa Bidhaa Moja kwa Moja"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

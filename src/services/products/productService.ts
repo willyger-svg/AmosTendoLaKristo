@@ -18,6 +18,30 @@ import { Product, ProductCategory } from '../../types';
 import { initialProducts } from '../seed/initialSeedData';
 
 const PRODUCTS_COLLECTION = 'products';
+const DELETED_PRODUCTS_KEY = 'tk_deleted_product_ids_v2';
+
+export const getDeletedProductIds = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem(DELETED_PRODUCTS_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) return new Set(arr);
+    }
+  } catch {
+    // ignore
+  }
+  return new Set();
+};
+
+export const markProductIdAsDeleted = (id: string): void => {
+  try {
+    const set = getDeletedProductIds();
+    set.add(id);
+    localStorage.setItem(DELETED_PRODUCTS_KEY, JSON.stringify(Array.from(set)));
+  } catch {
+    // ignore
+  }
+};
 
 export interface ProductFilterOptions {
   category?: ProductCategory | 'All';
@@ -35,6 +59,7 @@ export const productService = {
    * Fetch products with multi-attribute filtering & sorting
    */
   async getProducts(options: ProductFilterOptions = {}): Promise<Product[]> {
+    const deletedIds = getDeletedProductIds();
     try {
       const colRef = collection(db, PRODUCTS_COLLECTION);
       let q = query(colRef);
@@ -42,14 +67,22 @@ export const productService = {
       const snapshot = await getDocs(q);
 
       if (snapshot.empty) {
-        // If collection is empty, trigger initial seed in background
+        // If collection is empty, trigger initial seed in background (excluding any deleted IDs)
         await this.seedProductsIfEmpty();
-        return this.filterLocally(initialProducts.map(p => ({ ...p, isActive: p.isActive ?? true })), options);
+        return this.filterLocally(
+          initialProducts
+            .filter(p => !deletedIds.has(p.id))
+            .map(p => ({ ...p, isActive: p.isActive ?? true })),
+          options
+        );
       }
 
       const products: Product[] = [];
       snapshot.forEach(docSnap => {
+        if (deletedIds.has(docSnap.id)) return;
         const data = docSnap.data();
+        if (data.isDeleted) return;
+
         const p: Product = {
           id: docSnap.id,
           slug: data.slug || docSnap.id,
@@ -90,7 +123,13 @@ export const productService = {
       return this.filterLocally(products, options);
     } catch (err) {
       console.warn('Error fetching products from Firestore, using baseline catalog fallback:', err);
-      return this.filterLocally(initialProducts.map(p => ({ ...p, isActive: true })), options);
+      const deletedIds = getDeletedProductIds();
+      return this.filterLocally(
+        initialProducts
+          .filter(p => !deletedIds.has(p.id))
+          .map(p => ({ ...p, isActive: true })),
+        options
+      );
     }
   },
 
@@ -274,13 +313,42 @@ export const productService = {
   },
 
   /**
-   * Admin: Permanently delete product from Firestore
+   * Admin: Permanently delete product from Firestore and prevent resurrection
    */
   async deleteProduct(id: string): Promise<void> {
+    markProductIdAsDeleted(id);
     try {
       await deleteDoc(doc(db, PRODUCTS_COLLECTION, id));
     } catch (err) {
       console.warn('Firestore deleteDoc notice on product:', err);
+    }
+
+    try {
+      // Record tombstone so any other clients or listeners also ignore this product ID
+      await setDoc(doc(db, 'deleted_records', `prod_${id}`), {
+        type: 'product',
+        targetId: id,
+        deletedAt: new Date().toISOString()
+      }, { merge: true });
+    } catch {
+      // ignore
+    }
+  },
+
+  /**
+   * Admin: Remove product image completely (leaves product with no image)
+   */
+  async clearProductImage(id: string): Promise<void> {
+    try {
+      const docRef = doc(db, PRODUCTS_COLLECTION, id);
+      await updateDoc(docRef, {
+        image: '',
+        images: [],
+        galleryImages: [],
+        updatedAt: new Date().toISOString()
+      });
+    } catch (err) {
+      console.warn('Firestore clearProductImage notice:', err);
     }
   },
 
@@ -292,15 +360,23 @@ export const productService = {
     return onSnapshot(
       colRef,
       snapshot => {
+        const deletedIds = getDeletedProductIds();
         if (snapshot.empty) {
           this.seedProductsIfEmpty();
-          callback(initialProducts.map(p => ({ ...p, isActive: p.isActive ?? true })));
+          callback(
+            initialProducts
+              .filter(p => !deletedIds.has(p.id))
+              .map(p => ({ ...p, isActive: p.isActive ?? true }))
+          );
           return;
         }
 
         const items: Product[] = [];
         snapshot.forEach(docSnap => {
+          if (deletedIds.has(docSnap.id)) return;
           const data = docSnap.data();
+          if (data.isDeleted) return;
+
           items.push({
             id: docSnap.id,
             slug: data.slug || docSnap.id,
@@ -340,7 +416,12 @@ export const productService = {
       },
       error => {
         console.warn('Realtime listener error on products:', error);
-        callback(initialProducts.map(p => ({ ...p, isActive: true })));
+        const deletedIds = getDeletedProductIds();
+        callback(
+          initialProducts
+            .filter(p => !deletedIds.has(p.id))
+            .map(p => ({ ...p, isActive: true }))
+        );
       }
     );
   },
@@ -350,9 +431,11 @@ export const productService = {
    */
   async seedProductsIfEmpty(): Promise<void> {
     try {
+      const deletedIds = getDeletedProductIds();
       const snap = await getDocs(query(collection(db, PRODUCTS_COLLECTION), limit(1)));
       if (snap.empty) {
         for (const item of initialProducts) {
+          if (deletedIds.has(item.id)) continue;
           const itemDoc = {
             ...item,
             isActive: true,
